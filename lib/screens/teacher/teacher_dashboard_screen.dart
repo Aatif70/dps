@@ -1,141 +1,235 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:dps/theme/app_theme.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class TeacherDashboardScreen extends StatelessWidget {
+class TeacherDashboardScreen extends StatefulWidget {
   const TeacherDashboardScreen({super.key});
+
+  @override
+  State<TeacherDashboardScreen> createState() => _TeacherDashboardScreenState();
+}
+
+class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
+  Future<void> _refreshPage() async {
+    setState(() {});
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // No initial animations needed
+  }
+
+  @override
+  void dispose() {
+    // No animation controllers to dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Quick action
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) => _buildQuickActionsSheet(context),
-          );
-        },
-        backgroundColor: AppTheme.secondaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      backgroundColor: const Color(0xFFF8F9FA),
+      floatingActionButton: _buildEnhancedFAB(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with welcome message and teacher photo
-              _buildHeader(context),
-              
-              const SizedBox(height: 20),
-              
-              // Today's Schedule
-              _buildTodaySchedule(context),
-              
-              const SizedBox(height: 20),
-              
-              // Class Summary
-              _buildClassSummary(context),
-              
-              const SizedBox(height: 20),
-              
-              // Feature List
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  'Features',
-                  style: Theme.of(context).textTheme.displaySmall,
+        child: RefreshIndicator(
+          onRefresh: _refreshPage,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header (no animation)
+                _buildEnhancedHeader(context),
+                const SizedBox(height: 25),
+                // Today's Schedule (no animation)
+                _buildEnhancedTodaySchedule(context),
+                const SizedBox(height: 25),
+                // Analytics Dashboard (keep animation inside graph only)
+                _buildEnhancedAnalytics(context),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Teaching Hub',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2D3748),
+                    ),
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 15),
-              
-              // Feature List
-              _buildFeaturesList(context),
-              
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+                // Feature Grid (no animation)
+                _buildEnhancedFeatureGrid(context),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildEnhancedHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: AppTheme.secondaryColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF58CC02).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${AppStrings.welcome},',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${AppStrings.welcome}! 👨‍🏫',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Dr. Rajesh Kumar',
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Mathematics & Physics',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Static Achievement Badge (no animation)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.stars_rounded,
+                            color: Color(0xFFFF9500),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Top Educator ⭐',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 5),
-              Text(
-                'Dr. Rajesh Kumar',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Mathematics & Physics',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 14,
-                ),
+              // Enhanced Avatar with Status
+              Stack(
+                children: [
+                  Hero(
+                    tag: 'teacher_avatar',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.white,
+                        child: Text(
+                          'RK',
+                          style: TextStyle(
+                            color: const Color(0xFF58CC02),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 2,
+                    right: 2,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4A90E2),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.white,
-            child: Text(
-              'RK',
-              style: TextStyle(
-                color: AppTheme.secondaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTodaySchedule(BuildContext context) {
+  Widget _buildEnhancedTodaySchedule(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Colors.grey.shade100,
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
@@ -149,51 +243,70 @@ class TeacherDashboardScreen extends StatelessWidget {
                   'Today\'s Schedule',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: const Color(0xFF2D3748),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
+                    horizontal: 12,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.secondaryColor.withOpacity(0.1),
+                    color: const Color(0xFF58CC02).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    AppStrings.today,
-                    style: TextStyle(
-                      color: AppTheme.secondaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.schedule_rounded,
+                        color: const Color(0xFF58CC02),
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        AppStrings.today,
+                        style: TextStyle(
+                          color: const Color(0xFF58CC02),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
-            _buildScheduleItem(
-              context, 
-              time: '09:00 AM', 
+            const SizedBox(height: 20),
+            _buildEnhancedScheduleItem(
+              context,
+              time: '09:00 AM',
               subject: 'Mathematics',
               classRoom: 'Class 10-A',
+              studentsCount: '32 students',
               icon: Icons.calculate_rounded,
+              color: const Color(0xFF4A90E2),
+              isNext: true,
             ),
-            const Divider(),
-            _buildScheduleItem(
-              context, 
-              time: '11:00 AM', 
+            const SizedBox(height: 16),
+            _buildEnhancedScheduleItem(
+              context,
+              time: '11:00 AM',
               subject: 'Physics',
               classRoom: 'Class 11-A',
+              studentsCount: '28 students',
               icon: Icons.science_rounded,
+              color: const Color(0xFF8E44AD),
             ),
-            const Divider(),
-            _buildScheduleItem(
-              context, 
-              time: '02:00 PM', 
+            const SizedBox(height: 16),
+            _buildEnhancedScheduleItem(
+              context,
+              time: '02:00 PM',
               subject: 'Mathematics',
               classRoom: 'Class 10-B',
+              studentsCount: '30 students',
               icon: Icons.calculate_rounded,
+              color: const Color(0xFF4A90E2),
             ),
           ],
         ),
@@ -201,106 +314,235 @@ class TeacherDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScheduleItem(
-    BuildContext context, {
-    required String time,
-    required String subject,
-    required String classRoom,
-    required IconData icon,
-  }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AppTheme.secondaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildEnhancedScheduleItem(
+      BuildContext context, {
+        required String time,
+        required String subject,
+        required String classRoom,
+        required String studentsCount,
+        required IconData icon,
+        required Color color,
+        bool isNext = false,
+      }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isNext ? color.withOpacity(0.05) : const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(16),
+        border: isNext ? Border.all(color: color.withOpacity(0.2)) : null,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color.withOpacity(0.1),
+                  color.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 24,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: AppTheme.secondaryColor,
-            size: 24,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        subject,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF2D3748),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isNext) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          'NEXT',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  classRoom,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFF718096),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  studentsCount,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF718096),
+                    fontSize: 12,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(width: 8),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                subject,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                time,
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  color: color,
+                  fontSize: 14,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                classRoom,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondaryColor,
+              if (isNext)
+                Icon(
+                  Icons.play_circle_filled_rounded,
+                  color: color,
+                  size: 16,
                 ),
-              ),
             ],
           ),
-        ),
-        Text(
-          time,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppTheme.secondaryColor,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildClassSummary(BuildContext context) {
+  Widget _buildEnhancedAnalytics(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Colors.grey.shade100,
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              'Class Summary',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+            // Progress Ring
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 0.87),
+              duration: const Duration(milliseconds: 2000),
+              builder: (context, value, child) {
+                return CircularPercentIndicator(
+                  radius: 50.0,
+                  lineWidth: 10.0,
+                  percent: value,
+                  center: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${(value * 100).toInt()}%",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Color(0xFF58CC02),
+                        ),
+                      ),
+                      const Text(
+                        "Efficiency",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF718096),
+                        ),
+                      ),
+                    ],
+                  ),
+                  progressColor: const Color(0xFF58CC02),
+                  backgroundColor: const Color(0xFFE2E8F0),
+                  circularStrokeCap: CircularStrokeCap.round,
+                  animation: true,
+                  animationDuration: 2000,
+                );
+              },
             ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  context,
-                  value: '5',
-                  label: 'Classes',
-                  color: AppTheme.secondaryColor,
-                ),
-                _buildStatItem(
-                  context,
-                  value: '95',
-                  label: 'Students',
-                  color: AppTheme.primaryColor,
-                ),
-                _buildStatItem(
-                  context,
-                  value: '23',
-                  label: 'Pending',
-                  color: AppTheme.accentColor,
-                ),
-              ],
+
+            const SizedBox(width: 25),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        ' Analytics',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: const Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.trending_up_rounded,
+                        color: Color(0xFF58CC02),
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Great progress! Your students are performing excellently.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF718096),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Mini Stats
+                  Row(
+                    children: [
+                      _buildMiniStat('Classes', '5', const Color(0xFF58CC02)),
+                      const SizedBox(width: 16),
+                      _buildMiniStat('Students', '95', const Color(0xFF4A90E2)),
+                      const SizedBox(width: 16),
+                      _buildMiniStat('Pending', '23', const Color(0xFFFF9500)),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -308,246 +550,339 @@ class TeacherDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(
-    BuildContext context, {
-    required String value,
-    required String label,
-    required Color color,
-  }) {
+  Widget _buildMiniStat(String label, String value, Color color) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           value,
           style: TextStyle(
-            fontSize: 28,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppTheme.textSecondaryColor,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Color(0xFF718096),
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFeaturesList(BuildContext context) {
-    List<Map<String, dynamic>> features = [
-      {
-        'title': AppStrings.attendance,
-        'icon': Icons.calendar_today_rounded,
-        'color': const Color(0xFF4A90E2),
-        'route': AppRoutes.teacherAttendance,
-        'description': 'Mark & view class attendance',
-      },
-      {
-        'title': AppStrings.homework,
-        'icon': Icons.assignment_rounded,
-        'color': const Color(0xFF58CC02),
-        'route': AppRoutes.teacherHomework,
-        'description': 'Create & grade assignments',
-      },
-      {
-        'title': AppStrings.leave,
-        'icon': Icons.event_busy_rounded,
-        'color': const Color(0xFF8E44AD),
-        'route': AppRoutes.teacherLeave,
-        'description': 'Manage leave requests',
-      },
-      {
-        'title': AppStrings.studyMaterial,
-        'icon': Icons.menu_book_rounded,
-        'color': const Color(0xFFE74C3C),
-        'route': AppRoutes.teacherStudyMaterial,
-        'description': 'Upload & share learning materials',
-      },
-      {
-        'title': AppStrings.allocatedSubjects,
-        'icon': Icons.school_rounded,
-        'color': const Color(0xFF2ECC71),
-        'route': AppRoutes.teacherAllocatedSubjects,
-        'description': 'View assigned subjects & classes',
-      },
+  Widget _buildEnhancedFeatureGrid(BuildContext context) {
+    final features = [
+      TeacherFeatureData(
+        title: AppStrings.attendance,
+        icon: Icons.calendar_today_rounded,
+        color: const Color(0xFF4A90E2),
+        value: '94%',
+        subtitle: 'Average',
+        route: AppRoutes.teacherAttendance,
+        description: 'Mark & view class attendance',
+      ),
+      TeacherFeatureData(
+        title: AppStrings.homework,
+        icon: Icons.assignment_rounded,
+        color: const Color(0xFF58CC02),
+        value: '15',
+        subtitle: 'Active',
+        route: AppRoutes.teacherHomework,
+        description: 'Create & grade assignments',
+      ),
+      TeacherFeatureData(
+        title: AppStrings.leave,
+        icon: Icons.event_busy_rounded,
+        color: const Color(0xFF8E44AD),
+        value: '8',
+        subtitle: 'Requests',
+        route: AppRoutes.teacherLeave,
+        description: 'Manage leave requests',
+      ),
+      TeacherFeatureData(
+        title: AppStrings.studyMaterial,
+        icon: Icons.menu_book_rounded,
+        color: const Color(0xFFE74C3C),
+        value: '67',
+        subtitle: 'Resources',
+        route: AppRoutes.teacherStudyMaterial,
+        description: 'Upload & share materials',
+      ),
+      TeacherFeatureData(
+        title: AppStrings.allocatedSubjects,
+        icon: Icons.school_rounded,
+        color: const Color(0xFF2ECC71),
+        value: '2',
+        subtitle: 'Subjects',
+        route: AppRoutes.teacherAllocatedSubjects,
+        description: 'View assigned subjects',
+      ),
     ];
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: features.length,
-      itemBuilder: (context, index) {
-        final feature = features[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, feature['route']);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: feature['color'].withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: feature['color'].withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      feature['icon'],
-                      color: feature['color'],
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          feature['title'],
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          feature['description'],
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.textSecondaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.grey,
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 0.85,
+        ),
+        itemCount: features.length,
+        itemBuilder: (context, index) {
+          return _buildEnhancedFeatureCard(
+            context,
+            features[index],
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildQuickActionsSheet(BuildContext context) {
+  Widget _buildEnhancedFeatureCard(BuildContext context, TeacherFeatureData feature) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.pushNamed(context, feature.route);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: feature.color.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon Container
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      feature.color.withOpacity(0.1),
+                      feature.color.withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  feature.icon,
+                  color: feature.color,
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Title
+              Text(
+                feature.title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2D3748),
+                ),
+              ),
+
+              const Spacer(),
+
+              // Value and Subtitle
+              Row(
+                children: [
+                  Text(
+                    feature.value,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: feature.color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      feature.subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF718096),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedFAB() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF58CC02).withOpacity(0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          showModalBottomSheet(
+            context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            builder: (context) => _buildEnhancedQuickActionsSheet(context),
+          );
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: const Icon(
+          Icons.add_rounded,
+          color: Colors.white,
+          size: 28,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedQuickActionsSheet(BuildContext context) {
+    final quickActions = [
+      QuickActionData(
+        icon: Icons.calendar_today_rounded,
+        label: 'Mark Attendance',
+        color: const Color(0xFF4A90E2),
+        route: AppRoutes.teacherAttendance,
+      ),
+      QuickActionData(
+        icon: Icons.assignment_rounded,
+        label: 'Create Assignment',
+        color: const Color(0xFF58CC02),
+        route: AppRoutes.teacherHomework,
+      ),
+      QuickActionData(
+        icon: Icons.menu_book_rounded,
+        label: 'Upload Study Material',
+        color: const Color(0xFFE74C3C),
+        route: AppRoutes.teacherStudyMaterial,
+      ),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 40,
             height: 4,
-            margin: const EdgeInsets.only(bottom: 20),
+            margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
               color: Colors.grey.shade300,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
+
           Text(
             'Quick Actions',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2D3748),
+            ),
           ),
-          const SizedBox(height: 20),
-          _buildQuickActionButton(
-            context,
-            icon: Icons.calendar_today_rounded,
-            label: 'Mark Attendance',
-            color: AppTheme.primaryColor,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, AppRoutes.teacherAttendance);
-            },
-          ),
-          const SizedBox(height: 15),
-          _buildQuickActionButton(
-            context,
-            icon: Icons.assignment_rounded,
-            label: 'Create Assignment',
-            color: AppTheme.secondaryColor,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, AppRoutes.teacherHomework);
-            },
-          ),
-          const SizedBox(height: 15),
-          _buildQuickActionButton(
-            context,
-            icon: Icons.menu_book_rounded,
-            label: 'Upload Study Material',
-            color: AppTheme.accentColor,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, AppRoutes.teacherStudyMaterial);
-            },
-          ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 24),
+
+          ...quickActions.map((action) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildEnhancedQuickActionButton(context, action),
+          )).toList(),
+
+          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  Widget _buildQuickActionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildEnhancedQuickActionButton(BuildContext context, QuickActionData action) {
     return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, action.route);
+      },
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: action.color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: action.color.withOpacity(0.1),
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                gradient: LinearGradient(
+                  colors: [
+                    action.color.withOpacity(0.1),
+                    action.color.withOpacity(0.05),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                icon,
-                color: color,
+                action.icon,
+                color: action.color,
                 size: 20,
               ),
             ),
-            const SizedBox(width: 15),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                action.label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3748),
+                ),
               ),
             ),
-            const Spacer(),
             Icon(
-              Icons.arrow_forward_ios,
-              color: color,
+              Icons.arrow_forward_ios_rounded,
+              color: action.color,
               size: 16,
             ),
           ],
@@ -555,4 +890,38 @@ class TeacherDashboardScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
+
+class TeacherFeatureData {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final String value;
+  final String subtitle;
+  final String route;
+  final String description;
+
+  const TeacherFeatureData({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.value,
+    required this.subtitle,
+    required this.route,
+    required this.description,
+  });
+}
+
+class QuickActionData {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final String route;
+
+  const QuickActionData({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.route,
+  });
+}
