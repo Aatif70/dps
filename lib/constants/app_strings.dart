@@ -7,7 +7,6 @@ class AppStrings {
   static const String splashSubtitle = "Smart Learning Hub";
   
   // Role Selection
-  static const String chooseRole = "Choose Your Role";
   static const String student = "Student";
   static const String teacher = "Teacher";
   static const String studentDescription = "Access attendance, homework, fees & more";

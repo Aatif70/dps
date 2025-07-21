@@ -134,10 +134,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                   // Animated Logo Section
                   _buildAnimatedLogo(),
 
-                  const SizedBox(height: 40),
 
-                  // Animated Header
-                  _buildAnimatedHeader(context),
 
                   const SizedBox(height: 60),
 
@@ -247,53 +244,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
           );
         },
       ),
-    );
-  }
-
-  Widget _buildAnimatedHeader(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_headerSlideAnimation, _headerOpacityAnimation]),
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _headerSlideAnimation.value),
-          child: Opacity(
-            opacity: _headerOpacityAnimation.value,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.chooseRole,
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF2D3748),
-                    fontSize: 32,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppStrings.appTagline,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: const Color(0xFF718096),
-                          height: 1.5,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      Icons.rocket_launch_rounded,
-                      color: Color(0xFFFF9500),
-                      size: 24,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
