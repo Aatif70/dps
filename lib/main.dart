@@ -4,7 +4,13 @@ import 'package:dps/constants/app_strings.dart';
 import 'package:dps/screens/auth/login_screen.dart';
 import 'package:dps/screens/role_selection_screen.dart';
 import 'package:dps/screens/splash_screen.dart';
+import 'package:dps/screens/student/attendance_screen.dart';
+import 'package:dps/screens/student/examination_screen.dart';
+import 'package:dps/screens/student/fees_screen.dart';
+import 'package:dps/screens/student/homework_screen.dart';
+import 'package:dps/screens/student/leave_screen.dart';
 import 'package:dps/screens/student/student_dashboard_screen.dart';
+import 'package:dps/screens/student/study_material_screen.dart';
 import 'package:dps/screens/teacher/teacher_dashboard_screen.dart';
 import 'package:dps/theme/app_theme.dart';
 
@@ -23,9 +29,20 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       initialRoute: AppRoutes.splash,
       routes: {
+        // Main routes
         AppRoutes.splash: (context) => const SplashScreen(),
         AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
+        
+        // Student routes
         AppRoutes.studentDashboard: (context) => const StudentDashboardScreen(),
+        AppRoutes.studentAttendance: (context) => const AttendanceScreen(),
+        AppRoutes.studentFees: (context) => const FeesScreen(),
+        AppRoutes.studentHomework: (context) => const HomeworkScreen(),
+        AppRoutes.studentLeave: (context) => const LeaveScreen(),
+        AppRoutes.studentStudyMaterial: (context) => const StudyMaterialScreen(),
+        AppRoutes.studentExamination: (context) => const ExaminationScreen(),
+        
+        // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),
       },
       onGenerateRoute: (settings) {

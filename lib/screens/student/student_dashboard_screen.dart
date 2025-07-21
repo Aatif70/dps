@@ -395,7 +395,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Excellent work! You\'re ahead of 78% of your classmates.',
+                    'Excellent work! You\'re doing great.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF718096),
                       height: 1.4,
@@ -470,7 +470,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         icon: Icons.account_balance_wallet_rounded,
         color: const Color(0xFFFF9500),
         value: '₹12,500',
-        subtitle: 'Pending',
+        subtitle: 'Left',
         route: AppRoutes.studentFees,
       ),
       FeatureData(
