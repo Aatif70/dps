@@ -1,3 +1,7 @@
+import 'package:dps/screens/teacher/allocated_subjects_screen.dart';
+import 'package:dps/screens/teacher/homework_screen.dart';
+import 'package:dps/screens/teacher/leave_screen.dart';
+import 'package:dps/screens/teacher/study_material_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
@@ -37,7 +41,6 @@ class MyApp extends StatelessWidget {
         // Student routes
         AppRoutes.studentDashboard: (context) => const StudentDashboardScreen(),
         AppRoutes.studentAttendance: (context) => const AttendanceScreen(),
-        AppRoutes.teacherAttendance: (context) => const TeacherAttendanceScreen(),
         AppRoutes.studentFees: (context) => const FeesScreen(),
         AppRoutes.studentHomework: (context) => const HomeworkScreen(),
         AppRoutes.studentLeave: (context) => const LeaveScreen(),
@@ -46,6 +49,13 @@ class MyApp extends StatelessWidget {
         
         // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),
+        AppRoutes.teacherAttendance: (context) => const TeacherAttendanceScreen(),
+        AppRoutes.teacherHomework: (context) => const TeacherHomeworkScreen(),
+        AppRoutes.teacherLeave: (context) => const TeacherLeaveScreen(),
+        AppRoutes.teacherStudyMaterial: (context) => const TeacherStudyMaterialScreen(),
+        AppRoutes.teacherAllocatedSubjects: (context) => const TeacherAllocatedSubjectsScreen(),
+
+
       },
       onGenerateRoute: (settings) {
         // Handle routes with arguments
