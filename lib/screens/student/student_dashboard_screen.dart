@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
-import 'package:dps/theme/app_theme.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'dart:math' as math;
 
 class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
