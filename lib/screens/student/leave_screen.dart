@@ -139,22 +139,22 @@ class _LeaveScreenState extends State<LeaveScreen>
       body: Column(
         children: [
 
-
-          // Enhanced Animated Leave Balance
-          AnimatedBuilder(
-            animation: _headerSlideAnimation,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, _headerSlideAnimation.value),
-                child: _buildEnhancedLeaveBalance(
-                    context,
-                    _totalLeaveDays,
-                    consumedLeaveDays,
-                    remainingLeaveDays
-                ),
-              );
-            },
-          ),
+          // COMMENTED OUT FOR NOW
+          // // Enhanced Animated Leave Balance
+          // AnimatedBuilder(
+          //   animation: _headerSlideAnimation,
+          //   builder: (context, child) {
+          //     return Transform.translate(
+          //       offset: Offset(0, _headerSlideAnimation.value),
+          //       child: _buildEnhancedLeaveBalance(
+          //           context,
+          //           _totalLeaveDays,
+          //           consumedLeaveDays,
+          //           remainingLeaveDays
+          //       ),
+          //     );
+          //   },
+          // ),
 
           // Enhanced Tab Section
           _buildEnhancedTabSection(context),
