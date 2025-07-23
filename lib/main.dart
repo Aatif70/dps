@@ -15,6 +15,7 @@ import 'package:dps/screens/student/fees_screen.dart';
 import 'package:dps/screens/student/homework_screen.dart';
 import 'package:dps/screens/student/leave_screen.dart';
 import 'package:dps/screens/student/student_dashboard_screen.dart';
+import 'package:dps/screens/student/student_profile_screen.dart';
 import 'package:dps/screens/student/study_material_screen.dart';
 import 'package:dps/screens/teacher/teacher_dashboard_screen.dart';
 import 'package:dps/theme/app_theme.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.studentLeave: (context) => const LeaveScreen(),
         AppRoutes.studentStudyMaterial: (context) => const StudyMaterialScreen(),
         AppRoutes.studentExamination: (context) => const ExaminationScreen(),
+        AppRoutes.studentProfile: (context) => const StudentProfileScreen(),
         
         // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),

@@ -13,6 +13,7 @@ class AppRoutes {
   static const String studentLeave = '/student/leave';
   static const String studentStudyMaterial = '/student/study-material';
   static const String studentExamination = '/student/examination';
+  static const String studentProfile = '/student/profile';
   
   // Teacher Routes
   static const String teacherDashboard = '/teacher/dashboard';

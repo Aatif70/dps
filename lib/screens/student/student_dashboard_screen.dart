@@ -11,87 +11,36 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _headerAnimationController;
-  late AnimationController _progressAnimationController;
-  late AnimationController _cardsAnimationController;
-  late AnimationController _streakAnimationController;
-
-  late Animation<double> _headerSlideAnimation;
-  late Animation<double> _progressScaleAnimation;
-  late Animation<double> _streakPulseAnimation;
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fadeAnimationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controllers
-    _headerAnimationController = AnimationController(
+    // Initialize animation controller for fade effect
+    _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
-    _progressAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _cardsAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-
-    _streakAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    )..repeat();
-
-    // Setup animations
-    _headerSlideAnimation = Tween<double>(
-      begin: -100.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _headerAnimationController,
-      curve: Curves.easeOutBack,
-    ));
-
-    _progressScaleAnimation = Tween<double>(
+    // Setup fade animation
+    _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _progressAnimationController,
-      curve: Curves.elasticOut,
+      parent: _fadeAnimationController,
+      curve: Curves.easeIn,
     ));
 
-    _streakPulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _streakAnimationController,
-      curve: Curves.easeInOut,
-    ));
-
-    // Start animations
-    _startAnimations();
-  }
-
-  void _startAnimations() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _headerAnimationController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 500));
-    _progressAnimationController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 300));
-    _cardsAnimationController.forward();
+    // Start animation
+    _fadeAnimationController.forward();
   }
 
   @override
   void dispose() {
-    _headerAnimationController.dispose();
-    _progressAnimationController.dispose();
-    _cardsAnimationController.dispose();
-    _streakAnimationController.dispose();
+    _fadeAnimationController.dispose();
     super.dispose();
   }
 
@@ -100,48 +49,26 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Animated Header
-              AnimatedBuilder(
-                animation: _headerSlideAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _headerSlideAnimation.value),
-                    child: _buildEnhancedHeader(context),
-                  );
-                },
-              ),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                _buildEnhancedHeader(context),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 25),
 
-              // Animated Progress Section
-              AnimatedBuilder(
-                animation: _progressScaleAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _progressScaleAnimation.value,
-                    child: _buildEnhancedProgressSection(context),
-                  );
-                },
-              ),
+                // Progress Section
+                _buildEnhancedProgressSection(context),
 
-              const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-              // Section Title with Animation
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(-1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: _cardsAnimationController,
-                    curve: const Interval(0.0, 0.1, curve: Curves.easeIn),
-                  )),
+                // Section Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     'Your Learning Hub',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -150,15 +77,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Enhanced Feature Grid with Staggered Animation
-              _buildEnhancedFeatureGrid(context),
+                // Feature Grid
+                _buildEnhancedFeatureGrid(context),
 
-              const SizedBox(height: 30),
-            ],
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
@@ -166,146 +93,143 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   }
 
   Widget _buildEnhancedHeader(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.studentProfile);
+      },
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back! 👋',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4A90E2).withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome back! 👋',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Priya Sharma',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
+                      const SizedBox(height: 8),
+                      Text(
+                        'Priya Sharma',
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    // Enhanced Streak Counter
-                    AnimatedBuilder(
-                      animation: _streakPulseAnimation,
-                      builder: (context, child) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                      // Streak Counter
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(25),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Color(0xFFFF9500),
+                              size: 18,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Transform.scale(
-                                scale: _streakPulseAnimation.value,
-                                child: const Icon(
-                                  Icons.local_fire_department_rounded,
-                                  color: Color(0xFFFF9500),
-                                  size: 18,
-                                ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '7 Day Streak! 🔥',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '7 Day Streak! 🔥',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              // Enhanced Avatar with Online Indicator
-              Stack(
-                children: [
-                  Hero(
-                    tag: 'student_avatar',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
-                      child: const CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          'PS',
-                          style: TextStyle(
-                            color: Color(0xFF4A90E2),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                    ],
+                  ),
+                ),
+
+                // Avatar with Online Indicator
+                Stack(
+                  children: [
+                    Hero(
+                      tag: 'student_avatar',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            'PS',
+                            style: TextStyle(
+                              color: Color(0xFF4A90E2),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF58CC02),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                    Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF58CC02),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -518,32 +442,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
-          return AnimatedBuilder(
-            animation: _cardsAnimationController,
-            builder: (context, child) {
-              final interval = Interval(
-                (index * 0.1).clamp(0.0, 1.0),
-                ((index * 0.1) + 0.6).clamp(0.0, 1.0),
-                curve: Curves.easeOutBack,
-              );
-
-              final scaleAnimation = Tween<double>(
-                begin: 0.0,
-                end: 1.0,
-              ).animate(CurvedAnimation(
-                parent: _cardsAnimationController,
-                curve: interval,
-              ));
-
-              return Transform.scale(
-                scale: scaleAnimation.value,
-                child: _buildEnhancedFeatureCard(
-                  context,
-                  features[index],
-                ),
-              );
-            },
-          );
+          return _buildEnhancedFeatureCard(context, features[index]);
         },
       ),
     );
@@ -552,11 +451,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   Widget _buildEnhancedFeatureCard(BuildContext context, FeatureData feature) {
     return GestureDetector(
       onTap: () {
-        // Add haptic feedback
         Navigator.pushNamed(context, feature.route);
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
