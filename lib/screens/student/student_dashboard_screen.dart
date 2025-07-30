@@ -61,10 +61,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
                 const SizedBox(height: 25),
 
-                // Progress Section
-                _buildEnhancedProgressSection(context),
-
-                const SizedBox(height: 30),
 
                 // Section Title
                 Padding(
@@ -234,113 +230,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     );
   }
 
-  Widget _buildEnhancedProgressSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(25),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade100,
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Enhanced Circular Progress
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 0.78),
-              duration: const Duration(milliseconds: 2000),
-              builder: (context, value, child) {
-                return CircularPercentIndicator(
-                  radius: 50.0,
-                  lineWidth: 10.0,
-                  percent: value,
-                  center: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "${(value * 100).toInt()}%",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Color(0xFF4A90E2),
-                        ),
-                      ),
-                      const Text(
-                        "Overall",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF718096),
-                        ),
-                      ),
-                    ],
-                  ),
-                  progressColor: const Color(0xFF4A90E2),
-                  backgroundColor: const Color(0xFFE2E8F0),
-                  circularStrokeCap: CircularStrokeCap.round,
-                  animation: true,
-                  animationDuration: 2000,
-                );
-              },
-            ),
 
-            const SizedBox(width: 25),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Academic\n'
-                            'Progress ',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: const Color(0xFF2D3748),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.trending_up_rounded,
-                        color: Color(0xFF58CC02),
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Excellent work! You\'re doing great.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF718096),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Progress Indicators
-                  Row(
-                    children: [
-                      _buildMiniProgress('Attendance', 0.85, const Color(0xFF4A90E2)),
-                      const SizedBox(width: 16),
-                      _buildMiniProgress('Assignments', 0.92, const Color(0xFF58CC02)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildMiniProgress(String label, double value, Color color) {
     return Column(
