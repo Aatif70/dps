@@ -14,6 +14,7 @@ class FeesScreen extends StatefulWidget {
 
 class _FeesScreenState extends State<FeesScreen> {
   List<PaidFeeRecord> paidFees = [];
+  List<RemainingFeeRecord> remainingFees = [];
   bool isLoading = true;
   Map<String, double> categoryTotals = {};
   Map<String, int> categoryCounts = {};
@@ -31,9 +32,17 @@ class _FeesScreenState extends State<FeesScreen> {
     });
 
     try {
-      print('Fees Screen - Calling FeeService.getPaidFees()');
-      final fees = await FeeService.getPaidFees();
-      print('Fees Screen - Received ${fees.length} fee records');
+      // Load both paid and remaining fees concurrently
+      final results = await Future.wait([
+        FeeService.getPaidFees(),
+        FeeService.getRemainingFees(),
+      ]);
+
+      final fees = results[0] as List<PaidFeeRecord>;
+      final remaining = results[1] as List<RemainingFeeRecord>;
+
+      print('Fees Screen - Received ${fees.length} paid fee records');
+      print('Fees Screen - Received ${remaining.length} remaining fee records');
 
       // Calculate category totals
       final totals = <String, double>{};
@@ -47,9 +56,6 @@ class _FeesScreenState extends State<FeesScreen> {
         final category = FeeCategory.getCategoryFromParticular(fee.particular);
         totals[category] = (totals[category] ?? 0) + fee.amount;
         counts[category] = (counts[category] ?? 0) + 1;
-
-        print('Updated totals: $totals');
-        print('Updated counts: $counts');
       }
 
       print('Final category totals: $totals');
@@ -57,6 +63,7 @@ class _FeesScreenState extends State<FeesScreen> {
 
       setState(() {
         paidFees = fees;
+        remainingFees = remaining;
         categoryTotals = totals;
         categoryCounts = counts;
         isLoading = false;
@@ -79,7 +86,6 @@ class _FeesScreenState extends State<FeesScreen> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -422,28 +428,206 @@ class _FeesScreenState extends State<FeesScreen> {
   }
 
   Widget _buildPendingFeesNotice(BuildContext context) {
+    if (remainingFees.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD4EDDA),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFC3E6CB),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF28A745).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.check_circle_outline_rounded,
+                color: Color(0xFF155724),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'All Fees Paid!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF155724),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Congratulations! You have no pending fees at the moment.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: const Color(0xFF155724).withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final totalPending = remainingFees.fold(0.0, (sum, fee) => sum + fee.balanceFee);
+    final currencyFormat = NumberFormat.currency(
+      symbol: '₹',
+      locale: 'en_IN',
+      decimalDigits: 0,
+    );
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3CD),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFFFE69C),
-          width: 1,
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade100,
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.warning_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Pending Fees',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${remainingFees.length} Fee${remainingFees.length > 1 ? 's' : ''} Due',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      currencyFormat.format(totalPending),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Total Due',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Pending fees list
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: remainingFees.length,
+            separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
+            itemBuilder: (context, index) {
+              final fee = remainingFees[index];
+              return _buildPendingFeeItem(context, fee, currencyFormat);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPendingFeeItem(BuildContext context, RemainingFeeRecord fee, NumberFormat currencyFormat) {
+    final category = FeeCategory.getCategoryFromParticular(fee.particular);
+    final categoryColor = FeeCategory.getCategoryColor(category);
+    final categoryIcon = FeeCategory.getCategoryIcon(category);
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFC107).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [
+                  categoryColor.withOpacity(0.1),
+                  categoryColor.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.info_outline_rounded,
-              color: Color(0xFF856404),
+            child: Icon(
+              categoryIcon,
+              color: categoryColor,
               size: 24,
             ),
           ),
@@ -452,24 +636,76 @@ class _FeesScreenState extends State<FeesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Pending Fees Information',
-                  style: TextStyle(
-                    fontSize: 16,
+                Text(
+                  fee.particular.trim(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF856404),
+                    fontSize: 15,
+                    color: Color(0xFF2D3748),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Currently showing payment history only. Contact office for pending fee information.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: const Color(0xFF856404).withOpacity(0.8),
+                  fee.className,
+                  style: const TextStyle(
+                    color: Color(0xFF718096),
+                    fontSize: 12,
                   ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text(
+                      'Fixed: ${currencyFormat.format(fee.fixedFee)}',
+                      style: const TextStyle(
+                        color: Color(0xFF718096),
+                        fontSize: 12,
+                      ),
+                    ),
+                    if (fee.isLate) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B6B).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'OVERDUE',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFFF6B6B),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                currencyFormat.format(fee.balanceFee),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Color(0xFFFF6B6B),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Due Amount',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),

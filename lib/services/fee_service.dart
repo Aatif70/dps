@@ -51,11 +51,132 @@ class FeeService {
     }
   }
 
+  static Future<List<RemainingFeeRecord>> getRemainingFees() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      print('=== REMAINING FEES SERVICE DEBUG START ===');
+      print('All SharedPreferences keys: ${prefs.getKeys()}');
+
+      // Safe retrieval that handles both string and int types
+      String uid = '';
+      dynamic idValue;
+
+      // Check if Uid exists and get its value regardless of type
+      if (prefs.containsKey('Uid')) {
+        final uidValue = prefs.get('Uid');
+        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        uid = uidValue.toString();
+      }
+
+      // Check if Id exists and get its value regardless of type
+      if (prefs.containsKey('Id')) {
+        idValue = prefs.get('Id');
+        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+      }
+
+      print('Remaining Fees Service - Processed Uid: $uid');
+      print('Remaining Fees Service - Id value for request: $idValue');
+
+      if (uid.isEmpty || idValue == null) {
+        print('ERROR: Uid or Id not found in SharedPreferences');
+        return [];
+      }
+
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/RemainingFees');
+      print('Remaining Fees Service - Request URL: $url');
+
+      // Create multipart request
+      var request = http.MultipartRequest('POST', url);
+      request.fields['Uid'] = uid;
+      request.fields['Id'] = idValue.toString();
+
+      print('Remaining Fees Service - Multipart fields: ${request.fields}');
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('Remaining Fees Service - Response status: ${response.statusCode}');
+      print('Remaining Fees Service - Response headers: ${response.headers}');
+      print('Remaining Fees Service - Raw response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        print('Remaining Fees Service - Parsed JSON response: $jsonResponse');
+
+        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          final List<dynamic> data = jsonResponse['data'];
+          print('Remaining Fees Service - Data array length: ${data.length}');
+
+          List<RemainingFeeRecord> feeRecords = [];
+
+          for (int i = 0; i < data.length; i++) {
+            try {
+              print('--- Processing remaining fee record $i ---');
+              final item = data[i];
+              print('Raw item data: $item');
+
+              final feeRecord = RemainingFeeRecord.fromJson(item);
+              print('Successfully parsed remaining fee record $i: ${feeRecord.particular}');
+              feeRecords.add(feeRecord);
+            } catch (e, stackTrace) {
+              print('ERROR parsing remaining fee record $i: $e');
+              print('Stack trace: $stackTrace');
+              print('Failed item data: ${data[i]}');
+            }
+          }
+
+          print('Remaining Fees Service - Successfully parsed ${feeRecords.length} out of ${data.length} records');
+          print('=== REMAINING FEES SERVICE DEBUG END ===');
+          return feeRecords;
+        } else {
+          print('API returned success: false or no data');
+          return [];
+        }
+      } else {
+        print('Failed to load remaining fees. Status code: ${response.statusCode}');
+        print('Error response body: ${response.body}');
+        return [];
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching remaining fees: $e');
+      print('Stack trace: $stackTrace');
+      return [];
+    }
+  }
+
   static Future<List<PaidFeeRecord>> _tryMultipleRequestFormats(
       Uri url,
       String uid,
       dynamic idValue
       ) async {
+    // Format 1: JSON with Id as integer
+    print('\n--- TRYING FORMAT 1: JSON with Id as integer ---');
+    try {
+      final requestBody1 = {
+        'Uid': uid,
+        'Id': idValue is int ? idValue : int.tryParse(idValue.toString()) ?? 0,
+      };
+
+      final result1 = await _makeRequest(url, requestBody1, 'application/json', isJson: true);
+      if (result1.isNotEmpty) return result1;
+    } catch (e) {
+      print('Format 1 failed: $e');
+    }
+
+    // Format 2: JSON with Id as string
+    print('\n--- TRYING FORMAT 2: JSON with Id as string ---');
+    try {
+      final requestBody2 = {
+        'Uid': uid,
+        'Id': idValue.toString(),
+      };
+
+      final result2 = await _makeRequest(url, requestBody2, 'application/json', isJson: true);
+      if (result2.isNotEmpty) return result2;
+    } catch (e) {
+      print('Format 2 failed: $e');
+    }
 
     // Format 3: Form data
     print('\n--- TRYING FORMAT 3: Form data ---');
@@ -70,8 +191,6 @@ class FeeService {
     } catch (e) {
       print('Format 3 failed: $e');
     }
-
-
 
     print('All request formats failed. Returning empty list.');
     return [];
@@ -105,38 +224,6 @@ class FeeService {
     print('Request body: $body');
 
     final response = await http.post(url, headers: headers, body: body);
-
-    return _processResponse(response);
-  }
-
-  static Future<List<PaidFeeRecord>> _makeRequestWithAuth(
-      Uri url,
-      Map<String, dynamic> data
-      ) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Try to get any potential authentication tokens
-    final token = prefs.getString('token') ?? prefs.getString('auth_token') ?? prefs.getString('access_token') ?? '';
-
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-
-    if (token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
-      print('Added Authorization header');
-    }
-
-    print('Making authenticated request');
-    print('Request headers: $headers');
-    print('Request data: $data');
-
-    final response = await http.post(
-        url,
-        headers: headers,
-        body: jsonEncode(data)
-    );
 
     return _processResponse(response);
   }
@@ -185,16 +272,6 @@ class FeeService {
         print('Error parsing JSON response: $e');
         return [];
       }
-    } else if (response.statusCode == 500) {
-      print('Server error (500). Response body: ${response.body}');
-      // Try to parse error message
-      try {
-        final errorResponse = jsonDecode(response.body);
-        print('Parsed error: $errorResponse');
-      } catch (e) {
-        print('Could not parse error response');
-      }
-      return [];
     } else {
       print('Failed to load paid fees. Status code: ${response.statusCode}');
       print('Error response body: ${response.body}');
@@ -203,7 +280,7 @@ class FeeService {
   }
 }
 
-// Keep the rest of the classes unchanged (PaidFeeRecord, FeeCategory, etc.)
+// Data model for the API response
 class PaidFeeRecord {
   final String receiptNo;
   final String particular;
@@ -259,7 +336,7 @@ class PaidFeeRecord {
   static String _safeStringExtraction(Map<String, dynamic> json, String key) {
     final value = json[key];
     if (value == null) return '';
-    return value.toString();
+    return value.toString().trim();
   }
 
   static double _safeDoubleExtraction(Map<String, dynamic> json, String key) {
@@ -311,6 +388,140 @@ class PaidFeeRecord {
   }
 }
 
+// Data model for remaining fees API response
+class RemainingFeeRecord {
+  final int feeId;
+  final int classId;
+  final int studentId;
+  final double amount;
+  final String? payMode;
+  final double fixedFee;
+  final double balanceFee;
+  final String particular;
+  final String feeType;
+  final int feesTypeId;
+  final bool isLateFee;
+  final double? lateFeeAmount;
+  final String? lastDate;
+  final bool isPerDay;
+  final bool isLate;
+  final double? lateAmount;
+  final int feeHead;
+  final String? paymentMode;
+  final String? details;
+  final String? bankName;
+  final String? chequeNo;
+  final String className;
+
+  const RemainingFeeRecord({
+    required this.feeId,
+    required this.classId,
+    required this.studentId,
+    required this.amount,
+    this.payMode,
+    required this.fixedFee,
+    required this.balanceFee,
+    required this.particular,
+    required this.feeType,
+    required this.feesTypeId,
+    required this.isLateFee,
+    this.lateFeeAmount,
+    this.lastDate,
+    required this.isPerDay,
+    required this.isLate,
+    this.lateAmount,
+    required this.feeHead,
+    this.paymentMode,
+    this.details,
+    this.bankName,
+    this.chequeNo,
+    required this.className,
+  });
+
+  factory RemainingFeeRecord.fromJson(Map<String, dynamic> json) {
+    try {
+      print('--- RemainingFeeRecord.fromJson START ---');
+      print('Input JSON: $json');
+
+      final record = RemainingFeeRecord(
+        feeId: _safeIntExtraction(json, 'FeeId'),
+        classId: _safeIntExtraction(json, 'ClassId'),
+        studentId: _safeIntExtraction(json, 'StudentId'),
+        amount: _safeDoubleExtraction(json, 'Amount'),
+        payMode: json['PayMode']?.toString(),
+        fixedFee: _safeDoubleExtraction(json, 'FixedFee'),
+        balanceFee: _safeDoubleExtraction(json, 'BalanceFee'),
+        particular: _safeStringExtraction(json, 'Particular'),
+        feeType: _safeStringExtraction(json, 'FeeType'),
+        feesTypeId: _safeIntExtraction(json, 'FeesTypeId'),
+        isLateFee: json['IsLateFee'] == true,
+        lateFeeAmount: json['LateFeeAmount'] != null ? _safeDoubleExtraction(json, 'LateFeeAmount') : null,
+        lastDate: json['LastDate']?.toString(),
+        isPerDay: json['IsPerDay'] == true,
+        isLate: json['IsLate'] == true,
+        lateAmount: json['LateAmount'] != null ? _safeDoubleExtraction(json, 'LateAmount') : null,
+        feeHead: _safeIntExtraction(json, 'FeeHead'),
+        paymentMode: json['PaymentMode']?.toString(),
+        details: json['Details']?.toString(),
+        bankName: json['BankName']?.toString(),
+        chequeNo: json['ChequeNo']?.toString(),
+        className: _safeStringExtraction(json, 'ClassName'),
+      );
+
+      print('--- RemainingFeeRecord.fromJson SUCCESS ---');
+      return record;
+    } catch (e, stackTrace) {
+      print('--- RemainingFeeRecord.fromJson ERROR ---');
+      print('Error: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  // Helper methods (same as PaidFeeRecord)
+  static String _safeStringExtraction(Map<String, dynamic> json, String key) {
+    final value = json[key];
+    if (value == null) return '';
+    return value.toString().trim();
+  }
+
+  static double _safeDoubleExtraction(Map<String, dynamic> json, String key) {
+    final value = json[key];
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      try {
+        return double.parse(value);
+      } catch (e) {
+        return 0.0;
+      }
+    }
+    return 0.0;
+  }
+
+  static int _safeIntExtraction(Map<String, dynamic> json, String key) {
+    final value = json[key];
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return 0;
+      }
+    }
+    return 0;
+  }
+
+  @override
+  String toString() {
+    return 'RemainingFeeRecord(particular: $particular, balanceFee: $balanceFee, fixedFee: $fixedFee, className: $className, isLate: $isLate)';
+  }
+}
+
+// Helper class for categorizing fees
 class FeeCategory {
   static String getCategoryFromParticular(String particular) {
     final lowerParticular = particular.toLowerCase().trim();
