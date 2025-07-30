@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
+import 'package:dps/services/fee_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
 
 class FeesScreen extends StatefulWidget {
@@ -11,126 +13,110 @@ class FeesScreen extends StatefulWidget {
 }
 
 class _FeesScreenState extends State<FeesScreen> {
-  // Enhanced mock data with more realistic structure
-  final List<FeeRecord> feeRecords = [
-    FeeRecord(
-      id: 'FEE-2023-001',
-      type: 'Tuition Fee',
-      amount: 15000,
-      dueDate: DateTime(2023, 10, 15),
-      status: PaymentStatus.paid,
-      paidOn: DateTime(2023, 10, 10),
-      receiptNo: 'RCP-2023-1024',
-      category: FeeCategory.tuition,
-    ),
-    FeeRecord(
-      id: 'FEE-2023-002',
-      type: 'Library Fee',
-      amount: 2000,
-      dueDate: DateTime(2023, 10, 15),
-      status: PaymentStatus.paid,
-      paidOn: DateTime(2023, 10, 10),
-      receiptNo: 'RCP-2023-1025',
-      category: FeeCategory.library,
-    ),
-    FeeRecord(
-      id: 'FEE-2023-003',
-      type: 'Computer Lab Fee',
-      amount: 3000,
-      dueDate: DateTime(2023, 10, 15),
-      status: PaymentStatus.paid,
-      paidOn: DateTime(2023, 10, 10),
-      receiptNo: 'RCP-2023-1026',
-      category: FeeCategory.computer,
-    ),
-    FeeRecord(
-      id: 'FEE-2023-004',
-      type: 'Sports Fee',
-      amount: 2500,
-      dueDate: DateTime(2023, 10, 15),
-      status: PaymentStatus.paid,
-      paidOn: DateTime(2023, 10, 10),
-      receiptNo: 'RCP-2023-1027',
-      category: FeeCategory.sports,
-    ),
-    FeeRecord(
-      id: 'FEE-2024-001',
-      type: 'Tuition Fee',
-      amount: 15000,
-      dueDate: DateTime(2024, 1, 15),
-      status: PaymentStatus.pending,
-      category: FeeCategory.tuition,
-    ),
-    FeeRecord(
-      id: 'FEE-2024-002',
-      type: 'Library Fee',
-      amount: 2000,
-      dueDate: DateTime(2024, 1, 15),
-      status: PaymentStatus.pending,
-      category: FeeCategory.library,
-    ),
-    FeeRecord(
-      id: 'FEE-2024-003',
-      type: 'Computer Lab Fee',
-      amount: 3000,
-      dueDate: DateTime(2024, 1, 15),
-      status: PaymentStatus.pending,
-      category: FeeCategory.computer,
-    ),
-    FeeRecord(
-      id: 'FEE-2024-004',
-      type: 'Sports Fee',
-      amount: 2500,
-      dueDate: DateTime(2024, 1, 15),
-      status: PaymentStatus.overdue,
-      category: FeeCategory.sports,
-    ),
-  ];
+  List<PaidFeeRecord> paidFees = [];
+  bool isLoading = true;
+  Map<String, double> categoryTotals = {};
+  Map<String, int> categoryCounts = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPaidFees();
+  }
+
+  Future<void> _loadPaidFees() async {
+    print('=== FEES SCREEN DEBUG START ===');
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      print('Fees Screen - Calling FeeService.getPaidFees()');
+      final fees = await FeeService.getPaidFees();
+      print('Fees Screen - Received ${fees.length} fee records');
+
+      // Calculate category totals
+      final totals = <String, double>{};
+      final counts = <String, int>{};
+
+      print('Fees Screen - Processing categories:');
+      for (int i = 0; i < fees.length; i++) {
+        final fee = fees[i];
+        print('Processing fee $i: ${fee.toString()}');
+
+        final category = FeeCategory.getCategoryFromParticular(fee.particular);
+        totals[category] = (totals[category] ?? 0) + fee.amount;
+        counts[category] = (counts[category] ?? 0) + 1;
+
+        print('Updated totals: $totals');
+        print('Updated counts: $counts');
+      }
+
+      print('Final category totals: $totals');
+      print('Final category counts: $counts');
+
+      setState(() {
+        paidFees = fees;
+        categoryTotals = totals;
+        categoryCounts = counts;
+        isLoading = false;
+      });
+
+      print('Fees Screen - State updated successfully');
+      print('=== FEES SCREEN DEBUG END ===');
+    } catch (e, stackTrace) {
+      print('Fees Screen - Error occurred: $e');
+      print('Stack trace: $stackTrace');
+
+      setState(() {
+        isLoading = false;
+      });
+      if (mounted) {
+        CustomSnackbar.showError(
+          context,
+          message: 'Failed to load fee data. Please try again.',
+        );
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final pendingFees = feeRecords.where((fee) =>
-    fee.status == PaymentStatus.pending ||
-        fee.status == PaymentStatus.overdue).toList();
-    final totalPending = pendingFees.fold<double>(0, (sum, fee) => sum + fee.amount);
-    final paidFees = feeRecords.where((fee) => fee.status == PaymentStatus.paid).toList();
-    final overdueFees = feeRecords.where((fee) => fee.status == PaymentStatus.overdue).toList();
+    final totalPaid = paidFees.fold(0.0, (sum, fee) => sum + fee.amount);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildEnhancedAppBar(context),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Enhanced Fees Summary
-            _buildEnhancedFeesSummary(context, totalPending, overdueFees.isNotEmpty),
+      body: RefreshIndicator(
+        onRefresh: _loadPaidFees,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Payment Summary
+              _buildPaymentSummary(context, totalPaid),
+              const SizedBox(height: 25),
 
-            const SizedBox(height: 25),
+              // Fee Categories Overview
+              if (categoryTotals.isNotEmpty)
+                _buildFeeCategories(context),
 
-            // Enhanced Fee Categories Overview
-            _buildEnhancedFeeCategories(context),
+              if (categoryTotals.isNotEmpty)
+                const SizedBox(height: 25),
 
-            const SizedBox(height: 25),
+              // Pending Fees Notice
+              _buildPendingFeesNotice(context),
+              const SizedBox(height: 25),
 
-            // Quick Payment Actions
-            if (pendingFees.isNotEmpty)
-              _buildQuickPaymentActions(context, pendingFees),
-
-            const SizedBox(height: 25),
-
-            // Enhanced Pending Fees
-            if (pendingFees.isNotEmpty)
-              _buildEnhancedPendingFees(context, pendingFees),
-
-            const SizedBox(height: 25),
-
-            // Enhanced Payment History
-            _buildEnhancedPaymentHistory(context, paidFees),
-
-            const SizedBox(height: 30),
-          ],
+              // Payment History
+              _buildPaymentHistory(context),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
@@ -164,25 +150,23 @@ class _FeesScreenState extends State<FeesScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFFF9500).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
-              Icons.receipt_long_rounded,
-              color: Color(0xFFFF9500),
+              Icons.refresh_rounded,
+              color: Color(0xFF58CC02),
               size: 20,
             ),
           ),
-          onPressed: () {
-            // Show all receipts
-          },
+          onPressed: _loadPaidFees,
         ),
         const SizedBox(width: 12),
       ],
     );
   }
 
-  Widget _buildEnhancedFeesSummary(BuildContext context, double totalPending, bool hasOverdue) {
+  Widget _buildPaymentSummary(BuildContext context, double totalPaid) {
     final currencyFormat = NumberFormat.currency(
       symbol: '₹',
       locale: 'en_IN',
@@ -193,18 +177,15 @@ class _FeesScreenState extends State<FeesScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: hasOverdue
-              ? [const Color(0xFFE74C3C), const Color(0xFFC0392B)]
-              : [const Color(0xFFFF9500), const Color(0xFFE67E00)],
+        gradient: const LinearGradient(
+          colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: (hasOverdue ? const Color(0xFFE74C3C) : const Color(0xFFFF9500))
-                .withOpacity(0.3),
+            color: const Color(0xFF58CC02).withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -221,14 +202,14 @@ class _FeesScreenState extends State<FeesScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          hasOverdue ? Icons.warning_rounded : Icons.account_balance_wallet_rounded,
+                        const Icon(
+                          Icons.account_balance_wallet_rounded,
                           color: Colors.white,
                           size: 24,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          hasOverdue ? 'Overdue Fees' : 'Pending Fees',
+                          'Total Paid',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 16,
@@ -239,7 +220,7 @@ class _FeesScreenState extends State<FeesScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      currencyFormat.format(totalPending),
+                      currencyFormat.format(totalPaid),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -258,7 +239,7 @@ class _FeesScreenState extends State<FeesScreen> {
                         ),
                       ),
                       child: Text(
-                        'Due: ${DateFormat('d MMM yyyy').format(DateTime(2024, 1, 15))}',
+                        '${paidFees.length} Payments',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -269,8 +250,6 @@ class _FeesScreenState extends State<FeesScreen> {
                   ],
                 ),
               ),
-
-              // Payment Status Indicator
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -281,89 +260,29 @@ class _FeesScreenState extends State<FeesScreen> {
                     width: 2,
                   ),
                 ),
-                child: Icon(
-                  hasOverdue ? Icons.schedule_rounded : Icons.payment_rounded,
+                child: const Icon(
+                  Icons.check_circle_rounded,
                   color: Colors.white,
                   size: 32,
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: 25),
-
-          // Enhanced Pay Now Button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: totalPending > 0 ? () => _showPaymentOptions(context) : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: hasOverdue ? const Color(0xFFE74C3C) : const Color(0xFFFF9500),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                disabledBackgroundColor: Colors.white.withOpacity(0.7),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.payment_rounded,
-                    size: 20,
-                    color: hasOverdue ? const Color(0xFFE74C3C) : const Color(0xFFFF9500),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    totalPending > 0 ? 'Pay Now' : 'All Paid',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: hasOverdue ? const Color(0xFFE74C3C) : const Color(0xFFFF9500),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildEnhancedFeeCategories(BuildContext context) {
-    final categories = [
-      CategoryData(
-        title: 'Tuition',
-        amount: 15000,
-        color: const Color(0xFF4A90E2),
-        icon: Icons.school_rounded,
-        category: FeeCategory.tuition,
-      ),
-      CategoryData(
-        title: 'Library',
-        amount: 2000,
-        color: const Color(0xFF58CC02),
-        icon: Icons.menu_book_rounded,
-        category: FeeCategory.library,
-      ),
-      CategoryData(
-        title: 'Computer',
-        amount: 3000,
-        color: const Color(0xFFE74C3C),
-        icon: Icons.computer_rounded,
-        category: FeeCategory.computer,
-      ),
-      CategoryData(
-        title: 'Sports',
-        amount: 2500,
-        color: const Color(0xFF8E44AD),
-        icon: Icons.sports_soccer_rounded,
-        category: FeeCategory.sports,
-      ),
-    ];
+  Widget _buildFeeCategories(BuildContext context) {
+    final categories = categoryTotals.entries.map((entry) {
+      return CategoryData(
+        title: entry.key,
+        amount: entry.value,
+        count: categoryCounts[entry.key] ?? 0,
+        color: FeeCategory.getCategoryColor(entry.key),
+        icon: FeeCategory.getCategoryIcon(entry.key),
+      );
+    }).toList();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -391,7 +310,7 @@ class _FeesScreenState extends State<FeesScreen> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Fee Categories',
+                'Payment Categories',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2D3748),
@@ -412,7 +331,7 @@ class _FeesScreenState extends State<FeesScreen> {
             ),
             itemCount: categories.length,
             itemBuilder: (context, index) {
-              return _buildEnhancedCategoryCard(categories[index]);
+              return _buildCategoryCard(categories[index]);
             },
           ),
         ],
@@ -420,7 +339,7 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildEnhancedCategoryCard(CategoryData category) {
+  Widget _buildCategoryCard(CategoryData category) {
     final currencyFormat = NumberFormat.currency(
       symbol: '₹',
       locale: 'en_IN',
@@ -447,17 +366,37 @@ class _FeesScreenState extends State<FeesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: category.color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              category.icon,
-              color: category.color,
-              size: 24,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: category.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  category.icon,
+                  color: category.color,
+                  size: 20,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: category.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${category.count}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: category.color,
+                  ),
+                ),
+              ),
+            ],
           ),
           const Spacer(),
           Text(
@@ -482,214 +421,29 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildQuickPaymentActions(BuildContext context, List<FeeRecord> pendingFees) {
+  Widget _buildPendingFeesNotice(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.flash_on_rounded,
-                color: Color(0xFFFF9500),
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Quick Actions',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2D3748),
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickActionButton(
-                  context,
-                  'Pay All',
-                  Icons.payment_rounded,
-                  const Color(0xFF58CC02),
-                      () => _payAllFees(context, pendingFees),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickActionButton(
-                  context,
-                  'Pay Partial',
-                  Icons.payments_rounded,
-                  const Color(0xFF4A90E2),
-                      () => _showPartialPayment(context, pendingFees),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton(
-      BuildContext context,
-      String label,
-      IconData icon,
-      Color color,
-      VoidCallback onPressed,
-      ) {
-    return InkWell(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onPressed();
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
-            ),
-          ],
+        color: const Color(0xFFFFF3CD),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFFE69C),
+          width: 1,
         ),
       ),
-    );
-  }
-
-  Widget _buildEnhancedPendingFees(BuildContext context, List<FeeRecord> pendingFees) {
-    final currencyFormat = NumberFormat.currency(
-      symbol: '₹',
-      locale: 'en_IN',
-      decimalDigits: 0,
-    );
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.pending_actions_rounded,
-                      color: const Color(0xFFFF9500),
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Pending Fees',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF2D3748),
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF9500).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${pendingFees.length} Items',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF9500),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: pendingFees.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
-            itemBuilder: (context, index) {
-              final fee = pendingFees[index];
-              return _buildEnhancedFeeItem(context, fee, currencyFormat);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEnhancedFeeItem(BuildContext context, FeeRecord fee, NumberFormat currencyFormat) {
-    final isOverdue = fee.status == PaymentStatus.overdue;
-    final statusColor = isOverdue ? const Color(0xFFE74C3C) : const Color(0xFFFF9500);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  _getCategoryColor(fee.category).withOpacity(0.1),
-                  _getCategoryColor(fee.category).withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xFFFFC107).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              _getCategoryIcon(fee.category),
-              color: _getCategoryColor(fee.category),
+            child: const Icon(
+              Icons.info_outline_rounded,
+              color: Color(0xFF856404),
               size: 24,
             ),
           ),
@@ -698,86 +452,77 @@ class _FeesScreenState extends State<FeesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      fee.type,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Color(0xFF2D3748),
-                      ),
-                    ),
-                    if (isOverdue) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE74C3C),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Text(
-                          'OVERDUE',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                const Text(
+                  'Pending Fees Information',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF856404),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Due: ${DateFormat('d MMM, yyyy').format(fee.dueDate)}',
+                  'Currently showing payment history only. Contact office for pending fee information.',
                   style: TextStyle(
-                    color: isOverdue ? const Color(0xFFE74C3C) : const Color(0xFF718096),
-                    fontSize: 13,
+                    fontSize: 14,
+                    color: const Color(0xFF856404).withOpacity(0.8),
                   ),
                 ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                currencyFormat.format(fee.amount),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: statusColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-              GestureDetector(
-                onTap: () => _payIndividualFee(context, fee),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Pay',
-                    style: TextStyle(
-                      color: statusColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEnhancedPaymentHistory(BuildContext context, List<FeeRecord> paidFees) {
-    if (paidFees.isEmpty) return const SizedBox();
+  Widget _buildPaymentHistory(BuildContext context) {
+    if (paidFees.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade100,
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                Icons.receipt_long_rounded,
+                size: 64,
+                color: Colors.grey.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No Payment History',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Your payment history will appear here once fees are paid.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final currencyFormat = NumberFormat.currency(
       symbol: '₹',
@@ -824,20 +569,18 @@ class _FeesScreenState extends State<FeesScreen> {
                     ),
                   ],
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    // Show all payment history
-                  },
-                  icon: const Icon(
-                    Icons.receipt_long_rounded,
-                    size: 16,
-                    color: Color(0xFF4A90E2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF58CC02).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  label: const Text(
-                    'View All',
-                    style: TextStyle(
-                      color: Color(0xFF4A90E2),
-                      fontWeight: FontWeight.w600,
+                  child: Text(
+                    '${paidFees.length} Records',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF58CC02),
                     ),
                   ),
                 ),
@@ -847,11 +590,11 @@ class _FeesScreenState extends State<FeesScreen> {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: paidFees.take(5).length,
+            itemCount: paidFees.length,
             separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
             itemBuilder: (context, index) {
               final fee = paidFees[index];
-              return _buildEnhancedPaymentHistoryItem(context, fee, currencyFormat);
+              return _buildPaymentHistoryItem(context, fee, currencyFormat);
             },
           ),
         ],
@@ -859,7 +602,11 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildEnhancedPaymentHistoryItem(BuildContext context, FeeRecord fee, NumberFormat currencyFormat) {
+  Widget _buildPaymentHistoryItem(BuildContext context, PaidFeeRecord fee, NumberFormat currencyFormat) {
+    final category = FeeCategory.getCategoryFromParticular(fee.particular);
+    final categoryColor = FeeCategory.getCategoryColor(category);
+    final categoryIcon = FeeCategory.getCategoryIcon(category);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
@@ -867,17 +614,17 @@ class _FeesScreenState extends State<FeesScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [
-                  Color(0x1A58CC02),
-                  Color(0x0D58CC02),
+                  categoryColor.withOpacity(0.1),
+                  categoryColor.withOpacity(0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.check_circle_rounded,
-              color: Color(0xFF58CC02),
+            child: Icon(
+              categoryIcon,
+              color: categoryColor,
               size: 24,
             ),
           ),
@@ -887,7 +634,7 @@ class _FeesScreenState extends State<FeesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  fee.type,
+                  fee.particular.trim(),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -896,11 +643,39 @@ class _FeesScreenState extends State<FeesScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Paid on: ${DateFormat('d MMM, yyyy').format(fee.paidOn!)}',
+                  fee.className,
                   style: const TextStyle(
                     color: Color(0xFF718096),
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      'Paid: ${DateFormat('d MMM, yyyy').format(fee.paymentDate)}',
+                      style: const TextStyle(
+                        color: Color(0xFF718096),
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _getPaymentModeColor(fee.paymentMode).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        fee.paymentMode,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: _getPaymentModeColor(fee.paymentMode),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -918,9 +693,9 @@ class _FeesScreenState extends State<FeesScreen> {
               ),
               const SizedBox(height: 4),
               GestureDetector(
-                onTap: () => _showReceipt(context, fee),
+                onTap: () => _showReceiptDetails(context, fee),
                 child: Text(
-                  fee.receiptNo!,
+                  fee.receiptNo,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF4A90E2),
@@ -936,18 +711,36 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  // Helper methods for enhanced functionality
-  void _showPaymentOptions(BuildContext context) {
+  Color _getPaymentModeColor(String paymentMode) {
+    switch (paymentMode.toLowerCase()) {
+      case 'cash':
+        return const Color(0xFF58CC02);
+      case 'online':
+        return const Color(0xFF4A90E2);
+      case 'card':
+        return const Color(0xFFE74C3C);
+      default:
+        return const Color(0xFF6C757D);
+    }
+  }
+
+  void _showReceiptDetails(BuildContext context, PaidFeeRecord fee) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => _buildPaymentOptionsSheet(context),
+      builder: (context) => _buildReceiptDetailsSheet(context, fee),
     );
   }
 
-  Widget _buildPaymentOptionsSheet(BuildContext context) {
+  Widget _buildReceiptDetailsSheet(BuildContext context, PaidFeeRecord fee) {
+    final currencyFormat = NumberFormat.currency(
+      symbol: '₹',
+      locale: 'en_IN',
+      decimalDigits: 2,
+    );
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
@@ -966,198 +759,100 @@ class _FeesScreenState extends State<FeesScreen> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          Text(
-            'Choose Payment Method',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D3748),
+          Row(
+            children: [
+              const Icon(
+                Icons.receipt_long_rounded,
+                color: Color(0xFF4A90E2),
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Receipt Details',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2D3748),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildReceiptDetailRow('Receipt No:', fee.receiptNo),
+          _buildReceiptDetailRow('Fee Type:', fee.particular.trim()),
+          _buildReceiptDetailRow('Class:', fee.className),
+          _buildReceiptDetailRow('Payment Mode:', fee.paymentMode),
+          _buildReceiptDetailRow('Amount:', currencyFormat.format(fee.amount)),
+          _buildReceiptDetailRow('Payment Date:', DateFormat('d MMMM, yyyy - h:mm a').format(fee.paymentDate)),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4A90E2),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
-
-          const SizedBox(height: 24),
-
-          _buildPaymentMethodButton(
-            context,
-            'UPI Payment',
-            Icons.account_balance_wallet_rounded,
-            const Color(0xFF4A90E2),
-                () {
-              Navigator.pop(context);
-              // Implement UPI payment
-            },
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildPaymentMethodButton(
-            context,
-            'Credit/Debit Card',
-            Icons.credit_card_rounded,
-            const Color(0xFF58CC02),
-                () {
-              Navigator.pop(context);
-              // Implement card payment
-            },
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildPaymentMethodButton(
-            context,
-            'Net Banking',
-            Icons.account_balance_rounded,
-            const Color(0xFFE74C3C),
-                () {
-              Navigator.pop(context);
-              // Implement net banking
-            },
-          ),
-
-          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentMethodButton(
-      BuildContext context,
-      String label,
-      IconData icon,
-      Color color,
-      VoidCallback onPressed,
-      ) {
-    return InkWell(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onPressed();
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withOpacity(0.1),
-            width: 1,
+  Widget _buildReceiptDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF718096),
+              ),
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3748),
-                ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF2D3748),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: color,
-              size: 16,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  void _payAllFees(BuildContext context, List<FeeRecord> fees) {
-    // Implement pay all functionality
-  }
-
-  void _showPartialPayment(BuildContext context, List<FeeRecord> fees) {
-    // Show partial payment selection
-  }
-
-  void _payIndividualFee(BuildContext context, FeeRecord fee) {
-    // Implement individual fee payment
-  }
-
-  void _showReceipt(BuildContext context, FeeRecord fee) {
-    // Show receipt details
-  }
-
-  // Helper methods for categories
-  Color _getCategoryColor(FeeCategory category) {
-    switch (category) {
-      case FeeCategory.tuition:
-        return const Color(0xFF4A90E2);
-      case FeeCategory.library:
-        return const Color(0xFF58CC02);
-      case FeeCategory.computer:
-        return const Color(0xFFE74C3C);
-      case FeeCategory.sports:
-        return const Color(0xFF8E44AD);
-    }
-  }
-
-  IconData _getCategoryIcon(FeeCategory category) {
-    switch (category) {
-      case FeeCategory.tuition:
-        return Icons.school_rounded;
-      case FeeCategory.library:
-        return Icons.menu_book_rounded;
-      case FeeCategory.computer:
-        return Icons.computer_rounded;
-      case FeeCategory.sports:
-        return Icons.sports_soccer_rounded;
-    }
-  }
 }
 
-// Enhanced data models
-enum PaymentStatus { pending, paid, overdue }
-enum FeeCategory { tuition, library, computer, sports }
-
-class FeeRecord {
-  final String id;
-  final String type;
-  final double amount;
-  final DateTime dueDate;
-  final PaymentStatus status;
-  final DateTime? paidOn;
-  final String? receiptNo;
-  final FeeCategory category;
-
-  const FeeRecord({
-    required this.id,
-    required this.type,
-    required this.amount,
-    required this.dueDate,
-    required this.status,
-    required this.category,
-    this.paidOn,
-    this.receiptNo,
-  });
-}
-
+// Helper class for category data
 class CategoryData {
   final String title;
   final double amount;
+  final int count;
   final Color color;
   final IconData icon;
-  final FeeCategory category;
 
   const CategoryData({
     required this.title,
     required this.amount,
+    required this.count,
     required this.color,
     required this.icon,
-    required this.category,
   });
 }
