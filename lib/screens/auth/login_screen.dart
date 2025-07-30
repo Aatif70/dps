@@ -3,6 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:dps/theme/app_theme.dart';
+import 'package:dps/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../widgets/custom_snackbar.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -52,25 +57,57 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState?.validate() == true) {
       setState(() {
         _isLoading = true;
       });
 
       HapticFeedback.lightImpact();
+      print('Login button pressed');
+      print('Email: ${_emailController.text}');
+      print('Password: ${_passwordController.text}');
 
-      // Simulate login
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
+      // Call API
+      bool success = await ApiService.login(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
-        // Navigate to a generic dashboard (update as needed)
-        Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
+      setState(() {
+        _isLoading = false;
       });
+
+      if (success) {
+        print('Login successful, checking role for navigation');
+
+        // Get role from SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        final role = prefs.getString('Role') ?? '';
+
+        print('User role: $role');
+
+        // Navigate based on role
+        if (role.toLowerCase() == 'admin' || role.toLowerCase() == 'teacher') {
+          print('Navigating to teacher dashboard');
+          Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
+        } else if (role.toLowerCase() == 'student') {
+          print('Navigating to student dashboard');
+          Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
+        } else {
+          print('Unknown role, defaulting to student dashboard');
+          Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
+        }
+      } else {
+        print('Login failed, show error');
+        CustomSnackbar.showError(
+          context,
+          message: 'Login failed. Please check your credentials.',
+        );
+      }
     }
   }
+
 
   Color get _primaryColor {
     return const Color(0xFF4A90E2); // Use a neutral color
@@ -124,8 +161,6 @@ class _LoginScreenState extends State<LoginScreen>
       ),
     );
   }
-
-
 
   Widget _buildHeader(BuildContext context) {
     return Column(
