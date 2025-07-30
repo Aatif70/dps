@@ -5,12 +5,7 @@ import 'package:dps/constants/app_strings.dart';
 import 'package:dps/theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
-  final String role;
-
-  const LoginScreen({
-    super.key,
-    required this.role,
-  });
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -71,31 +66,19 @@ class _LoginScreenState extends State<LoginScreen>
           _isLoading = false;
         });
 
-        // Navigate to appropriate dashboard based on role
-        if (widget.role == 'student') {
-          Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
-        } else {
-          Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
-        }
+        // Navigate to a generic dashboard (update as needed)
+        Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
       });
     }
   }
 
   Color get _primaryColor {
-    return widget.role == 'student'
-        ? const Color(0xFF4A90E2)
-        : const Color(0xFF58CC02);
+    return const Color(0xFF4A90E2); // Use a neutral color
   }
 
   LinearGradient get _backgroundGradient {
-    return widget.role == 'student'
-        ? const LinearGradient(
+    return const LinearGradient(
       colors: [Color(0xFFF8F9FA), Color(0xFFE3F2FD)],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    )
-        : const LinearGradient(
-      colors: [Color(0xFFF8F9FA), Color(0xFFE8F5E8)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
     );
@@ -103,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isStudent = widget.role == 'student';
+    // final isStudent = widget.role == 'student';
 
     return Scaffold(
       body: Container(
@@ -118,25 +101,18 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
 
-                    // Enhanced Back Button
-                    _buildBackButton(),
 
                     const SizedBox(height: 40),
 
                     // Enhanced Header Section
-                    _buildHeader(context, isStudent),
+                    _buildHeader(context),
 
                     const SizedBox(height: 50),
 
                     // Enhanced Login Form Card
                     _buildLoginFormCard(context),
 
-                    const SizedBox(height: 30),
-
-                    // Enhanced Register Section
-                    _buildRegisterSection(context),
 
                     const SizedBox(height: 20),
                   ],
@@ -149,40 +125,13 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildBackButton() {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        Navigator.pop(context);
-      },
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: 18,
-          color: const Color(0xFF2D3748),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildHeader(BuildContext context, bool isStudent) {
+
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Role Indicator
+        // App Title or Logo
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -197,13 +146,13 @@ class _LoginScreenState extends State<LoginScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                isStudent ? Icons.school_rounded : Icons.assignment_rounded,
+                Icons.login_rounded,
                 size: 16,
                 color: _primaryColor,
               ),
               const SizedBox(width: 6),
               Text(
-                '${isStudent ? AppStrings.student : AppStrings.teacher} ${AppStrings.login}',
+                AppStrings.login,
                 style: TextStyle(
                   color: _primaryColor,
                   fontSize: 13,
@@ -213,27 +162,22 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ),
-
         const SizedBox(height: 20),
-
-        // Welcome Text
         Text(
-          'Welcome back! 👋',
+          'Welcome',
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF2D3748),
-            fontSize: 32,
-          ),
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF2D3748),
+                fontSize: 32,
+              ),
         ),
-
         const SizedBox(height: 8),
-
         Text(
           'Sign in to continue your learning journey',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: const Color(0xFF718096),
-            height: 1.4,
-          ),
+                color: const Color(0xFF718096),
+                height: 1.4,
+              ),
         ),
       ],
     );
@@ -336,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     ),
                     Text(
-                      'Remember me',
+                      'Remember',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF718096),
                       ),
@@ -504,68 +448,4 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildRegisterSection(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Text(
-              AppStrings.dontHaveAccount,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF718096),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.register,
-                  arguments: widget.role,
-                );
-              },
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                backgroundColor: _primaryColor.withOpacity(0.1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    AppStrings.register,
-                    style: TextStyle(
-                      color: _primaryColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Icon(
-                    Icons.person_add_rounded,
-                    size: 16,
-                    color: _primaryColor,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     
     // Navigate to role selection screen after 3 seconds
     Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     });
   }
   

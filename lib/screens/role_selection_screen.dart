@@ -336,7 +336,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
               Navigator.pushNamed(
                 context,
                 AppRoutes.login,
-                arguments: role.route,
               );
             },
             child: Container(

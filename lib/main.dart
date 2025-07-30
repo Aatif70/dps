@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         // Main routes
         AppRoutes.splash: (context) => const SplashScreen(),
-        AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
+        // AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
         
         // Student routes
         AppRoutes.studentDashboard: (context) => const StudentDashboardScreen(),
@@ -62,9 +62,8 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         // Handle routes with arguments
         if (settings.name == AppRoutes.login) {
-          final String role = settings.arguments as String;
           return MaterialPageRoute(
-            builder: (context) => LoginScreen(role: role),
+            builder: (context) => const LoginScreen(),
           );
         }
         // Add other routes with arguments as needed
