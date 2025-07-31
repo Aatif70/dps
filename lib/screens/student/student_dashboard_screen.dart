@@ -89,6 +89,20 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 _buildEnhancedFeatureGrid(context),
 
                 const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Others',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2D3748),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                _buildEnhancedFeatureGrid2(context),
+
               ],
             ),
           ),
@@ -203,75 +217,44 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
 
 
-  Widget _buildMiniProgress(String label, double value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFF718096),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE2E8F0),
-            borderRadius: BorderRadius.circular(2),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: value,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildMiniProgress(String label, double value, Color color) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         label,
+  //         style: const TextStyle(
+  //           fontSize: 11,
+  //           color: Color(0xFF718096),
+  //           fontWeight: FontWeight.w500,
+  //         ),
+  //       ),
+  //       const SizedBox(height: 4),
+  //       Container(
+  //         width: 40,
+  //         height: 4,
+  //         decoration: BoxDecoration(
+  //           color: const Color(0xFFE2E8F0),
+  //           borderRadius: BorderRadius.circular(2),
+  //         ),
+  //         child: FractionallySizedBox(
+  //           alignment: Alignment.centerLeft,
+  //           widthFactor: value,
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               color: color,
+  //               borderRadius: BorderRadius.circular(2),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildEnhancedFeatureGrid(BuildContext context) {
     final features = [
-      FeatureData(
-        title: AppStrings.attendance,
-        icon: Icons.calendar_today_rounded,
-        color: const Color(0xFF4A90E2),
-        // value: '85%',
-        // subtitle: 'This month',
-        route: AppRoutes.studentAttendance,
-      ),
-      FeatureData(
-        title: AppStrings.fees,
-        icon: Icons.account_balance_wallet_rounded,
-        color: const Color(0xFFFF9500),
-        // value: '₹12,500',
-        // subtitle: 'Left',
-        route: AppRoutes.studentFees,
-      ),
-      FeatureData(
-        title: AppStrings.homework,
-        icon: Icons.assignment_rounded,
-        color: const Color(0xFF58CC02),
-        // value: '3',
-        // subtitle: 'Pending',
-        route: AppRoutes.studentHomework,
-      ),
-      FeatureData(
-        title: AppStrings.leave,
-        icon: Icons.event_busy_rounded,
-        color: const Color(0xFF8E44AD),
-        // value: '18',
-        // subtitle: 'Days left',
-        route: AppRoutes.studentLeave,
-      ),
+
       FeatureData(
         title: AppStrings.studyMaterial,
         icon: Icons.menu_book_rounded,
@@ -280,6 +263,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         // subtitle: 'Resources',
         route: AppRoutes.studentStudyMaterial,
       ),
+
       FeatureData(
         title: AppStrings.examination,
         icon: Icons.school_rounded,
@@ -288,6 +272,26 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         // subtitle: 'Days to go',
         route: AppRoutes.studentExamination,
       ),
+
+      FeatureData(
+        title: AppStrings.homework,
+        icon: Icons.assignment_rounded,
+        color: const Color(0xFF58CC02),
+        // value: '3',
+        // subtitle: 'Pending',
+        route: AppRoutes.studentHomework,
+      ),
+
+      FeatureData(
+        title: AppStrings.attendance,
+        icon: Icons.calendar_today_rounded,
+        color: const Color(0xFF4A90E2),
+        // value: '85%',
+        // subtitle: 'This month',
+        route: AppRoutes.studentAttendance,
+      ),
+
+
     ];
 
     return Padding(
@@ -308,6 +312,69 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       ),
     );
   }
+
+
+
+
+  Widget _buildEnhancedFeatureGrid2(BuildContext context) {
+    final features = [
+
+
+
+      FeatureData(
+        title: AppStrings.leave,
+        icon: Icons.event_busy_rounded,
+        color: const Color(0xFF8E44AD),
+        // value: '18',
+        // subtitle: 'Days left',
+        route: AppRoutes.studentLeave,
+      ),
+
+      FeatureData(
+        title: AppStrings.fees,
+        icon: Icons.account_balance_wallet_rounded,
+        color: const Color(0xFFFF9500),
+        // value: '₹12,500',
+        // subtitle: 'Left',
+        route: AppRoutes.studentFees,
+      ),
+
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 1,
+        ),
+        itemCount: features.length,
+        itemBuilder: (context, index) {
+          return _buildEnhancedFeatureCard(context, features[index]);
+        },
+      ),
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   Widget _buildEnhancedFeatureCard(BuildContext context, FeatureData feature) {
     return GestureDetector(
