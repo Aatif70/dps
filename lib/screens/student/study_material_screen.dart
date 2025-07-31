@@ -147,7 +147,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     ),
   ];
 
-  // Subject list for filtering
+  // Subject list for filteringa
   final List<String> _subjects = [
     'All',
     'Mathematics',

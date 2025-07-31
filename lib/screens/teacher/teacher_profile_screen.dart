@@ -1,30 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-
-class StudentProfileScreen extends StatefulWidget {
-  const StudentProfileScreen({Key? key}) : super(key: key);
-
-  @override
-  State<StudentProfileScreen> createState() => _StudentProfileScreenState();
-}
-
-class _StudentProfileScreenState extends State<StudentProfileScreen> {
-  String fullName = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFullName();
-  }
-
-  Future<void> _loadFullName() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      fullName = prefs.getString('FullName') ?? '';
-    });
-  }
+class TeacherProfileScreen extends StatelessWidget {
+  const TeacherProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +36,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
         title: Text(
           'My Profile',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF2D3748),
-              ),
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF2D3748),
+          ),
         ),
         centerTitle: true,
       ),
@@ -72,7 +50,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              
+
               // Profile Avatar
               Center(
                 child: Hero(
@@ -105,20 +83,20 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Student Name
               Text(
-                fullName,
+                'Priya Sharma',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2D3748),
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2D3748),
+                ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Student Class
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -142,14 +120,14 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Profile Information Section
               _buildProfileInfoSection(context),
-              
+
               const SizedBox(height: 40),
-              
+
               // Logout Button
               SizedBox(
                 width: double.infinity,
@@ -158,7 +136,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       AppRoutes.login,
-                      (route) => false,
+                          (route) => false,
                       arguments: 'student',
                     );
                   },
@@ -229,9 +207,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           Text(
             'Personal Information',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2D3748),
-                ),
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2D3748),
+            ),
           ),
           const SizedBox(height: 24),
           ...infoItems.map((item) => _buildInfoItem(context, item)),
@@ -266,17 +244,17 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                 Text(
                   item.title,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF718096),
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: const Color(0xFF718096),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item.value,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: const Color(0xFF2D3748),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: const Color(0xFF2D3748),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -297,4 +275,4 @@ class ProfileInfoItem {
     required this.title,
     required this.value,
   });
-} 
+}

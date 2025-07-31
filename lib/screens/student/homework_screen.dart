@@ -323,7 +323,6 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                     ),
                     const SizedBox(height: 12),
 
-
                   ],
                 ),
               ),
@@ -1157,7 +1156,8 @@ class _HomeworkScreenState extends State<HomeworkScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        shape: BoxShape.circle,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF58CC02).withOpacity(0.3),

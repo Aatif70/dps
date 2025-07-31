@@ -200,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 20),
         Text(
-          'Welcome',
+          'Login',
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF2D3748),

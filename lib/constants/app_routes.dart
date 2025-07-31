@@ -22,7 +22,7 @@ class AppRoutes {
   static const String teacherLeave = '/teacher/leave';
   static const String teacherStudyMaterial = '/teacher/study-material';
   static const String teacherAllocatedSubjects = '/teacher/allocated-subjects';
-
+  static const String teacherprofile = '/teacher/profile';
 
   // Admin Routes
   static const String adminDashboard = '/admin/dashboard';

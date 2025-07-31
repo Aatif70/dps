@@ -2,6 +2,7 @@ import 'package:dps/screens/teacher/allocated_subjects_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
+import 'package:dps/screens/teacher/teacher_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.teacherLeave: (context) => const TeacherLeaveScreen(),
         AppRoutes.teacherStudyMaterial: (context) => const TeacherStudyMaterialScreen(),
         AppRoutes.teacherAllocatedSubjects: (context) => const TeacherAllocatedSubjectsScreen(),
-
+      AppRoutes.teacherprofile: (context) => const TeacherProfileScreen(),
 
       },
       onGenerateRoute: (settings) {

@@ -44,12 +44,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               children: [
                 // Header (no animation)
                 _buildEnhancedHeader(context),
-                const SizedBox(height: 25),
-                // Today's Schedule (no animation)
-                _buildEnhancedTodaySchedule(context),
-                const SizedBox(height: 25),
-                // Analytics Dashboard (keep animation inside graph only)
-                _buildEnhancedAnalytics(context),
+
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -74,243 +69,152 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   }
 
   Widget _buildEnhancedHeader(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${AppStrings.welcome}! 👨‍🏫',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Dr. Rajesh Kumar',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Mathematics & Physics',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Static Achievement Badge (no animation)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.stars_rounded,
-                            color: Color(0xFFFF9500),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Top Educator ⭐',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Enhanced Avatar with Status
-              Stack(
-                children: [
-                  Hero(
-                    tag: 'teacher_avatar',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          'RK',
-                          style: TextStyle(
-                            color: const Color(0xFF58CC02),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4A90E2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+   return GestureDetector(
+     onTap: () {
+       Navigator.pushNamed(context, AppRoutes.teacherprofile);
+     },
+    child: Container(
+   margin: const EdgeInsets.all(20),
+    padding: const EdgeInsets.all(25),
+    decoration: BoxDecoration(
+    gradient: const LinearGradient(
+    colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    ),
+    borderRadius: BorderRadius.circular(25),
+    boxShadow: [
+    BoxShadow(
+    color: const Color(0xFF58CC02).withOpacity(0.3),
+    blurRadius: 20,
+    offset: const Offset(0, 10),
+    ),
+    ],
+    ),
+    child: Column(
+    children: [
+    Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+    Expanded(
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    Text(
+    '${AppStrings.welcome}! 👨‍🏫',
+    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+    color: Colors.white.withOpacity(0.9),
+    fontSize: 16,
+    ),
+    ),
+    const SizedBox(height: 8),
+    Text(
+    'Dr. Rajesh Kumar',
+    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 24,
+    ),
+    ),
+    const SizedBox(height: 4),
+    Text(
+    'Mathematics & Physics',
+    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+    color: Colors.white.withOpacity(0.8),
+    fontSize: 14,
+    ),
+    ),
+    const SizedBox(height: 12),
+    // Static Achievement Badge (no animation)
+    Container(
+    padding: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 8,
+    ),
+    decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.2),
+    borderRadius: BorderRadius.circular(25),
+    border: Border.all(
+    color: Colors.white.withOpacity(0.3),
+    width: 1,
+    ),
+    ),
+    child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    const Icon(
+    Icons.stars_rounded,
+    color: Color(0xFFFF9500),
+    size: 18,
+    ),
+    const SizedBox(width: 8),
+    const Text(
+    'Top Educator ⭐',
+    style: TextStyle(
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ],
+    ),
+    ),
+    // Enhanced Avatar with Status
+    Stack(
+    children: [
+    Hero(
+    tag: 'teacher_avatar',
+    child: Container(
+    decoration: BoxDecoration(
+    shape: BoxShape.circle,
+    border: Border.all(color: Colors.white, width: 3),
+    boxShadow: [
+    BoxShadow(
+    color: Colors.black.withOpacity(0.2),
+    blurRadius: 10,
+    offset: const Offset(0, 5),
+    ),
+    ],
+    ),
+    child: CircleAvatar(
+    radius: 35,
+    backgroundColor: Colors.white,
+    child: Text(
+    'RK',
+    style: TextStyle(
+    color: const Color(0xFF58CC02),
+    fontWeight: FontWeight.bold,
+    fontSize: 20,
+    ),
+    ),
+    ),
+    ),
+    ),
+    Positioned(
+    bottom: 2,
+    right: 2,
+    child: Container(
+    width: 16,
+    height: 16,
+    decoration: BoxDecoration(
+    color: const Color(0xFF4A90E2),
+    shape: BoxShape.circle,
+    border: Border.all(color: Colors.white, width: 2),
+    ),
+    ),
+    ),
+    ],
+    ),
+    ],
+    ),
+    ],
+    ),
+    )
+   );
 
-  Widget _buildEnhancedTodaySchedule(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(25),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade100,
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Today\'s Schedule',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF2D3748),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF58CC02).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.schedule_rounded,
-                        color: const Color(0xFF58CC02),
-                        size: 14,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        AppStrings.today,
-                        style: TextStyle(
-                          color: const Color(0xFF58CC02),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildEnhancedScheduleItem(
-              context,
-              time: '09:00 AM',
-              subject: 'Mathematics',
-              classRoom: 'Class 10-A',
-              studentsCount: '32 students',
-              icon: Icons.calculate_rounded,
-              color: const Color(0xFF4A90E2),
-              isNext: true,
-            ),
-            const SizedBox(height: 16),
-            _buildEnhancedScheduleItem(
-              context,
-              time: '11:00 AM',
-              subject: 'Physics',
-              classRoom: 'Class 11-A',
-              studentsCount: '28 students',
-              icon: Icons.science_rounded,
-              color: const Color(0xFF8E44AD),
-            ),
-            const SizedBox(height: 16),
-            _buildEnhancedScheduleItem(
-              context,
-              time: '02:00 PM',
-              subject: 'Mathematics',
-              classRoom: 'Class 10-B',
-              studentsCount: '30 students',
-              icon: Icons.calculate_rounded,
-              color: const Color(0xFF4A90E2),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _buildEnhancedScheduleItem(
@@ -440,114 +344,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     );
   }
 
-  Widget _buildEnhancedAnalytics(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(25),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade100,
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Progress Ring
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 0.87),
-              duration: const Duration(milliseconds: 2000),
-              builder: (context, value, child) {
-                return CircularPercentIndicator(
-                  radius: 50.0,
-                  lineWidth: 10.0,
-                  percent: value,
-                  center: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "${(value * 100).toInt()}%",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Color(0xFF58CC02),
-                        ),
-                      ),
-                      const Text(
-                        "Efficiency",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF718096),
-                        ),
-                      ),
-                    ],
-                  ),
-                  progressColor: const Color(0xFF58CC02),
-                  backgroundColor: const Color(0xFFE2E8F0),
-                  circularStrokeCap: CircularStrokeCap.round,
-                  animation: true,
-                  animationDuration: 2000,
-                );
-              },
-            ),
 
-            const SizedBox(width: 25),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        ' Analytics',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: const Color(0xFF2D3748),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.trending_up_rounded,
-                        color: Color(0xFF58CC02),
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Great progress! Your students are performing excellently.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF718096),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Mini Stats
-                  Row(
-                    children: [
-                      _buildMiniStat('Classes', '5', const Color(0xFF58CC02)),
-                      const SizedBox(width: 16),
-                      _buildMiniStat('Students', '95', const Color(0xFF4A90E2)),
-                      const SizedBox(width: 16),
-                      _buildMiniStat('Pending', '23', const Color(0xFFFF9500)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildMiniStat(String label, String value, Color color) {
     return Column(
