@@ -318,7 +318,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                   },
                 ),
               ),
-              const SizedBox(width: 16),
+              // const SizedBox(width: 16),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -447,11 +447,13 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                 const SizedBox(height: 16),
                 Row(
                   children: [
+                    Spacer(),
                     _buildStatItem('$totalAssignments', 'Assignments', Colors.white),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 20),
                     _buildStatItem('$uniqueSubjects', 'Subjects', Colors.white),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 45),
                     _buildStatItem('$daysWithHomework', 'Days', Colors.white),
+                    Spacer(),
                   ],
                 ),
               ],
