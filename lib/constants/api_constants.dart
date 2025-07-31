@@ -11,4 +11,8 @@ class ApiConstants {
   // LEAVE
   static const String studentLeave = '/api/User/StudentLeave';
   static const String addLeaveMobile = '/api/User/AddLeaveMobile';
+
+  // HOMEWORK
+  static const String studentHomework = '/api/User/StudentHomeWork';
+
 }
