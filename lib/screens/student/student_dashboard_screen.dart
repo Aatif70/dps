@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
@@ -14,11 +15,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
+  String _fullName = '';
 
   @override
   void initState() {
     super.initState();
-
+    _loadFullName();
     // Initialize animation controller for fade effect
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
@@ -36,6 +38,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
     // Start animation
     _fadeAnimationController.forward();
+  }
+
+  Future<void> _loadFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fullName = prefs.getString('FullName') ?? 'cant get name';
+    });
   }
 
   @override
@@ -129,7 +138,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Priya Sharma',
+                        _fullName,
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

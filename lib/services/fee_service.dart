@@ -38,7 +38,7 @@ class FeeService {
         return [];
       }
 
-      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/PaidFees');
+      final url = Uri.parse(ApiConstants.baseUrl + 'remainingfees');
       print('Fee Service - Request URL: $url');
 
       // Try multiple request formats

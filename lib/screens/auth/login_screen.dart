@@ -84,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen>
         // Get role from SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         final role = prefs.getString('Role') ?? '';
+        print('Full Name: ${prefs.getString('FullName')}');
 
         print('User role: $role');
 
