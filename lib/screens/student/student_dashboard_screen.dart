@@ -171,13 +171,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                         child: const CircleAvatar(
                           radius: 35,
                           backgroundColor: Colors.white,
-                          child: Text(
-                            'PS',
-                            style: TextStyle(
-                              color: Color(0xFF4A90E2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.blueGrey,
                           ),
                         ),
                       ),
@@ -248,48 +244,48 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         title: AppStrings.attendance,
         icon: Icons.calendar_today_rounded,
         color: const Color(0xFF4A90E2),
-        value: '85%',
-        subtitle: 'This month',
+        // value: '85%',
+        // subtitle: 'This month',
         route: AppRoutes.studentAttendance,
       ),
       FeatureData(
         title: AppStrings.fees,
         icon: Icons.account_balance_wallet_rounded,
         color: const Color(0xFFFF9500),
-        value: '₹12,500',
-        subtitle: 'Left',
+        // value: '₹12,500',
+        // subtitle: 'Left',
         route: AppRoutes.studentFees,
       ),
       FeatureData(
         title: AppStrings.homework,
         icon: Icons.assignment_rounded,
         color: const Color(0xFF58CC02),
-        value: '3',
-        subtitle: 'Pending',
+        // value: '3',
+        // subtitle: 'Pending',
         route: AppRoutes.studentHomework,
       ),
       FeatureData(
         title: AppStrings.leave,
         icon: Icons.event_busy_rounded,
         color: const Color(0xFF8E44AD),
-        value: '8',
-        subtitle: 'Days left',
+        // value: '18',
+        // subtitle: 'Days left',
         route: AppRoutes.studentLeave,
       ),
       FeatureData(
         title: AppStrings.studyMaterial,
         icon: Icons.menu_book_rounded,
         color: const Color(0xFFE74C3C),
-        value: '45',
-        subtitle: 'Resources',
+        // value: '45',
+        // subtitle: 'Resources',
         route: AppRoutes.studentStudyMaterial,
       ),
       FeatureData(
         title: AppStrings.examination,
         icon: Icons.school_rounded,
         color: const Color(0xFF2ECC71),
-        value: '5',
-        subtitle: 'Days to go',
+        // value: '5',
+        // subtitle: 'Days to go',
         route: AppRoutes.studentExamination,
       ),
     ];
@@ -301,9 +297,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.85,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 1,
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
@@ -333,7 +329,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Icon Container with Gradient
               Container(
@@ -356,7 +352,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 22),
 
               // Title
               Text(
@@ -367,31 +363,31 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 ),
               ),
 
-              const Spacer(),
+              // const Spacer(),
 
               // Value and Subtitle
-              Row(
-                children: [
-                  Text(
-                    feature.value,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: feature.color,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      feature.subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF718096),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     Text(
+              //       feature.value,
+              //       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              //         color: feature.color,
+              //         fontWeight: FontWeight.bold,
+              //         fontSize: 20,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 8),
+              //     Expanded(
+              //       child: Text(
+              //         feature.subtitle,
+              //         style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              //           color: const Color(0xFF718096),
+              //           fontSize: 12,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -404,16 +400,16 @@ class FeatureData {
   final String title;
   final IconData icon;
   final Color color;
-  final String value;
-  final String subtitle;
+  // final String value;
+  // final String subtitle;
   final String route;
 
   const FeatureData({
     required this.title,
     required this.icon,
     required this.color,
-    required this.value,
-    required this.subtitle,
+    // required this.value,
+    // required this.subtitle,
     required this.route,
   });
 }

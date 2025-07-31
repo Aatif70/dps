@@ -1004,47 +1004,52 @@ class _LeaveScreenState extends State<LeaveScreen>
 
     return StatefulBuilder(
       builder: (context, setModalState) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 24),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+        return GestureDetector(
+          onTap: () {
+            // Dismiss keyboard when tapping anywhere on the screen
+            FocusScope.of(context).unfocus();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.event_available_rounded,
-                    color: Color(0xFF8E44AD),
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Apply for Leave',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2D3748),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.event_available_rounded,
+                      color: Color(0xFF8E44AD),
+                      size: 24,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    const SizedBox(width: 12),
+                    Text(
+                      'Apply for Leave',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF2D3748),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                       // From Date
                       const Text(
                         'From Date',
@@ -1239,6 +1244,7 @@ class _LeaveScreenState extends State<LeaveScreen>
               ),
             ],
           ),
+          )
         );
       },
     );
