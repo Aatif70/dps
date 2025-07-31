@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
+import 'package:dps/services/study_material_service.dart' as study_service;
+import 'package:dps/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
+
 
 class StudyMaterialScreen extends StatefulWidget {
   const StudyMaterialScreen({super.key});
@@ -20,143 +23,13 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   String _selectedMaterialType = 'All';
   bool _showExtraNotes = false;
 
-  // Enhanced mock data for study materials
-  final List<StudyMaterial> _studyMaterials = [
-    StudyMaterial(
-      id: 'SM-2024-001',
-      title: 'Linear Equations and Inequalities',
-      description: 'Comprehensive guide to solving linear equations with step-by-step examples and practice problems',
-      subject: 'Mathematics',
-      type: MaterialType.pdf,
-      teacherName: 'Mr. Rajesh Kumar',
-      teacherAvatar: 'RK',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 2)),
-      fileSize: '3.2 MB',
-      downloadCount: 127,
-      isNew: true,
-      tags: ['algebra', 'equations', 'grade-10'],
-      difficulty: DifficultyLevel.intermediate,
-    ),
-    StudyMaterial(
-      id: 'SM-2024-002',
-      title: 'Photosynthesis Process Explained',
-      description: 'Detailed explanation of photosynthesis with diagrams, chemical equations, and real-world applications',
-      subject: 'Science',
-      type: MaterialType.video,
-      teacherName: 'Mrs. Priya Singh',
-      teacherAvatar: 'PS',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 1)),
-      fileSize: '45.8 MB',
-      duration: '12:34',
-      downloadCount: 89,
-      isNew: true,
-      tags: ['biology', 'plants', 'photosynthesis'],
-      difficulty: DifficultyLevel.beginner,
-    ),
-    StudyMaterial(
-      id: 'SM-2024-003',
-      title: 'Essay Writing Masterclass',
-      description: 'Learn the art of essay writing with structure, techniques, and examples from award-winning essays',
-      subject: 'English',
-      type: MaterialType.pdf,
-      teacherName: 'Mrs. Anjali Sharma',
-      teacherAvatar: 'AS',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 4)),
-      fileSize: '2.1 MB',
-      downloadCount: 156,
-      tags: ['writing', 'essays', 'composition'],
-      difficulty: DifficultyLevel.advanced,
-    ),
-    StudyMaterial(
-      id: 'SM-2024-004',
-      title: 'World War II Documentary',
-      description: 'Educational documentary covering key events, battles, and outcomes of World War II',
-      subject: 'History',
-      type: MaterialType.video,
-      teacherName: 'Mr. Suresh Patel',
-      teacherAvatar: 'SP',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 6)),
-      fileSize: '128.5 MB',
-      duration: '28:15',
-      downloadCount: 67,
-      tags: ['world-war', 'history', 'documentary'],
-      difficulty: DifficultyLevel.intermediate,
-    ),
-    StudyMaterial(
-      id: 'SM-2024-005',
-      title: 'Python Programming Basics',
-      description: 'Introduction to Python programming with syntax, examples, and hands-on coding exercises',
-      subject: 'Computer Science',
-      type: MaterialType.pdf,
-      teacherName: 'Ms. Riya Agarwal',
-      teacherAvatar: 'RA',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 3)),
-      fileSize: '4.7 MB',
-      downloadCount: 203,
-      isPopular: true,
-      tags: ['programming', 'python', 'coding'],
-      difficulty: DifficultyLevel.beginner,
-    ),
-    StudyMaterial(
-      id: 'SM-2024-006',
-      title: 'Geometry Theorems Audio Guide',
-      description: 'Audio explanation of important geometry theorems with proof techniques and applications',
-      subject: 'Mathematics',
-      type: MaterialType.audio,
-      teacherName: 'Mr. Rajesh Kumar',
-      teacherAvatar: 'RK',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 8)),
-      fileSize: '18.3 MB',
-      duration: '22:47',
-      downloadCount: 84,
-      tags: ['geometry', 'theorems', 'proofs'],
-      difficulty: DifficultyLevel.advanced,
-    ),
-  ];
+  // Real data from API
+  List<study_service.ApiStudyMaterialRecord> _apiMaterials = [];
+  List<study_service.StudyMaterial> _studyMaterials = [];
+  bool _isLoading = true;
 
-  // Extra notes and books
-  final List<StudyMaterial> _extraResources = [
-    StudyMaterial(
-      id: 'ER-2024-001',
-      title: 'NCERT Solutions Class 10 - Complete',
-      description: 'Complete NCERT solutions for all subjects with detailed explanations and answers',
-      subject: 'All Subjects',
-      type: MaterialType.pdf,
-      teacherName: 'School Library',
-      teacherAvatar: 'SL',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 15)),
-      fileSize: '25.6 MB',
-      downloadCount: 345,
-      isPopular: true,
-      tags: ['ncert', 'solutions', 'textbook'],
-      difficulty: DifficultyLevel.intermediate,
-    ),
-    StudyMaterial(
-      id: 'ER-2024-002',
-      title: 'Reference Book: Advanced Mathematics',
-      description: 'Additional reference material for advanced mathematics topics and competitive exam preparation',
-      subject: 'Mathematics',
-      type: MaterialType.pdf,
-      teacherName: 'School Library',
-      teacherAvatar: 'SL',
-      uploadedOn: DateTime.now().subtract(const Duration(days: 20)),
-      fileSize: '12.4 MB',
-      downloadCount: 178,
-      tags: ['reference', 'advanced', 'competitive'],
-      difficulty: DifficultyLevel.advanced,
-    ),
-  ];
-
-  // Subject list for filteringa
-  final List<String> _subjects = [
-    'All',
-    'Mathematics',
-    'Science',
-    'English',
-    'History',
-    'Computer Science',
-    'Geography',
-  ];
+  // Subject list for filtering (will be populated from API data)
+  List<String> _subjects = ['All'];
 
   // Material type filters
   final List<String> _materialTypes = [
@@ -184,10 +57,61 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       curve: Curves.easeIn,
     ));
 
-    // Start fade animation
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _fadeController.forward();
+    _loadStudyMaterials();
+  }
+
+  Future<void> _loadStudyMaterials() async {
+    print('=== STUDY MATERIAL SCREEN DEBUG START ===');
+    setState(() {
+      _isLoading = true;
     });
+
+    try {
+      print('Study Material Screen - Calling StudyMaterialService.getStudyMaterials()');
+      final apiMaterials = await study_service.StudyMaterialService.getStudyMaterials();
+      print('Study Material Screen - Received ${apiMaterials.length} study material records');
+
+      // Convert to legacy format for compatibility with existing UI
+      final studyMaterials = apiMaterials.map((material) => material.toLegacyStudyMaterial()).toList();
+      print('Study Material Screen - Converted to ${studyMaterials.length} legacy study materials');
+
+      // Extract unique subjects from API data
+      final subjects = {'All'};
+      for (var material in apiMaterials) {
+        if (material.subject.isNotEmpty) {
+          subjects.add(material.subject);
+        }
+      }
+
+      setState(() {
+        _apiMaterials = apiMaterials;
+        _studyMaterials = studyMaterials;
+        _subjects = subjects.toList();
+        _isLoading = false;
+      });
+
+      // Start fade animation after data is loaded
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _fadeController.forward();
+      });
+
+      print('Study Material Screen - State updated successfully');
+      print('=== STUDY MATERIAL SCREEN DEBUG END ===');
+    } catch (e, stackTrace) {
+      print('Study Material Screen - Error occurred: $e');
+      print('Stack trace: $stackTrace');
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        CustomSnackbar.showError(
+          context,
+          message: 'Failed to load study materials. Please try again.',
+        );
+      }
+    }
   }
 
   @override
@@ -199,34 +123,42 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        appBar: _buildEnhancedAppBar(context),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     final filteredMaterials = _getFilteredMaterials();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildEnhancedAppBar(context),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Enhanced Study Progress Header
-              _buildEnhancedStudyHeader(context),
-
-              const SizedBox(height: 20),
-
-              // Enhanced Search Bar
-              _buildEnhancedSearchBar(context),
-
-              const SizedBox(height: 20),
-
-              // Filter Tabs
-              _buildEnhancedFilterTabs(context),
-
-              const SizedBox(height: 20),
-
-              // Materials List - No longer in Expanded widget
-              _buildEnhancedMaterialsList(context, filteredMaterials),
-            ],
+      body: RefreshIndicator(
+        onRefresh: _loadStudyMaterials,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                // Enhanced Study Progress Header
+                _buildEnhancedStudyHeader(context),
+                const SizedBox(height: 20),
+                // Enhanced Search Bar
+                _buildEnhancedSearchBar(context),
+                const SizedBox(height: 20),
+                // Filter Tabs
+                _buildEnhancedFilterTabs(context),
+                const SizedBox(height: 20),
+                // Materials List
+                _buildEnhancedMaterialsList(context, filteredMaterials),
+              ],
+            ),
           ),
         ),
       ),
@@ -265,14 +197,12 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
-              Icons.filter_list_rounded,
+              Icons.refresh_rounded,
               color: Color(0xFFE74C3C),
               size: 20,
             ),
           ),
-          onPressed: () {
-            _showAdvancedFilters(context);
-          },
+          onPressed: _loadStudyMaterials,
         ),
         const SizedBox(width: 12),
       ],
@@ -333,14 +263,13 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$_totalDownloads downloads this month',
+                  'From ${_getUniqueSubjectsCount()} subjects',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 // Study Streak Badge
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -375,7 +304,6 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
               ],
             ),
           ),
-
           // Study Progress Indicator
           Container(
             padding: const EdgeInsets.all(20),
@@ -421,7 +349,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
               setState(() {});
             },
             decoration: InputDecoration(
-              hintText: 'Search materials, notes, books...',
+              hintText: 'Search materials, chapters, subjects...',
               prefixIcon: const Icon(
                 Icons.search_rounded,
                 color: Color(0xFF718096),
@@ -452,70 +380,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
               color: Color(0xFF2D3748),
             ),
           ),
-
-          // Search Type Toggle
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.tune_rounded,
-                  color: Color(0xFF718096),
-                  size: 18,
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Search in:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF718096),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                _buildSearchToggle('Materials', !_showExtraNotes),
-                const SizedBox(width: 12),
-                _buildSearchToggle('Extra Notes', _showExtraNotes),
-              ],
-            ),
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSearchToggle(String label, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _showExtraNotes = label == 'Extra Notes';
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE74C3C) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFE74C3C) : const Color(0xFFE2E8F0),
-            width: 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF718096),
-          ),
-        ),
       ),
     );
   }
@@ -523,7 +388,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   Widget _buildEnhancedFilterTabs(BuildContext context) {
     return Column(
       children: [
-        // Subject Filter - Make sure it scrolls horizontally
+        // Subject Filter
         SizedBox(
           height: 45,
           child: ListView.builder(
@@ -577,10 +442,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
             },
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Material Type Filter - Make sure it scrolls horizontally
+        // Material Type Filter
         SizedBox(
           height: 40,
           child: ListView.builder(
@@ -644,18 +507,17 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     );
   }
 
-  Widget _buildEnhancedMaterialsList(BuildContext context, List<StudyMaterial> materials) {
+  Widget _buildEnhancedMaterialsList(BuildContext context, List<study_service.StudyMaterial> materials) {
     if (materials.isEmpty) {
       return _buildEmptyState(context);
     }
 
-    // Use Column instead of ListView since we're already in a SingleChildScrollView
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: materials.map((material) {
           return AnimatedContainer(
-            duration: Duration(milliseconds: 100),
+            duration: const Duration(milliseconds: 100),
             margin: const EdgeInsets.only(bottom: 16),
             child: _buildEnhancedMaterialCard(material),
           );
@@ -664,8 +526,26 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     );
   }
 
-  Widget _buildEnhancedMaterialCard(StudyMaterial material) {
+  Widget _buildEnhancedMaterialCard(study_service.StudyMaterial material) {
     final subjectColor = _getSubjectColor(material.subject);
+
+    // Find the corresponding API record for additional details
+    final apiRecord = _apiMaterials.firstWhere(
+          (api) => api.studyMaterialId.toString() == material.id.replaceAll('SM-', ''),
+      orElse: () => study_service.ApiStudyMaterialRecord(
+        studyMaterialId: 0,
+        classMasterId: 0,
+        subjectId: 0,
+        className: '',
+        subject: material.subject,
+        empName: material.teacherName,
+        uploadType: 'File',
+        fileName: '',
+        chapter: material.title,
+        description: material.description,
+        isActive: true,
+      ),
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -719,7 +599,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                               ),
                             ),
                           ),
-                          if (material.isNew)
+                          if (apiRecord.isActive)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -727,23 +607,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Text(
-                                'NEW',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          if (material.isPopular)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF9500),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Text(
-                                'POPULAR',
+                                'ACTIVE',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -771,22 +635,24 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: _getDifficultyColor(material.difficulty).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              _getDifficultyText(material.difficulty),
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: _getDifficultyColor(material.difficulty),
+                          if (apiRecord.className.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                'Class ${apiRecord.className}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF4A90E2),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],
@@ -810,34 +676,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                     height: 1.5,
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Tags
-                if (material.tags.isNotEmpty) ...[
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: material.tags.take(3).map((tag) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4A90E2).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '#$tag',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF4A90E2),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                ],
 
                 // Teacher Info and Stats
                 Row(
@@ -868,7 +707,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                             ),
                           ),
                           Text(
-                            _getTimeAgo(material.uploadedOn),
+                            apiRecord.uploadType,
                             style: const TextStyle(
                               fontSize: 11,
                               color: Color(0xFF718096),
@@ -878,26 +717,12 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                       ),
                     ),
                     _buildStatChip(
-                      Icons.download_rounded,
-                      material.downloadCount.toString(),
-                      const Color(0xFF58CC02),
+                      Icons.insert_drive_file_rounded,
+                      apiRecord.uploadType,
+                      const Color(0xFF718096),
                     ),
-                    const SizedBox(width: 8),
-                    if (material.duration != null)
-                      _buildStatChip(
-                        Icons.play_circle_outline_rounded,
-                        material.duration!,
-                        const Color(0xFF4A90E2),
-                      )
-                    else
-                      _buildStatChip(
-                        Icons.insert_drive_file_rounded,
-                        material.fileSize,
-                        const Color(0xFF718096),
-                      ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
                 // Action Buttons
@@ -905,7 +730,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _viewMaterial(material),
+                        onPressed: () => _viewMaterial(material, apiRecord),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: subjectColor),
                           foregroundColor: subjectColor,
@@ -914,7 +739,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        icon: Icon(Icons.visibility_rounded, size: 16),
+                        icon: const Icon(Icons.visibility_rounded, size: 16),
                         label: const Text(
                           'View',
                           style: TextStyle(fontWeight: FontWeight.w600),
@@ -924,7 +749,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _downloadMaterial(material),
+                        onPressed: () => _downloadMaterial(material, apiRecord),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: subjectColor,
                           foregroundColor: Colors.white,
@@ -950,17 +775,22 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     );
   }
 
-  Widget _buildEnhancedMaterialTypeIcon(MaterialType type, Color color) {
-    IconData icon;
+  Widget _buildEnhancedMaterialTypeIcon(study_service.MaterialType type, Color color) {
+    IconData icon; // Declare the variable
+
+    // Initialize the icon based on type
     switch (type) {
-      case MaterialType.pdf:
+      case study_service.MaterialType.pdf:
         icon = Icons.picture_as_pdf_rounded;
         break;
-      case MaterialType.video:
+      case study_service.MaterialType.video:
         icon = Icons.play_circle_fill_rounded;
         break;
-      case MaterialType.audio:
+      case study_service.MaterialType.audio:
         icon = Icons.headphones_rounded;
+        break;
+      default:
+        icon = Icons.insert_drive_file_rounded; // Default fallback
         break;
     }
 
@@ -982,6 +812,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       ),
     );
   }
+
 
   Widget _buildStatChip(IconData icon, String text, Color color) {
     return Container(
@@ -1037,11 +868,9 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              _showExtraNotes
-                  ? 'Try searching in regular materials or adjust your filters'
-                  : 'Try different search terms or browse all subjects',
-              style: const TextStyle(
+            const Text(
+              'Try different search terms or browse all subjects',
+              style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF718096),
                 height: 1.5,
@@ -1055,10 +884,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   }
 
   // Helper Methods
-  List<StudyMaterial> _getFilteredMaterials() {
-    final materials = _showExtraNotes ? _extraResources : _studyMaterials;
-
-    var filtered = materials.where((material) {
+  List<study_service.StudyMaterial> _getFilteredMaterials() {
+    var filtered = _studyMaterials.where((material) {
       // Subject filter
       if (_selectedSubject != 'All' && material.subject != _selectedSubject) {
         return false;
@@ -1073,30 +900,24 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         }
       }
 
-      // Search filter
-      if (_searchController.text.isNotEmpty) {
-        final searchTerm = _searchController.text.toLowerCase();
-        return material.title.toLowerCase().contains(searchTerm) ||
-            material.description.toLowerCase().contains(searchTerm) ||
-            material.tags.any((tag) => tag.toLowerCase().contains(searchTerm));
-      }
-
       return true;
     }).toList();
-
-    // Sort by newest first
-    filtered.sort((a, b) => b.uploadedOn.compareTo(a.uploadedOn));
 
     return filtered;
   }
 
   int _getTotalMaterials() {
-    return _showExtraNotes ? _extraResources.length : _studyMaterials.length;
+    return _studyMaterials.length;
+  }
+
+  int _getUniqueSubjectsCount() {
+    return _subjects.length - 1; // Subtract 1 for 'All'
   }
 
   Color _getSubjectColor(String subject) {
     switch (subject.toLowerCase()) {
       case 'mathematics':
+      case 'maths':
         return const Color(0xFF4A90E2);
       case 'science':
         return const Color(0xFF58CC02);
@@ -1113,28 +934,6 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     }
   }
 
-  Color _getDifficultyColor(DifficultyLevel difficulty) {
-    switch (difficulty) {
-      case DifficultyLevel.beginner:
-        return const Color(0xFF58CC02);
-      case DifficultyLevel.intermediate:
-        return const Color(0xFFFF9500);
-      case DifficultyLevel.advanced:
-        return const Color(0xFFE74C3C);
-    }
-  }
-
-  String _getDifficultyText(DifficultyLevel difficulty) {
-    switch (difficulty) {
-      case DifficultyLevel.beginner:
-        return 'BEGINNER';
-      case DifficultyLevel.intermediate:
-        return 'INTERMEDIATE';
-      case DifficultyLevel.advanced:
-        return 'ADVANCED';
-    }
-  }
-
   IconData _getTypeIcon(String type) {
     switch (type.toLowerCase()) {
       case 'pdf':
@@ -1148,73 +947,26 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     }
   }
 
-  String _getTimeAgo(DateTime dateTime) {
-    final difference = DateTime.now().difference(dateTime);
-    if (difference.inDays > 8) {
-      return DateFormat('d MMM').format(dateTime);
-    } else if (difference.inDays > 1) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inDays == 1) {
-      return 'yesterday';
-    } else if (difference.inHours >= 1) {
-      return '${difference.inHours}h ago';
-    } else {
-      return 'just now';
-    }
-  }
-
   // Action Methods
-  void _viewMaterial(StudyMaterial material) {
-    // Implement view functionality
+  void _viewMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) {
     HapticFeedback.lightImpact();
+    print('Viewing material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
+    print('File path: ${apiRecord.fileName}');
+
+    CustomSnackbar.showInfo(
+      context,
+      message: 'Opening ${apiRecord.chapter}...',
+    );
   }
 
-  void _downloadMaterial(StudyMaterial material) {
-    // Implement download functionality
+  void _downloadMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) {
     HapticFeedback.lightImpact();
+    print('Downloading material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
+    print('File path: ${apiRecord.fileName}');
+
+    CustomSnackbar.showSuccess(
+      context,
+      message: 'Downloading ${apiRecord.chapter}...',
+    );
   }
-
-  void _showAdvancedFilters(BuildContext context) {
-    // Show advanced filter options
-  }
-}
-
-// Enhanced Data Models
-enum MaterialType { pdf, video, audio }
-enum DifficultyLevel { beginner, intermediate, advanced }
-
-class StudyMaterial {
-  final String id;
-  final String title;
-  final String description;
-  final String subject;
-  final MaterialType type;
-  final String teacherName;
-  final String teacherAvatar;
-  final DateTime uploadedOn;
-  final String fileSize;
-  final String? duration;
-  final int downloadCount;
-  final bool isNew;
-  final bool isPopular;
-  final List<String> tags;
-  final DifficultyLevel difficulty;
-
-  const StudyMaterial({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.subject,
-    required this.type,
-    required this.teacherName,
-    required this.teacherAvatar,
-    required this.uploadedOn,
-    required this.fileSize,
-    this.duration,
-    required this.downloadCount,
-    this.isNew = false,
-    this.isPopular = false,
-    this.tags = const [],
-    this.difficulty = DifficultyLevel.intermediate,
-  });
 }

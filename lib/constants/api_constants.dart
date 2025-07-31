@@ -15,4 +15,7 @@ class ApiConstants {
   // HOMEWORK
   static const String studentHomework = '/api/User/StudentHomeWork';
 
+  // Study Material Management
+  static const String studentStudyMaterial = '/api/OnlineExam/StudentStudyMaterial';
+
 }
