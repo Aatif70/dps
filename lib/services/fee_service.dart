@@ -38,11 +38,14 @@ class FeeService {
         return [];
       }
 
-      final url = Uri.parse(ApiConstants.baseUrl + 'remainingfees');
+      print('Calling Paid Fees API...');
+      final url = Uri.parse(ApiConstants.baseUrl + ApiConstants.paidfees);
       print('Fee Service - Request URL: $url');
 
       // Try multiple request formats
-      return await _tryMultipleRequestFormats(url, uid, idValue);
+      final result = await _tryMultipleRequestFormats(url, uid, idValue);
+      print('Paid Fees API - Result length: ${result.length}');
+      return result;
 
     } catch (e, stackTrace) {
       print('Error fetching paid fees: $e');
