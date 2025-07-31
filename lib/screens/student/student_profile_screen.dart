@@ -73,13 +73,11 @@ class StudentProfileScreen extends StatelessWidget {
                     child: const CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.white,
-                      child: Text(
-                        'PS',
-                        style: TextStyle(
-                          color: Color(0xFF4A90E2),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                        ),
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: Colors.blueGrey,
+                        size: 48,
+
                       ),
                     ),
                   ),

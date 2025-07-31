@@ -264,14 +264,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         route: AppRoutes.studentStudyMaterial,
       ),
 
-      FeatureData(
-        title: AppStrings.examination,
-        icon: Icons.school_rounded,
-        color: const Color(0xFF2ECC71),
-        // value: '5',
-        // subtitle: 'Days to go',
-        route: AppRoutes.studentExamination,
-      ),
+      // FeatureData(
+      //   title: AppStrings.examination,
+      //   icon: Icons.school_rounded,
+      //   color: const Color(0xFF2ECC71),
+      //   // value: '5',
+      //   // subtitle: 'Days to go',
+      //   route: AppRoutes.studentExamination,
+      // ),
 
       FeatureData(
         title: AppStrings.homework,
@@ -282,14 +282,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         route: AppRoutes.studentHomework,
       ),
 
-      FeatureData(
-        title: AppStrings.attendance,
-        icon: Icons.calendar_today_rounded,
-        color: const Color(0xFF4A90E2),
-        // value: '85%',
-        // subtitle: 'This month',
-        route: AppRoutes.studentAttendance,
-      ),
+      // FeatureData(
+      //   title: AppStrings.attendance,
+      //   icon: Icons.calendar_today_rounded,
+      //   color: const Color(0xFF4A90E2),
+      //   // value: '85%',
+      //   // subtitle: 'This month',
+      //   route: AppRoutes.studentAttendance,
+      // ),
 
 
     ];
