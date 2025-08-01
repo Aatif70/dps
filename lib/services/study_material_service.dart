@@ -88,6 +88,145 @@ class StudyMaterialService {
       return [];
     }
   }
+
+  // Method to construct full file URL for viewing
+  static String getFileUrl(String fileName) {
+    if (fileName.isEmpty) return '';
+
+    // Remove leading slash if present to avoid double slashes
+    String cleanFileName = fileName.startsWith('/') ? fileName.substring(1) : fileName;
+
+    // Construct the full URL
+    return '${ApiConstants.baseUrl}/$cleanFileName';
+  }
+
+  // Method to check if file is viewable in browser
+  static bool isViewableInBrowser(String fileName) {
+    if (fileName.isEmpty) return false;
+
+    final extension = fileName.toLowerCase().split('.').last;
+    switch (extension) {
+      case 'pdf':
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  // Method to get file type for proper handling
+  static String getFileType(String fileName) {
+    if (fileName.isEmpty) return 'unknown';
+
+    final extension = fileName.toLowerCase().split('.').last;
+    switch (extension) {
+      case 'pdf':
+        return 'pdf';
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+      case 'mkv':
+        return 'video';
+      case 'mp3':
+      case 'wav':
+      case 'aac':
+        return 'audio';
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+        return 'image';
+      case 'doc':
+      case 'docx':
+        return 'document';
+      case 'xls':
+      case 'xlsx':
+        return 'spreadsheet';
+      case 'ppt':
+      case 'pptx':
+        return 'presentation';
+      default:
+        return 'unknown';
+    }
+  }
+
+  // Method to validate if URL is accessible
+  static Future<bool> isUrlAccessible(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      return response.statusCode == 200;
+    } catch (e) {
+      print('URL accessibility check failed: $e');
+      return false;
+    }
+  }
+
+  // Method to get file size from URL (if available)
+  static Future<String> getFileSize(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      final contentLength = response.headers['content-length'];
+      if (contentLength != null) {
+        final sizeInBytes = int.parse(contentLength);
+        if (sizeInBytes < 1024) {
+          return '${sizeInBytes} B';
+        } else if (sizeInBytes < 1024 * 1024) {
+          return '${(sizeInBytes / 1024).toStringAsFixed(1)} KB';
+        } else {
+          return '${(sizeInBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+        }
+      }
+      return 'Unknown size';
+    } catch (e) {
+      return 'Unknown size';
+    }
+  }
+
+  // Method to get file extension from filename
+  static String getFileExtension(String fileName) {
+    if (fileName.isEmpty) return '';
+    final parts = fileName.split('.');
+    return parts.length > 1 ? parts.last.toLowerCase() : '';
+  }
+
+  // Method to get clean filename without path
+  static String getCleanFileName(String fileName) {
+    if (fileName.isEmpty) return '';
+    final parts = fileName.split('/');
+    return parts.last;
+  }
+
+  // Test method to verify URL construction
+  static void testUrlConstruction() {
+    print('=== URL CONSTRUCTION TEST ===');
+
+    final testCases = [
+      '/StudyMaterial/10002---test.pdf',
+      'StudyMaterial/10002---test.pdf',
+      '/StudyMaterial/test.jpg',
+      'StudyMaterial/test.jpg',
+      '',
+    ];
+
+    for (final testCase in testCases) {
+      final url = getFileUrl(testCase);
+      final fileType = getFileType(testCase);
+      final isViewable = isViewableInBrowser(testCase);
+
+      print('Input: "$testCase"');
+      print('URL: "$url"');
+      print('Type: $fileType');
+      print('Viewable: $isViewable');
+      print('---');
+    }
+
+    print('=== END URL CONSTRUCTION TEST ===');
+  }
 }
 
 // Data model for API study material response

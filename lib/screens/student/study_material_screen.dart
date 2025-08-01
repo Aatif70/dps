@@ -4,6 +4,8 @@ import 'package:dps/constants/app_strings.dart';
 import 'package:dps/services/study_material_service.dart' as study_service;
 import 'package:dps/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 
 class StudyMaterialScreen extends StatefulWidget {
@@ -40,7 +42,6 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   ];
 
   int _studyStreak = 9;
-  int _totalDownloads = 28;
 
   @override
   void initState() {
@@ -56,6 +57,9 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       parent: _fadeController,
       curve: Curves.easeIn,
     ));
+
+    // Test URL construction
+    study_service.StudyMaterialService.testUrlConstruction();
 
     _loadStudyMaterials();
   }
@@ -150,8 +154,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                 _buildEnhancedStudyHeader(context),
                 const SizedBox(height: 20),
                 // Enhanced Search Bar
-                _buildEnhancedSearchBar(context),
-                const SizedBox(height: 20),
+                // _buildEnhancedSearchBar(context),
+                // const SizedBox(height: 20),
                 // Filter Tabs
                 _buildEnhancedFilterTabs(context),
                 const SizedBox(height: 20),
@@ -243,7 +247,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Your Study Journey 📚',
+                      'Your Study Journey',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 16,
@@ -270,37 +274,37 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Study Streak Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.local_fire_department_rounded,
-                        color: Color(0xFFFF9500),
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$_studyStreak Day Study Streak! 🔥',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // // Study Streak Badge
+                // Container(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                //   decoration: BoxDecoration(
+                //     color: Colors.white.withOpacity(0.2),
+                //     borderRadius: BorderRadius.circular(25),
+                //     border: Border.all(
+                //       color: Colors.white.withOpacity(0.3),
+                //       width: 1,
+                //     ),
+                //   ),
+                //   child: Row(
+                //     mainAxisSize: MainAxisSize.min,
+                //     children: [
+                //       const Icon(
+                //         Icons.local_fire_department_rounded,
+                //         color: Color(0xFFFF9500),
+                //         size: 18,
+                //       ),
+                //       const SizedBox(width: 8),
+                //       Text(
+                //         '$_studyStreak Day Study Streak! 🔥',
+                //         style: const TextStyle(
+                //           color: Colors.white,
+                //           fontSize: 13,
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -326,64 +330,64 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     );
   }
 
-  Widget _buildEnhancedSearchBar(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Search Input
-          TextField(
-            controller: _searchController,
-            onChanged: (value) {
-              setState(() {});
-            },
-            decoration: InputDecoration(
-              hintText: 'Search materials, chapters, subjects...',
-              prefixIcon: const Icon(
-                Icons.search_rounded,
-                color: Color(0xFF718096),
-                size: 22,
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                icon: const Icon(
-                  Icons.clear_rounded,
-                  color: Color(0xFF718096),
-                  size: 20,
-                ),
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-              )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(20),
-              hintStyle: const TextStyle(
-                color: Color(0xFF718096),
-                fontSize: 16,
-              ),
-            ),
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildEnhancedSearchBar(BuildContext context) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(16),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.grey.shade100,
+  //           blurRadius: 12,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         // Search Input
+  //         TextField(
+  //           controller: _searchController,
+  //           onChanged: (value) {
+  //             setState(() {});
+  //           },
+  //           decoration: InputDecoration(
+  //             hintText: 'Search materials, chapters, subjects...',
+  //             prefixIcon: const Icon(
+  //               Icons.search_rounded,
+  //               color: Color(0xFF718096),
+  //               size: 22,
+  //             ),
+  //             suffixIcon: _searchController.text.isNotEmpty
+  //                 ? IconButton(
+  //               icon: const Icon(
+  //                 Icons.clear_rounded,
+  //                 color: Color(0xFF718096),
+  //                 size: 20,
+  //               ),
+  //               onPressed: () {
+  //                 _searchController.clear();
+  //                 setState(() {});
+  //               },
+  //             )
+  //                 : null,
+  //             border: InputBorder.none,
+  //             contentPadding: const EdgeInsets.all(20),
+  //             hintStyle: const TextStyle(
+  //               color: Color(0xFF718096),
+  //               fontSize: 16,
+  //             ),
+  //           ),
+  //           style: const TextStyle(
+  //             fontSize: 16,
+  //             color: Color(0xFF2D3748),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildEnhancedFilterTabs(BuildContext context) {
     return Column(
@@ -728,24 +732,24 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                 // Action Buttons
                 Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _viewMaterial(material, apiRecord),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: subjectColor),
-                          foregroundColor: subjectColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        icon: const Icon(Icons.visibility_rounded, size: 16),
-                        label: const Text(
-                          'View',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: OutlinedButton.icon(
+                    //     onPressed: () => _viewMaterial(material, apiRecord),
+                    //     style: OutlinedButton.styleFrom(
+                    //       side: BorderSide(color: subjectColor),
+                    //       foregroundColor: subjectColor,
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(12),
+                    //       ),
+                    //       padding: const EdgeInsets.symmetric(vertical: 12),
+                    //     ),
+                    //     icon: const Icon(Icons.visibility_rounded, size: 16),
+                    //     label: const Text(
+                    //       'View',
+                    //       style: TextStyle(fontWeight: FontWeight.w600),
+                    //     ),
+                    //   ),
+                    // ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
@@ -758,9 +762,9 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        icon: const Icon(Icons.download_rounded, size: 16),
+                        icon: const Icon(Icons.visibility_rounded, size: 16),
                         label: const Text(
-                          'Download',
+                          'View',
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -948,25 +952,436 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   }
 
   // Action Methods
-  void _viewMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) {
+  void _viewMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) async {
     HapticFeedback.lightImpact();
     print('Viewing material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
     print('File path: ${apiRecord.fileName}');
 
-    CustomSnackbar.showInfo(
-      context,
-      message: 'Opening ${apiRecord.chapter}...',
+    if (apiRecord.fileName.isEmpty) {
+      CustomSnackbar.showError(
+        context,
+        message: 'No file available for this material.',
+      );
+      return;
+    }
+
+    final fileUrl = study_service.StudyMaterialService.getFileUrl(apiRecord.fileName);
+    final fileType = study_service.StudyMaterialService.getFileType(apiRecord.fileName);
+    final isViewableInBrowser = study_service.StudyMaterialService.isViewableInBrowser(apiRecord.fileName);
+
+    print('Constructed file URL: $fileUrl');
+    print('File type: $fileType');
+    print('Viewable in browser: $isViewableInBrowser');
+
+    // Show loading message
+    // CustomSnackbar.showInfo(
+    //   context,
+    //   message: 'Opening ${apiRecord.chapter}...',
+    // );
+
+    try {
+      if (isViewableInBrowser) {
+        // For PDFs and images, try InAppWebView first, with fallback to external browser
+        _showViewOptions(fileUrl, apiRecord.chapter);
+      } else {
+        // For non-viewable files, try to download or open with external app
+        final uri = Uri.parse(fileUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          CustomSnackbar.showSuccess(
+            context,
+            message: 'Opening ${apiRecord.chapter} in external app...',
+          );
+        } else {
+          CustomSnackbar.showError(
+            context,
+            message: 'Unable to open ${apiRecord.chapter}. Please try downloading instead.',
+          );
+        }
+      }
+    } catch (e) {
+      print('Error opening file: $e');
+      CustomSnackbar.showError(
+        context,
+        message: 'Failed to open ${apiRecord.chapter}. Please try again.',
+      );
+    }
+  }
+
+  void _showViewOptions(String url, String title) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Choose how to view the document',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(
+                Icons.visibility_rounded,
+                color: Color(0xFFE74C3C),
+              ),
+              title: const Text(
+                'View in App',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3748),
+                ),
+              ),
+              subtitle: const Text(
+                'Open in built-in viewer',
+                style: TextStyle(
+                  color: Color(0xFF718096),
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _openInAppBrowser(url, title);
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.open_in_new_rounded,
+                color: Color(0xFF4A90E2),
+              ),
+              title: const Text(
+                'Open in Browser',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3748),
+                ),
+              ),
+              subtitle: const Text(
+                'Open in external browser',
+                style: TextStyle(
+                  color: Color(0xFF718096),
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
     );
   }
 
-  void _downloadMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) {
+  void _openInAppBrowser(String url, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _PdfViewerScreen(url: url, title: title),
+      ),
+    );
+  }
+
+  void _downloadMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) async {
     HapticFeedback.lightImpact();
     print('Downloading material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
     print('File path: ${apiRecord.fileName}');
 
-    CustomSnackbar.showSuccess(
-      context,
-      message: 'Downloading ${apiRecord.chapter}...',
+    if (apiRecord.fileName.isEmpty) {
+      CustomSnackbar.showError(
+        context,
+        message: 'No file available for download.',
+      );
+      return;
+    }
+
+    final fileUrl = study_service.StudyMaterialService.getFileUrl(apiRecord.fileName);
+    print('Download URL: $fileUrl');
+
+    try {
+      final uri = Uri.parse(fileUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        // CustomSnackbar.showSuccess(
+        //   context,
+        //       message: 'Opening ${apiRecord.chapter} for download...',
+        //     );
+      } else {
+        CustomSnackbar.showError(
+          context,
+          message: 'Unable to download ${apiRecord.chapter}. Please try again.',
+        );
+      }
+    } catch (e) {
+      print('Error downloading file: $e');
+      CustomSnackbar.showError(
+        context,
+        message: 'Failed to download ${apiRecord.chapter}. Please try again.',
+      );
+    }
+  }
+}
+
+// Dedicated PDF Viewer Screen with better InAppWebView configuration
+class _PdfViewerScreen extends StatefulWidget {
+  final String url;
+  final String title;
+
+  const _PdfViewerScreen({
+    required this.url,
+    required this.title,
+  });
+
+  @override
+  State<_PdfViewerScreen> createState() => _PdfViewerScreenState();
+}
+
+class _PdfViewerScreenState extends State<_PdfViewerScreen> {
+  bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    print('PDF Viewer - Initializing with URL: ${widget.url}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Color(0xFF2D3748),
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.open_in_new_rounded,
+              color: Color(0xFF2D3748),
+              size: 20,
+            ),
+            onPressed: () async {
+              final uri = Uri.parse(widget.url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          InAppWebView(
+            initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+            initialOptions: InAppWebViewGroupOptions(
+              crossPlatform: InAppWebViewOptions(
+                useShouldOverrideUrlLoading: true,
+                mediaPlaybackRequiresUserGesture: false,
+                javaScriptEnabled: true,
+                cacheEnabled: true,
+                clearCache: false,
+                supportZoom: true,
+                useOnLoadResource: true,
+                useShouldInterceptAjaxRequest: true,
+                useShouldInterceptFetchRequest: true,
+
+              ),
+              android: AndroidInAppWebViewOptions(
+                useHybridComposition: true,
+                mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+
+              ),
+              ios: IOSInAppWebViewOptions(
+                allowsInlineMediaPlayback: true,
+                allowsBackForwardNavigationGestures: true,
+              ),
+            ),
+            onLoadStart: (controller, url) {
+              print('PDF Viewer - Loading started: $url');
+              setState(() {
+                _isLoading = true;
+                _hasError = false;
+              });
+            },
+            onLoadStop: (controller, url) {
+              print('PDF Viewer - Loading stopped: $url');
+              setState(() {
+                _isLoading = false;
+              });
+            },
+            onLoadError: (controller, url, code, message) {
+              print('PDF Viewer - Load error: $code - $message');
+              setState(() {
+                _isLoading = false;
+                _hasError = true;
+                _errorMessage = 'Failed to load the document: $message';
+              });
+            },
+            onLoadHttpError: (controller, url, statusCode, description) {
+              print('PDF Viewer - HTTP error: $statusCode - $description');
+              setState(() {
+                _isLoading = false;
+                _hasError = true;
+                _errorMessage = 'HTTP Error $statusCode: $description';
+              });
+            },
+            onReceivedError: (controller, request, error) {
+              print('PDF Viewer - Received error: $error');
+              setState(() {
+                _isLoading = false;
+                _hasError = true;
+                _errorMessage = 'Network error: $error';
+              });
+            },
+            onReceivedServerTrustAuthRequest: (controller, challenge) async {
+              print('PDF Viewer - Server trust auth request');
+              return ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
+            },
+            onPermissionRequest: (controller, request) async {
+              print('PDF Viewer - Permission request: ${request.resources}');
+              return PermissionResponse(
+                resources: request.resources,
+                action: PermissionResponseAction.GRANT,
+              );
+            },
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.white,
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE74C3C)),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Loading document...',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF718096),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (_hasError)
+            Container(
+              color: Colors.white,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        size: 64,
+                        color: Color(0xFFE74C3C),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Failed to load document',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _errorMessage,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF718096),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _isLoading = true;
+                                _hasError = false;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFE74C3C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: const Text('Retry'),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final uri = Uri.parse(widget.url);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4A90E2),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: const Icon(Icons.open_in_new_rounded),
+                            label: const Text('Open in Browser'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

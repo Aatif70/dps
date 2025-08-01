@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         // Main routes
         AppRoutes.splash: (context) => const SplashScreen(),
         // AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
-        
+
         // Student routes
         AppRoutes.studentDashboard: (context) => const StudentDashboardScreen(),
         AppRoutes.studentAttendance: (context) => const AttendanceScreen(),
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.studentStudyMaterial: (context) => const StudyMaterialScreen(),
         AppRoutes.studentExamination: (context) => const ExaminationScreen(),
         AppRoutes.studentProfile: (context) => const StudentProfileScreen(),
-        
+
         // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),
         AppRoutes.teacherAttendance: (context) => const TeacherAttendanceScreen(),
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.teacherLeave: (context) => const TeacherLeaveScreen(),
         AppRoutes.teacherStudyMaterial: (context) => const TeacherStudyMaterialScreen(),
         AppRoutes.teacherAllocatedSubjects: (context) => const TeacherAllocatedSubjectsScreen(),
-      AppRoutes.teacherprofile: (context) => const TeacherProfileScreen(),
+        AppRoutes.teacherprofile: (context) => const TeacherProfileScreen(),
 
       },
       onGenerateRoute: (settings) {
@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
           );
         }
         // Add other routes with arguments as needed
-        
+
         return null;
       },
     );
