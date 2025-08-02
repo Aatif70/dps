@@ -4,6 +4,10 @@ class ApiConstants {
   static const String login = '/api/User/Login';
 
   // ------------- STUDENT -------------
+
+  // EVENT CALENDAR
+  static const String eventCalendar = '/api/User/EventCalendar';
+
   // FEE
   static const String paidfees = '/api/User/PaidFees';
   static const String remainingFees = '/api/User/RemainingFees';
@@ -26,5 +30,4 @@ class ApiConstants {
 
   static const String searchStudentDetail = '/api/user/SearchStudentDetail';
   static const String studentDocuments = '/api/user/StudentDocuments';
-
 }

@@ -3,6 +3,7 @@ import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dps/widgets/event_calendar_widget.dart'; // Add this import
 
 class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
@@ -13,6 +14,7 @@ class StudentDashboardScreen extends StatefulWidget {
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
   String _fullName = '';
@@ -26,7 +28,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-
     // Setup fade animation
     _fadeAnimation = Tween<double>(
       begin: 0.0,
@@ -35,7 +36,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       parent: _fadeAnimationController,
       curve: Curves.easeIn,
     ));
-
     // Start animation
     _fadeAnimationController.forward();
   }
@@ -67,11 +67,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
               children: [
                 // Header
                 _buildEnhancedHeader(context),
-
                 const SizedBox(height: 25),
 
+                // EVENT CALENDAR - NEW ADDITION
+                const EventCalendarWidget(),
+                const SizedBox(height: 25),
 
-                // Section Title
+                // Your Learning Hub
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
@@ -82,13 +84,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 // Feature Grid
                 _buildEnhancedFeatureGrid(context),
-
                 const SizedBox(height: 30),
+                // Others
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
@@ -100,9 +100,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-
+                // Feature Grid 2
                 _buildEnhancedFeatureGrid2(context),
-
               ],
             ),
           ),
@@ -215,43 +214,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     );
   }
 
-
-
-  // Widget _buildMiniProgress(String label, double value, Color color) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text(
-  //         label,
-  //         style: const TextStyle(
-  //           fontSize: 11,
-  //           color: Color(0xFF718096),
-  //           fontWeight: FontWeight.w500,
-  //         ),
-  //       ),
-  //       const SizedBox(height: 4),
-  //       Container(
-  //         width: 40,
-  //         height: 4,
-  //         decoration: BoxDecoration(
-  //           color: const Color(0xFFE2E8F0),
-  //           borderRadius: BorderRadius.circular(2),
-  //         ),
-  //         child: FractionallySizedBox(
-  //           alignment: Alignment.centerLeft,
-  //           widthFactor: value,
-  //           child: Container(
-  //             decoration: BoxDecoration(
-  //               color: color,
-  //               borderRadius: BorderRadius.circular(2),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _buildEnhancedFeatureGrid(BuildContext context) {
     final features = [
 
@@ -322,9 +284,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     );
   }
 
-
-
-
   Widget _buildEnhancedFeatureGrid2(BuildContext context) {
     final features = [
 
@@ -368,22 +327,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       ),
     );
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   Widget _buildEnhancedFeatureCard(BuildContext context, FeatureData feature) {
     return GestureDetector(
