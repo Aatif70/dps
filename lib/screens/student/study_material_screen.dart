@@ -1123,10 +1123,10 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       final uri = Uri.parse(fileUrl);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-        // CustomSnackbar.showSuccess(
-        //   context,
-        //       message: 'Opening ${apiRecord.chapter} for download...',
-        //     );
+    // CustomSnackbar.showSuccess(
+    //   context,
+    //       message: 'Opening ${apiRecord.chapter} for download...',
+    //     );
       } else {
         CustomSnackbar.showError(
           context,

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_strings.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import '../../services/attendance_service.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({super.key});
+  const AttendanceScreen({
+    super.key,
+  });
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -13,101 +15,55 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen>
     with TickerProviderStateMixin {
+
   late AnimationController _headerAnimationController;
   late AnimationController _statsAnimationController;
   late AnimationController _cardsAnimationController;
   late AnimationController _streakAnimationController;
-
   late Animation<double> _headerSlideAnimation;
   late Animation<double> _statsScaleAnimation;
   late Animation<double> _streakPulseAnimation;
 
-  // Enhanced mock data for attendance
-  final Map<String, double> monthlyAttendance = {
-    'Jan': 0.89,
-    'Feb': 0.92,
-    'Mar': 0.88,
-    'Apr': 0.92,
-    'May': 0.88,
-    'Jun': 0.75,
-    'Jul': 0.95,
-    'Aug': 0.85,
-    'Sep': 0.78,
-    'Oct': 0.91,
-    'Nov': 0.87,
-    'Dec': 0.93,
+  // State variables for API data
+  bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  DateTime _selectedDate = DateTime.now();
+  List<AttendanceRecord> _todayAttendance = [];
+  Map<String, double> _monthlyStats = {
+    'totalDays': 0.0,
+    'presentDays': 0.0,
+    'attendancePercentage': 0.0,
   };
 
-  // Enhanced attendance records with more details
-  final List<AttendanceRecord> attendanceRecords = [
-    AttendanceRecord(
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      status: AttendanceStatus.present,
-      subject: 'All Classes',
-      checkInTime: '08:45',
-      teacher: 'Mrs. Sharma',
-    ),
-    AttendanceRecord(
-      date: DateTime.now().subtract(const Duration(days: 2)),
-      status: AttendanceStatus.present,
-      subject: 'All Classes',
-      checkInTime: '08:50',
-      teacher: 'Mr. Kumar',
-    ),
-    AttendanceRecord(
-      date: DateTime.now().subtract(const Duration(days: 3)),
-      status: AttendanceStatus.absent,
-      subject: 'All Classes',
-      reason: 'Medical Leave',
-      teacher: 'Mrs. Patel',
-    ),
-    AttendanceRecord(
-      date: DateTime.now().subtract(const Duration(days: 4)),
-      status: AttendanceStatus.late,
-      subject: 'All Classes',
-      checkInTime: '09:15',
-      reason: 'Traffic Delay',
-      teacher: 'Dr. Singh',
-    ),
-    AttendanceRecord(
-      date: DateTime.now().subtract(const Duration(days: 5)),
-      status: AttendanceStatus.present,
-      subject: 'All Classes',
-      checkInTime: '08:42',
-      teacher: 'Mrs. Gupta',
-    ),
-  ];
-
-  String _selectedMonth = DateFormat('MMM').format(DateTime.now());
-  int _currentStreak = 7;
-  int _totalDays = 22;
+  int _currentStreak = 0;
 
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+    _loadAttendanceData();
+  }
 
-    // Initialize animation controllers
+  void _initializeAnimations() {
     _headerAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-
     _statsAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-
     _cardsAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-
     _streakAnimationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     )..repeat();
 
-    // Setup animations
     _headerSlideAnimation = Tween<double>(
       begin: -100.0,
       end: 0.0,
@@ -132,19 +88,81 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       curve: Curves.easeInOut,
     ));
 
-    // Start animations
     _startAnimations();
   }
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
     _headerAnimationController.forward();
-
     await Future.delayed(const Duration(milliseconds: 500));
     _statsAnimationController.forward();
-
     await Future.delayed(const Duration(milliseconds: 300));
     _cardsAnimationController.forward();
+  }
+
+  Future<void> _loadAttendanceData() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
+    try {
+      print('=== LOADING ATTENDANCE DATA ===');
+      print('Selected Date: $_selectedDate');
+
+      // Format date for API call (dd-mm-yyyy)
+      final dateString = DateFormat('dd-MM-yyyy').format(_selectedDate);
+      print('Formatted Date String: $dateString');
+
+      // Get today's attendance
+      final attendanceResponse = await AttendanceService.getStudentAttendance(
+        attDate: dateString,
+      );
+
+      if (attendanceResponse != null) {
+        _todayAttendance = attendanceResponse.attendanceList;
+        print('=== TODAY\'S ATTENDANCE LOADED ===');
+        print('Records count: ${_todayAttendance.length}');
+      } else {
+        _todayAttendance = [];
+        print('=== NO ATTENDANCE DATA FOR TODAY ===');
+      }
+
+      // Get monthly stats
+      final monthlyStats = await AttendanceService.getMonthlyAttendanceStats(
+        year: _selectedDate.year,
+        month: _selectedDate.month,
+      );
+
+      _monthlyStats = monthlyStats;
+      print('=== MONTHLY STATS LOADED ===');
+      print('Monthly Stats: $_monthlyStats');
+
+      // Calculate streak (simplified)
+      _currentStreak = _calculateCurrentStreak();
+      print('Current Streak: $_currentStreak days');
+
+      setState(() {
+        _isLoading = false;
+        _hasError = false;
+      });
+
+    } catch (e) {
+      print('=== ERROR LOADING ATTENDANCE DATA ===');
+      print('Error: $e');
+
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+        _errorMessage = 'Failed to load attendance data: $e';
+      });
+    }
+  }
+
+  int _calculateCurrentStreak() {
+    // Simple streak calculation - count consecutive days with present status
+    // You can enhance this logic based on your requirements
+    return (_monthlyStats['presentDays'] ?? 0).toInt();
   }
 
   @override
@@ -158,47 +176,108 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    final attendancePercentage = monthlyAttendance[_selectedMonth] ?? 0.0;
-    final presentDays = (attendancePercentage * _totalDays).round();
-    final absentDays = _totalDays - presentDays;
+    final attendancePercentage = _monthlyStats['attendancePercentage'] ?? 0.0;
+    final presentDays = (_monthlyStats['presentDays'] ?? 0).toInt();
+    final totalDays = (_monthlyStats['totalDays'] ?? 0).toInt();
+    final absentDays = totalDays - presentDays;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildEnhancedAppBar(context),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? _buildLoadingWidget()
+          : _hasError
+          ? _buildErrorWidget()
+          : SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Enhanced Header (no animation)
-            _buildEnhancedHeader(context, attendancePercentage),
-
+            // _buildEnhancedHeader(context, attendancePercentage),
             const SizedBox(height: 25),
-
-            // Enhanced Statistics Cards (no animation)
             _buildEnhancedStatistics(
-                context,
-                presentDays,
-                absentDays,
-                attendancePercentage
+              context,
+              presentDays,
+              absentDays,
+              attendancePercentage,
             ),
-
+            // const SizedBox(height: 25),
+            _buildDateSelector(context),
             const SizedBox(height: 25),
-
-            // Enhanced Month Selector
-            _buildEnhancedMonthSelector(context),
-
-            const SizedBox(height: 25),
-
-            // Enhanced Attendance Calendar (no animation)
-            _buildEnhancedAttendanceCalendar(context),
-
-            const SizedBox(height: 25),
-
-            // Enhanced Recent Activity (no animation)
-            _buildEnhancedRecentActivity(context),
-
+            _buildTodayAttendanceCard(context),
             const SizedBox(height: 30),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _loadAttendanceData,
+        backgroundColor: const Color(0xFF4A90E2),
+        child: const Icon(Icons.refresh, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildLoadingWidget() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading attendance data...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF718096),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: Colors.red.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Oops! Something went wrong',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF718096),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _loadAttendanceData,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4A90E2),
+                foregroundColor: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
@@ -207,11 +286,11 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
   PreferredSizeWidget _buildEnhancedAppBar(BuildContext context) {
     return AppBar(
-      title: Text(
+      title: const Text(
         'My Attendance',
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF2D3748),
+          color: Color(0xFF2D3748),
         ),
       ),
       backgroundColor: Colors.white,
@@ -242,8 +321,19 @@ class _AttendanceScreenState extends State<AttendanceScreen>
               size: 20,
             ),
           ),
-          onPressed: () {
-            // Show calendar picker
+          onPressed: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now(),
+            );
+            if (pickedDate != null) {
+              setState(() {
+                _selectedDate = pickedDate;
+              });
+              _loadAttendanceData();
+            }
           },
         ),
         const SizedBox(width: 12),
@@ -280,7 +370,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${DateFormat('MMMM yyyy').format(DateTime.now())}',
+                      DateFormat('MMMM yyyy').format(_selectedDate),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 16,
@@ -319,8 +409,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // Enhanced Streak Badge
                     AnimatedBuilder(
                       animation: _streakPulseAnimation,
                       builder: (context, child) {
@@ -365,10 +453,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   ],
                 ),
               ),
-
-              // Enhanced Progress Ring
               TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: attendancePercentage),
+                tween: Tween(begin: 0.0, end: attendancePercentage),
                 duration: const Duration(milliseconds: 2000),
                 builder: (context, value, child) {
                   return CircularPercentIndicator(
@@ -387,7 +473,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                           ),
                         ),
                         Text(
-                          "$_totalDays days",
+                          "${_monthlyStats['totalDays']?.toInt() ?? 0} days",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.white.withOpacity(0.8),
@@ -416,6 +502,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       int absentDays,
       double attendancePercentage,
       ) {
+    final lateDays = _todayAttendance.where((record) =>
+    record.attendanceStatus == AttendanceStatus.late).length;
+
     final stats = [
       StatData(
         title: 'Present',
@@ -433,17 +522,17 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       ),
       StatData(
         title: 'Late',
-        value: '3',
+        value: lateDays.toString(),
         color: const Color(0xFFFF9500),
         icon: Icons.schedule_rounded,
         subtitle: 'Late arrivals',
       ),
       StatData(
-        title: 'Holidays',
-        value: '4',
+        title: 'Classes',
+        value: _todayAttendance.length.toString(),
         color: const Color(0xFF8E44AD),
-        icon: Icons.celebration_rounded,
-        subtitle: 'School holidays',
+        icon: Icons.school_rounded,
+        subtitle: 'Today\'s classes',
       ),
     ];
 
@@ -534,229 +623,75 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     );
   }
 
-  Widget _buildEnhancedMonthSelector(BuildContext context) {
+  Widget _buildDateSelector(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'Monthly Overview',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D3748),
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Selected Date',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2D3748),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _selectedDate = pickedDate;
+                    });
+                    _loadAttendanceData();
+                  }
+                },
+                icon: const Icon(Icons.calendar_today, size: 16),
+                label: const Text('Change Date'),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 15),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
-          height: 64,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: monthlyAttendance.keys.length,
-            itemBuilder: (context, index) {
-              final month = monthlyAttendance.keys.elementAt(index);
-              final isSelected = month == _selectedMonth;
-              final percentage = monthlyAttendance[month] ?? 0.0;
-
-              return GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  setState(() {
-                    _selectedMonth = month;
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 75),
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? const LinearGradient(
-                      colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                    )
-                        : null,
-                    color: isSelected ? null : Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade200,
-                        blurRadius: isSelected ? 12 : 8,
-                        offset: Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        month,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : const Color(0xFF2D3748),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      if (isSelected) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          '${(percentage * 100).toInt()}%',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4A90E2).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEnhancedAttendanceCalendar(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Row(
             children: [
-              Text(
-                'Attendance Pattern',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2D3748),
-                  fontSize: 18,
-                ),
+              Icon(
+                Icons.calendar_today_rounded,
+                color: const Color(0xFF4A90E2),
+                size: 20,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _selectedMonth,
-                  style: const TextStyle(
-                    color: Color(0xFF4A90E2),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+              const SizedBox(width: 12),
+              Text(
+                DateFormat('EEEE, MMMM d, y').format(_selectedDate),
+                style: const TextStyle(
+                  color: Color(0xFF4A90E2),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-
-          // Calendar Grid
-          _buildCalendarGrid(context),
-
-          const SizedBox(height: 20),
-
-          // Legend
-          _buildAttendanceLegend(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCalendarGrid(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 1,
-      ),
-      itemCount: 28, // Simplified to 4 weeks
-      itemBuilder: (context, index) {
-        final day = index + 1;
-        final attendanceStatus = _getRandomAttendanceStatus(day);
-
-        return Container(
-          decoration: BoxDecoration(
-            color: _getStatusColor(attendanceStatus).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: _getStatusColor(attendanceStatus).withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              day.toString(),
-              style: TextStyle(
-                color: _getStatusColor(attendanceStatus),
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAttendanceLegend(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildLegendItem('Present', const Color(0xFF58CC02)),
-        _buildLegendItem('Absent', const Color(0xFFE74C3C)),
-        _buildLegendItem('Late', const Color(0xFFFF9500)),
-        _buildLegendItem('Holiday', const Color(0xFF718096)),
-      ],
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF718096),
-            fontWeight: FontWeight.w500,
-          ),
         ),
       ],
     );
   }
 
-  Widget _buildEnhancedRecentActivity(BuildContext context) {
+  Widget _buildTodayAttendanceCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
@@ -779,41 +714,76 @@ class _AttendanceScreenState extends State<AttendanceScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Recent Activity',
+                  'Today\'s Classes',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF2D3748),
                     fontSize: 18,
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    // View all activity
-                  },
-                  icon: const Icon(
-                    Icons.history_rounded,
-                    size: 16,
-                    color: Color(0xFF4A90E2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _todayAttendance.isNotEmpty
+                        ? const Color(0xFF58CC02).withOpacity(0.1)
+                        : const Color(0xFF718096).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  label: const Text(
-                    'View All',
+                  child: Text(
+                    '${_todayAttendance.length} Classes',
                     style: TextStyle(
-                      color: Color(0xFF4A90E2),
-                      fontWeight: FontWeight.w600,
+                      color: _todayAttendance.isNotEmpty
+                          ? const Color(0xFF58CC02)
+                          : const Color(0xFF718096),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          ListView.separated(
+          _todayAttendance.isEmpty
+              ? Padding(
+            padding: const EdgeInsets.all(40),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.school_outlined,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No classes found for this date',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Try selecting a different date',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
+          )
+              : ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: attendanceRecords.take(5).length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.grey),
+            itemCount: _todayAttendance.length,
+            separatorBuilder: (context, index) => const Divider(
+              height: 1,
+              color: Color(0xFFE2E8F0),
+            ),
             itemBuilder: (context, index) {
-              final record = attendanceRecords[index];
-              return _buildEnhancedAttendanceRecord(record);
+              final record = _todayAttendance[index];
+              return _buildAttendanceRecordCard(record);
             },
           ),
         ],
@@ -821,7 +791,10 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     );
   }
 
-  Widget _buildEnhancedAttendanceRecord(AttendanceRecord record) {
+  Widget _buildAttendanceRecordCard(AttendanceRecord record) {
+    final statusColor = _getStatusColor(record.attendanceStatus);
+    final statusIcon = _getStatusIcon(record.attendanceStatus);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
@@ -831,15 +804,15 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  _getStatusColor(record.status).withOpacity(0.1),
-                  _getStatusColor(record.status).withOpacity(0.05),
+                  statusColor.withOpacity(0.1),
+                  statusColor.withOpacity(0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
-              _getStatusIcon(record.status),
-              color: _getStatusColor(record.status),
+              statusIcon,
+              color: statusColor,
               size: 24,
             ),
           ),
@@ -849,10 +822,10 @@ class _AttendanceScreenState extends State<AttendanceScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('EEEE, d MMMM').format(record.date),
+                  record.subject,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 16,
                     color: Color(0xFF2D3748),
                   ),
                 ),
@@ -860,70 +833,51 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 Row(
                   children: [
                     Text(
-                      _getStatusText(record.status),
+                      record.status,
                       style: TextStyle(
-                        color: _getStatusColor(record.status),
+                        color: statusColor,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (record.checkInTime.isNotEmpty) ...[
-                      Text(
-                        ' • ${record.checkInTime}',
-                        style: const TextStyle(
-                          color: Color(0xFF718096),
-                          fontSize: 13,
-                        ),
+                    Text(
+                      ' • ${record.fromTime} - ${record.toTime}',
+                      style: const TextStyle(
+                        color: Color(0xFF718096),
+                        fontSize: 13,
                       ),
-                    ],
+                    ),
                   ],
                 ),
-                if (record.reason.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    record.reason,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
-          if (record.teacher.isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  record.teacher,
-                  style: const TextStyle(
-                    color: Color(0xFF718096),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                record.fromTime,
+                style: const TextStyle(
+                  color: Color(0xFF2D3748),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
                 ),
-                const SizedBox(height: 4),
-                Icon(
-                  Icons.person_rounded,
-                  size: 12,
-                  color: Colors.grey.shade400,
+              ),
+              Text(
+                'to ${record.toTime}',
+                style: const TextStyle(
+                  color: Color(0xFF718096),
+                  fontSize: 12,
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
   // Helper methods
-  AttendanceStatus _getRandomAttendanceStatus(int day) {
-    if (day % 7 == 0 || day % 6 == 0) return AttendanceStatus.holiday;
-    if (day % 8 == 0) return AttendanceStatus.absent;
-    if (day % 5 == 0) return AttendanceStatus.late;
-    return AttendanceStatus.present;
-  }
-
   Color _getStatusColor(AttendanceStatus status) {
     switch (status) {
       case AttendanceStatus.present:
@@ -949,42 +903,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         return Icons.celebration_rounded;
     }
   }
-
-  String _getStatusText(AttendanceStatus status) {
-    switch (status) {
-      case AttendanceStatus.present:
-        return 'Present';
-      case AttendanceStatus.absent:
-        return 'Absent';
-      case AttendanceStatus.late:
-        return 'Late';
-      case AttendanceStatus.holiday:
-        return 'Holiday';
-    }
-  }
 }
 
-// Enhanced data models
-enum AttendanceStatus { present, absent, late, holiday }
-
-class AttendanceRecord {
-  final DateTime date;
-  final AttendanceStatus status;
-  final String subject;
-  final String reason;
-  final String checkInTime;
-  final String teacher;
-
-  AttendanceRecord({
-    required this.date,
-    required this.status,
-    required this.subject,
-    this.reason = '',
-    this.checkInTime = '',
-    this.teacher = '',
-  });
-}
-
+// Data model for statistics
 class StatData {
   final String title;
   final String value;

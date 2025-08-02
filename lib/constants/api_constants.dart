@@ -18,4 +18,13 @@ class ApiConstants {
   // Study Material Management
   static const String studentStudyMaterial = '/api/OnlineExam/StudentStudyMaterial';
 
+  // Student Attendance
+  static const String studentAttendance = '/api/User/StudentAttendance';
+
+  // Student Timetable
+  static const String studentTimetable = '/api/User/StdTimeTable';
+
+  static const String searchStudentDetail = '/api/user/SearchStudentDetail';
+  static const String studentDocuments = '/api/user/StudentDocuments';
+
 }

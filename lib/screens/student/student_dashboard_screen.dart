@@ -282,14 +282,23 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         route: AppRoutes.studentHomework,
       ),
 
-      // FeatureData(
-      //   title: AppStrings.attendance,
-      //   icon: Icons.calendar_today_rounded,
-      //   color: const Color(0xFF4A90E2),
-      //   // value: '85%',
-      //   // subtitle: 'This month',
-      //   route: AppRoutes.studentAttendance,
-      // ),
+      FeatureData(
+        title: AppStrings.attendance,
+        icon: Icons.calendar_today_rounded,
+        color: const Color(0xFF4A90E2),
+        // value: '85%',
+        // subtitle: 'This month',
+        route: AppRoutes.studentAttendance,
+      ),
+
+      FeatureData(
+        title: AppStrings.timetable,
+        icon: Icons.calendar_month,
+        color: Colors.cyan,
+        // value: '85%',
+        // subtitle: 'This month',
+        route: AppRoutes.studenttimetable,
+      ),
 
 
     ];

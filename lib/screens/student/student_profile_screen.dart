@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:dps/constants/app_routes.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:dps/constants/app_routes.dart';
+import 'package:dps/services/student_profile_service.dart';
 
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({Key? key}) : super(key: key);
@@ -10,233 +11,594 @@ class StudentProfileScreen extends StatefulWidget {
   State<StudentProfileScreen> createState() => _StudentProfileScreenState();
 }
 
-class _StudentProfileScreenState extends State<StudentProfileScreen> {
-  String fullName = '';
+class _StudentProfileScreenState extends State<StudentProfileScreen>
+    with TickerProviderStateMixin {
+
+  late AnimationController _headerAnimationController;
+  late AnimationController _cardsAnimationController;
+  late AnimationController _statsAnimationController;
+  late Animation<double> _headerSlideAnimation;
+  late Animation<double> _cardsStaggerAnimation;
+  late Animation<double> _statsScaleAnimation;
+
+  bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  StudentDetail? _studentDetail;
+  List<DocumentCategory> _documentCategories = [];
 
   @override
   void initState() {
     super.initState();
-    _loadFullName();
+    _initializeAnimations();
+    _loadStudentData();
   }
 
-  Future<void> _loadFullName() async {
-    final prefs = await SharedPreferences.getInstance();
+  void _initializeAnimations() {
+    _headerAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _cardsAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _statsAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _headerSlideAnimation = Tween<double>(
+      begin: -100.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _headerAnimationController,
+      curve: Curves.easeOutBack,
+    ));
+
+    _cardsStaggerAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _cardsAnimationController,
+      curve: Curves.easeOutQuart,
+    ));
+
+    _statsScaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: Curves.elasticOut,
+    ));
+
+    _startAnimations();
+  }
+
+  void _startAnimations() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _headerAnimationController.forward();
+    await Future.delayed(const Duration(milliseconds: 500));
+    _statsAnimationController.forward();
+    await Future.delayed(const Duration(milliseconds: 300));
+    _cardsAnimationController.forward();
+  }
+
+  Future<void> _loadStudentData() async {
     setState(() {
-      fullName = prefs.getString('FullName') ?? '';
+      _isLoading = true;
+      _hasError = false;
     });
+
+    try {
+      print('=== LOADING STUDENT PROFILE DATA ===');
+
+      // Load student details
+      final studentDetailResponse = await StudentProfileService.getStudentDetails();
+      if (studentDetailResponse != null) {
+        _studentDetail = studentDetailResponse.data;
+        print('=== STUDENT DETAILS LOADED ===');
+        print('Student: ${_studentDetail!.studentName}');
+      }
+
+      // Load student documents
+      final documentsResponse = await StudentProfileService.getStudentDocuments();
+      if (documentsResponse != null) {
+        _documentCategories = documentsResponse.data;
+        print('=== STUDENT DOCUMENTS LOADED ===');
+        print('Categories: ${_documentCategories.length}');
+      }
+
+      setState(() {
+        _isLoading = false;
+        _hasError = false;
+      });
+
+    } catch (e) {
+      print('=== ERROR LOADING STUDENT DATA ===');
+      print('Error: $e');
+
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+        _errorMessage = 'Failed to load student data: $e';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _headerAnimationController.dispose();
+    _cardsAnimationController.dispose();
+    _statsAnimationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 16,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'My Profile',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF2D3748),
-              ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
+      appBar: _buildEnhancedAppBar(context),
+      body: _isLoading
+          ? _buildLoadingWidget()
+          : _hasError
+          ? _buildErrorWidget()
+          : SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              
-              // Profile Avatar
-              Center(
-                child: Hero(
-                  tag: 'student_avatar',
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF4A90E2),
-                        width: 4,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF4A90E2).withOpacity(0.2),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: const CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person_rounded,
-                        color: Colors.blueGrey,
-                        size: 48,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildEnhancedHeader(context),
+            const SizedBox(height: 25),
+            _buildQuickStats(context),
+            const SizedBox(height: 25),
+            _buildPersonalInformation(context),
+            const SizedBox(height: 25),
+            _buildDocumentsSection(context),
+            const SizedBox(height: 25),
+            _buildLogoutButton(context),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _loadStudentData,
+        backgroundColor: const Color(0xFF4A90E2),
+        child: const Icon(Icons.refresh, color: Colors.white),
+      ),
+    );
+  }
 
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Student Name
-              Text(
-                fullName,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2D3748),
-                    ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              // Student Class
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF4A90E2).withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-                child: const Text(
-                  'Class X-A | Roll No: 15',
-                  style: TextStyle(
-                    color: Color(0xFF4A90E2),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Profile Information Section
-              _buildProfileInfoSection(context),
-              
-              const SizedBox(height: 40),
-              
-              // Logout Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      AppRoutes.login,
-                      (route) => false,
-                      arguments: 'student',
-                    );
-                  },
-                  icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Logout'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE53E3E),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+  Widget _buildLoadingWidget() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
           ),
+          SizedBox(height: 16),
+          Text(
+            'Loading student profile...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF718096),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: Colors.red.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Oops! Something went wrong',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF718096),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _loadStudentData,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4A90E2),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileInfoSection(BuildContext context) {
-    final infoItems = [
-      ProfileInfoItem(
-        icon: Icons.email_outlined,
-        title: 'Email',
-        value: 'priya.sharma@example.com',
+  PreferredSizeWidget _buildEnhancedAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text(
+        'My Profile',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2D3748),
+        ),
       ),
-      ProfileInfoItem(
-        icon: Icons.phone_outlined,
-        title: 'Phone',
-        value: '+91 98765 43210',
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: Color(0xFF2D3748),
+          size: 20,
+        ),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.pop(context);
+        },
       ),
-      ProfileInfoItem(
-        icon: Icons.calendar_today_outlined,
-        title: 'Date of Birth',
-        value: '15 August 2008',
+      actions: [
+        IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Color(0xFF4A90E2),
+              size: 20,
+            ),
+          ),
+          onPressed: _loadStudentData,
+        ),
+        const SizedBox(width: 12),
+      ],
+    );
+  }
+
+  Widget _buildEnhancedHeader(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _headerSlideAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _headerSlideAnimation.value),
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4A90E2).withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Hero(
+                      tag: 'student_avatar',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 3,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Colors.white,
+                          backgroundImage: _studentDetail?.photo.isNotEmpty == true
+                              ? NetworkImage(_studentDetail!.photoUrl)
+                              : null,
+                          child: _studentDetail?.photo.isEmpty == true
+                              ? const Icon(
+                            Icons.person_rounded,
+                            color: Color(0xFF718096),
+                            size: 32,
+                          )
+                              : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _studentDetail?.studentName ?? 'Loading...',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _studentDetail?.className ?? 'Class Information',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Text(
+                              'PRN: ${_studentDetail?.prn ?? 'N/A'}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildQuickStats(BuildContext context) {
+    final totalDocuments = _documentCategories
+        .fold(0, (sum, category) => sum + category.documents.length);
+    final uploadedDocuments = _documentCategories
+        .fold(0, (sum, category) =>
+    sum + category.documents.where((doc) => doc.isUploaded).length);
+    final pendingDocuments = totalDocuments - uploadedDocuments;
+
+    final stats = [
+      StatData(
+        title: 'Admission Year',
+        value: _studentDetail?.admissionYear.toString() ?? '0',
+        color: const Color(0xFF4A90E2),
+        icon: Icons.school_rounded,
+        subtitle: 'Academic year',
       ),
-      ProfileInfoItem(
-        icon: Icons.location_on_outlined,
-        title: 'Address',
-        value: '123 Education Street, New Delhi',
+      StatData(
+        title: 'Category',
+        value: _studentDetail?.category ?? 'N/A',
+        color: const Color(0xFF58CC02),
+        icon: Icons.category_rounded,
+        subtitle: 'Student category',
       ),
-      ProfileInfoItem(
-        icon: Icons.person_outline_rounded,
-        title: 'Parent/Guardian',
-        value: 'Rajesh Sharma',
+      StatData(
+        title: 'Documents',
+        value: '$uploadedDocuments/$totalDocuments',
+        color: const Color(0xFFFF9500),
+        icon: Icons.description_rounded,
+        subtitle: 'Uploaded',
+      ),
+      StatData(
+        title: 'Pending',
+        value: pendingDocuments.toString(),
+        color: const Color(0xFFE74C3C),
+        icon: Icons.pending_actions_rounded,
+        subtitle: 'Documents',
       ),
     ];
 
+    return AnimatedBuilder(
+      animation: _statsScaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _statsScaleAnimation.value,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 1.2,
+              ),
+              itemCount: stats.length,
+              itemBuilder: (context, index) {
+                return _buildEnhancedStatCard(stats[index]);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEnhancedStatCard(StatData stat) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: stat.color.withOpacity(0.08),
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Personal Information',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2D3748),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      stat.color.withOpacity(0.1),
+                      stat.color.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                child: Icon(
+                  stat.icon,
+                  color: stat.color,
+                  size: 24,
+                ),
+              ),
+              Text(
+                stat.value,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: stat.color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
-          ...infoItems.map((item) => _buildInfoItem(context, item)),
+          const SizedBox(height: 12),
+          Text(
+            stat.title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          Text(
+            stat.subtitle,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF718096),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPersonalInformation(BuildContext context) {
+    if (_studentDetail == null) return Container();
+
+    final infoItems = [
+      ProfileInfoItem(
+        icon: Icons.email_outlined,
+        title: 'Email Address',
+        value: _studentDetail!.email,
+      ),
+      ProfileInfoItem(
+        icon: Icons.phone_outlined,
+        title: 'Student Mobile',
+        value: _studentDetail!.studentMobile,
+      ),
+      ProfileInfoItem(
+        icon: Icons.phone_android_outlined,
+        title: 'Parent Mobile',
+        value: _studentDetail!.parentMobile,
+      ),
+      ProfileInfoItem(
+        icon: Icons.location_on_outlined,
+        title: 'Address',
+        value: _studentDetail!.address,
+      ),
+      ProfileInfoItem(
+        icon: Icons.group_outlined,
+        title: 'Caste',
+        value: _studentDetail!.caste.isEmpty ? 'N/A' : _studentDetail!.caste,
+      ),
+    ];
+
+    return AnimatedBuilder(
+      animation: _cardsStaggerAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset((1 - _cardsStaggerAnimation.value) * 50, 0),
+          child: Opacity(
+            opacity: _cardsStaggerAnimation.value,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Personal Information',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2D3748),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ...infoItems.map((item) => _buildInfoItem(context, item)),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -266,17 +628,17 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                 Text(
                   item.title,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF718096),
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: const Color(0xFF718096),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item.value,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: const Color(0xFF2D3748),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: const Color(0xFF2D3748),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -285,8 +647,214 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       ),
     );
   }
+
+  Widget _buildDocumentsSection(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Documents',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF2D3748),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${_documentCategories.length} Categories',
+                    style: const TextStyle(
+                      color: Color(0xFF4A90E2),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_documentCategories.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(40),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.description_outlined,
+                    size: 48,
+                    color: Colors.grey.shade400,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No documents found',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _documentCategories.length,
+              separatorBuilder: (context, index) => const Divider(
+                height: 1,
+                color: Color(0xFFE2E8F0),
+              ),
+              itemBuilder: (context, index) {
+                return _buildDocumentCategory(_documentCategories[index]);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentCategory(DocumentCategory category) {
+    return ExpansionTile(
+      title: Text(
+        category.category,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2D3748),
+        ),
+      ),
+      subtitle: Text(
+        '${category.documents.length} documents',
+        style: const TextStyle(
+          color: Color(0xFF718096),
+          fontSize: 12,
+        ),
+      ),
+      children: category.documents.map((document) {
+        return ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: document.isUploaded
+                  ? const Color(0xFF58CC02).withOpacity(0.1)
+                  : const Color(0xFFE74C3C).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              document.isUploaded
+                  ? Icons.check_circle_outline
+                  : Icons.upload_file_outlined,
+              color: document.isUploaded
+                  ? const Color(0xFF58CC02)
+                  : const Color(0xFFE74C3C),
+              size: 20,
+            ),
+          ),
+          title: Text(
+            document.docType,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2D3748),
+              fontSize: 14,
+            ),
+          ),
+          subtitle: Text(
+            document.isUploaded ? 'Uploaded' : 'Pending',
+            style: TextStyle(
+              color: document.isUploaded
+                  ? const Color(0xFF58CC02)
+                  : const Color(0xFFE74C3C),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          trailing: document.isUploaded
+              ? IconButton(
+            icon: const Icon(Icons.visibility_outlined),
+            onPressed: () {
+              // TODO: Implement document viewer
+              print('View document: ${document.fullDocumentPath}');
+            },
+          )
+              : const Icon(Icons.upload_outlined, color: Color(0xFF718096)),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.clear();
+            if (mounted) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                    (route) => false,
+                arguments: 'student',
+              );
+            }
+          },
+          icon: const Icon(Icons.logout_rounded),
+          label: const Text('Logout'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFE53E3E),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
+// Data model for statistics
+class StatData {
+  final String title;
+  final String value;
+  final Color color;
+  final IconData icon;
+  final String subtitle;
+
+  const StatData({
+    required this.title,
+    required this.value,
+    required this.color,
+    required this.icon,
+    required this.subtitle,
+  });
+}
+
+// Data model for profile information
 class ProfileInfoItem {
   final IconData icon;
   final String title;
@@ -297,4 +865,4 @@ class ProfileInfoItem {
     required this.title,
     required this.value,
   });
-} 
+}

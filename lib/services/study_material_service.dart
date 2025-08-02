@@ -92,10 +92,10 @@ class StudyMaterialService {
   // Method to construct full file URL for viewing
   static String getFileUrl(String fileName) {
     if (fileName.isEmpty) return '';
-
+    
     // Remove leading slash if present to avoid double slashes
     String cleanFileName = fileName.startsWith('/') ? fileName.substring(1) : fileName;
-
+    
     // Construct the full URL
     return '${ApiConstants.baseUrl}/$cleanFileName';
   }
@@ -103,7 +103,7 @@ class StudyMaterialService {
   // Method to check if file is viewable in browser
   static bool isViewableInBrowser(String fileName) {
     if (fileName.isEmpty) return false;
-
+    
     final extension = fileName.toLowerCase().split('.').last;
     switch (extension) {
       case 'pdf':
@@ -121,7 +121,7 @@ class StudyMaterialService {
   // Method to get file type for proper handling
   static String getFileType(String fileName) {
     if (fileName.isEmpty) return 'unknown';
-
+    
     final extension = fileName.toLowerCase().split('.').last;
     switch (extension) {
       case 'pdf':
@@ -204,7 +204,7 @@ class StudyMaterialService {
   // Test method to verify URL construction
   static void testUrlConstruction() {
     print('=== URL CONSTRUCTION TEST ===');
-
+    
     final testCases = [
       '/StudyMaterial/10002---test.pdf',
       'StudyMaterial/10002---test.pdf',
@@ -217,14 +217,14 @@ class StudyMaterialService {
       final url = getFileUrl(testCase);
       final fileType = getFileType(testCase);
       final isViewable = isViewableInBrowser(testCase);
-
+      
       print('Input: "$testCase"');
       print('URL: "$url"');
       print('Type: $fileType');
       print('Viewable: $isViewable');
       print('---');
     }
-
+    
     print('=== END URL CONSTRUCTION TEST ===');
   }
 }

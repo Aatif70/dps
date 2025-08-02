@@ -39,6 +39,7 @@ class AppStrings {
   static const String leave = "Leave";
   static const String studyMaterial = "Study Material";
   static const String examination = "Examination";
+  static const String timetable = "Timetable";
   
   // Teacher Features
   static const String allocatedSubjects = "Allocated Subjects";

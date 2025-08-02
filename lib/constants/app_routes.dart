@@ -14,6 +14,7 @@ class AppRoutes {
   static const String studentStudyMaterial = '/student/study-material';
   static const String studentExamination = '/student/examination';
   static const String studentProfile = '/student/profile';
+  static const String studenttimetable = '/student/timetable';
   
   // Teacher Routes
   static const String teacherDashboard = '/teacher/dashboard';
