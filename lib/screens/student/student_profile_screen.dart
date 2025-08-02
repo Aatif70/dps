@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/services/student_profile_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({Key? key}) : super(key: key);
@@ -740,13 +742,21 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
               ? IconButton(
             icon: const Icon(Icons.visibility_outlined),
             onPressed: () {
-              // TODO: Implement document viewer
-              print('View document: ${document.fullDocumentPath}');
+              _showDocumentViewer(document);
             },
           )
               : const Icon(Icons.upload_outlined, color: Color(0xFF718096)),
         );
       }).toList(),
+    );
+  }
+
+  void _showDocumentViewer(Document document) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DocumentViewerModal(document: document),
     );
   }
 
@@ -812,4 +822,507 @@ class ProfileInfoItem {
     required this.title,
     required this.value,
   });
+}
+
+// Document Viewer Modal
+class DocumentViewerModal extends StatefulWidget {
+  final Document document;
+
+  const DocumentViewerModal({
+    Key? key,
+    required this.document,
+  }) : super(key: key);
+
+  @override
+  State<DocumentViewerModal> createState() => _DocumentViewerModalState();
+}
+
+class _DocumentViewerModalState extends State<DocumentViewerModal> {
+  bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDocumentAccessibility();
+  }
+
+  Future<void> _checkDocumentAccessibility() async {
+    try {
+      final url = widget.document.fullDocumentPath;
+      if (url.isEmpty) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Document path is empty';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Try to make a HEAD request to check if the document exists
+      final response = await http.head(Uri.parse(url));
+      if (response.statusCode == 200) {
+        setState(() {
+          _isLoading = false;
+          _hasError = false;
+        });
+      } else {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Document not found (Status: ${response.statusCode})';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Error accessing document: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.9,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          _buildModalHeader(),
+          Expanded(
+            child: _isLoading
+                ? _buildLoadingWidget()
+                : _hasError
+                    ? _buildErrorWidget()
+                    : _buildDocumentViewer(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModalHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.description_outlined,
+              color: Color(0xFF4A90E2),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.document.docType,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+                Text(
+                  'Document Viewer',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(
+              Icons.close_rounded,
+              color: Color(0xFF718096),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingWidget() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading document...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF718096),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: Colors.red.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Unable to load document',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF718096),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _checkDocumentAccessibility,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4A90E2),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _openDocumentInBrowser(),
+                  icon: const Icon(Icons.open_in_browser),
+                  label: const Text('Open in Browser'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF58CC02),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDocumentViewer() {
+    final url = widget.document.fullDocumentPath;
+    final fileExtension = _getFileExtension(url);
+
+    if (_isImageFile(fileExtension)) {
+      return _buildImageViewer(url);
+    } else if (_isPdfFile(fileExtension)) {
+      return _buildPdfViewer(url);
+    } else {
+      return _buildGenericViewer(url);
+    }
+  }
+
+  Widget _buildImageViewer(String url) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: InteractiveViewer(
+          panEnabled: true,
+          boundaryMargin: const EdgeInsets.all(20),
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Image.network(
+            url,
+            fit: BoxFit.contain,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return _buildErrorWidget();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPdfViewer(String url) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.picture_as_pdf,
+                  color: Color(0xFF4A90E2),
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'PDF Document',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.picture_as_pdf,
+                      size: 64,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'PDF Viewer',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'This document is a PDF file',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () => _openDocumentInBrowser(),
+                      icon: const Icon(Icons.open_in_browser),
+                      label: const Text('Open in Browser'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4A90E2),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenericViewer(String url) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF58CC02).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.description,
+                  color: Color(0xFF58CC02),
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Document File',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.description,
+                      size: 64,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Document Viewer',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'This document cannot be previewed',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () => _openDocumentInBrowser(),
+                      icon: const Icon(Icons.open_in_browser),
+                      label: const Text('Open in Browser'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF58CC02),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getFileExtension(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final path = uri.path;
+      final extension = path.split('.').last.toLowerCase();
+      return extension;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  bool _isImageFile(String extension) {
+    return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].contains(extension);
+  }
+
+  bool _isPdfFile(String extension) {
+    return extension == 'pdf';
+  }
+
+  Future<void> _openDocumentInBrowser() async {
+    final url = widget.document.fullDocumentPath;
+    if (url.isNotEmpty) {
+      try {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not open document in browser'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening document: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 }

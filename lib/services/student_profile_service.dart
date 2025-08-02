@@ -231,7 +231,11 @@ class StudentDetail {
     );
   }
 
-  String get photoUrl => 'http://192.168.1.7:8025$photo';
+  // String get photoUrl => ' $ApiConstants  $photo';
+
+  String get photoUrl => '${ApiConstants.baseUrl}$photo';
+
+
 }
 
 class StudentDocumentsResponse {
@@ -312,5 +316,5 @@ class Document {
   bool get isUploaded => documentPath != null && documentPath!.isNotEmpty;
 
   String get fullDocumentPath =>
-      documentPath != null ? '${ApiConstants.baseUrl}$documentPath' : '';
+      documentPath != null ? '${ApiConstants.baseUrl}/Images/Student/$documentPath' : '';
 }
