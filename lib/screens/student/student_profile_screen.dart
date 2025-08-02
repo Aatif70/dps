@@ -14,12 +14,8 @@ class StudentProfileScreen extends StatefulWidget {
 class _StudentProfileScreenState extends State<StudentProfileScreen>
     with TickerProviderStateMixin {
 
-  late AnimationController _headerAnimationController;
-  late AnimationController _cardsAnimationController;
-  late AnimationController _statsAnimationController;
-  late Animation<double> _headerSlideAnimation;
-  late Animation<double> _cardsStaggerAnimation;
-  late Animation<double> _statsScaleAnimation;
+  late AnimationController _fadeAnimationController;
+  late Animation<double> _fadeAnimation;
 
   bool _isLoading = true;
   bool _hasError = false;
@@ -31,58 +27,30 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
   @override
   void initState() {
     super.initState();
-    _initializeAnimations();
+    _initializeFadeAnimation();
     _loadStudentData();
   }
 
-  void _initializeAnimations() {
-    _headerAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _cardsAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _statsAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+  void _initializeFadeAnimation() {
+    _fadeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
-    _headerSlideAnimation = Tween<double>(
-      begin: -100.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _headerAnimationController,
-      curve: Curves.easeOutBack,
-    ));
-
-    _cardsStaggerAnimation = Tween<double>(
+    _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _cardsAnimationController,
-      curve: Curves.easeOutQuart,
+      parent: _fadeAnimationController,
+      curve: Curves.easeInOut,
     ));
 
-    _statsScaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _statsAnimationController,
-      curve: Curves.elasticOut,
-    ));
-
-    _startAnimations();
+    _startFadeAnimation();
   }
 
-  void _startAnimations() async {
+  void _startFadeAnimation() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    _headerAnimationController.forward();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _statsAnimationController.forward();
-    await Future.delayed(const Duration(milliseconds: 300));
-    _cardsAnimationController.forward();
+    _fadeAnimationController.forward();
   }
 
   Future<void> _loadStudentData() async {
@@ -129,9 +97,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
 
   @override
   void dispose() {
-    _headerAnimationController.dispose();
-    _cardsAnimationController.dispose();
-    _statsAnimationController.dispose();
+    _fadeAnimationController.dispose();
     super.dispose();
   }
 
@@ -144,24 +110,32 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
           ? _buildLoadingWidget()
           : _hasError
           ? _buildErrorWidget()
-          : SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildEnhancedHeader(context),
-            const SizedBox(height: 25),
-            _buildQuickStats(context),
-            const SizedBox(height: 25),
-            _buildPersonalInformation(context),
-            const SizedBox(height: 25),
-            _buildDocumentsSection(context),
-            const SizedBox(height: 25),
-            _buildLogoutButton(context),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
+          : AnimatedBuilder(
+              animation: _fadeAnimation,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildEnhancedHeader(context),
+                        const SizedBox(height: 25),
+                        _buildQuickStats(context),
+                        const SizedBox(height: 25),
+                        _buildPersonalInformation(context),
+                        const SizedBox(height: 25),
+                        _buildDocumentsSection(context),
+                        const SizedBox(height: 25),
+                        _buildLogoutButton(context),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _loadStudentData,
         backgroundColor: const Color(0xFF4A90E2),
@@ -282,116 +256,108 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
   }
 
   Widget _buildEnhancedHeader(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _headerSlideAnimation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _headerSlideAnimation.value),
-          child: Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4A90E2).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Hero(
+                tag: 'student_avatar',
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 35,
+                    backgroundColor: Colors.white,
+                    backgroundImage: _studentDetail?.photo.isNotEmpty == true
+                        ? NetworkImage(_studentDetail!.photoUrl)
+                        : null,
+                    child: _studentDetail?.photo.isEmpty == true
+                        ? const Icon(
+                      Icons.person_rounded,
+                      color: Color(0xFF718096),
+                      size: 32,
+                    )
+                        : null,
+                  ),
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Hero(
-                      tag: 'student_avatar',
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.white,
-                          backgroundImage: _studentDetail?.photo.isNotEmpty == true
-                              ? NetworkImage(_studentDetail!.photoUrl)
-                              : null,
-                          child: _studentDetail?.photo.isEmpty == true
-                              ? const Icon(
-                            Icons.person_rounded,
-                            color: Color(0xFF718096),
-                            size: 32,
-                          )
-                              : null,
-                        ),
+                    Text(
+                      _studentDetail?.studentName ?? 'Loading...',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
                     ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _studentDetail?.studentName ?? 'Loading...',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _studentDetail?.className ?? 'Class Information',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Text(
-                              'PRN: ${_studentDetail?.prn ?? 'N/A'}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 4),
+                    Text(
+                      _studentDetail?.className ?? 'Class Information',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text(
+                        'PRN: ${_studentDetail?.prn ?? 'N/A'}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -434,30 +400,22 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
       ),
     ];
 
-    return AnimatedBuilder(
-      animation: _statsScaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _statsScaleAnimation.value,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.2,
-              ),
-              itemCount: stats.length,
-              itemBuilder: (context, index) {
-                return _buildEnhancedStatCard(stats[index]);
-              },
-            ),
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1.2,
+        ),
+        itemCount: stats.length,
+        itemBuilder: (context, index) {
+          return _buildEnhancedStatCard(stats[index]);
+        },
+      ),
     );
   }
 
@@ -560,45 +518,34 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
       ),
     ];
 
-    return AnimatedBuilder(
-      animation: _cardsStaggerAnimation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset((1 - _cardsStaggerAnimation.value) * 50, 0),
-          child: Opacity(
-            opacity: _cardsStaggerAnimation.value,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Personal Information',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2D3748),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ...infoItems.map((item) => _buildInfoItem(context, item)),
-                ],
-              ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Personal Information',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2D3748),
             ),
           ),
-        );
-      },
+          const SizedBox(height: 24),
+          ...infoItems.map((item) => _buildInfoItem(context, item)),
+        ],
+      ),
     );
   }
 
