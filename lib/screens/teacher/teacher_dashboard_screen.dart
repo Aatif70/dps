@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherDashboardScreen extends StatefulWidget {
   const TeacherDashboardScreen({super.key});
@@ -12,6 +13,28 @@ class TeacherDashboardScreen extends StatefulWidget {
 }
 
 class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
+  String _fullName = '';
+
+  Future<void> _loadFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fullName = prefs.getString('FullName') ?? 'Teacher';
+    });
+  }
+
+  String _getInitials(String fullName) {
+    if (fullName.isEmpty) return 'T';
+
+    final names = fullName.split(' ');
+    if (names.length >= 2) {
+      return '${names[0][0]}${names[1][0]}'.toUpperCase();
+    } else if (names.length == 1) {
+      return names[0][0].toUpperCase();
+    }
+    return 'T';
+  }
+
+
   Future<void> _refreshPage() async {
     setState(() {});
     await Future.delayed(const Duration(milliseconds: 500));
@@ -20,6 +43,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _loadFullName();
     // No initial animations needed
   }
 
@@ -108,15 +132,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     ),
     ),
     const SizedBox(height: 8),
-    Text(
-    'Dr. Rajesh Kumar',
-    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-    color: Colors.white,
-    fontWeight: FontWeight.bold,
-    fontSize: 24,
-    ),
-    ),
-    const SizedBox(height: 4),
+      Text(
+        _fullName.isEmpty ? 'Loading...' : _fullName,
+        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+        ),
+      ),
+
+      const SizedBox(height: 4),
     Text(
     'Mathematics & Physics',
     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -182,14 +207,15 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     child: CircleAvatar(
     radius: 35,
     backgroundColor: Colors.white,
-    child: Text(
-    'RK',
-    style: TextStyle(
-    color: const Color(0xFF58CC02),
-    fontWeight: FontWeight.bold,
-    fontSize: 20,
-    ),
-    ),
+      child: Text(
+        _getInitials(_fullName),
+        style: TextStyle(
+          color: const Color(0xFF58CC02),
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      ),
+
     ),
     ),
     ),
