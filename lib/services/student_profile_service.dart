@@ -5,15 +5,31 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentProfileService {
-  static const String baseUrl = 'http://192.168.1.7:8025';
+  static const String baseUrl = ApiConstants.baseUrl;
 
   static Future<StudentDetailResponse?> getStudentDetails() async {
     try {
       print('=== STUDENT DETAILS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
-      final studentId = prefs.getString('Id') ?? '';
-      final uid = prefs.getString('Uid') ?? '';
+      
+      // Handle both string and int types for Id
+      String studentId = '';
+      if (prefs.containsKey('Id')) {
+        final idValue = prefs.get('Id');
+        if (idValue != null) {
+          studentId = idValue.toString();
+        }
+      }
+      
+      // Handle both string and int types for Uid
+      String uid = '';
+      if (prefs.containsKey('Uid')) {
+        final uidValue = prefs.get('Uid');
+        if (uidValue != null) {
+          uid = uidValue.toString();
+        }
+      }
 
       print('Student ID: $studentId');
       print('UID: $uid');
@@ -75,8 +91,24 @@ class StudentProfileService {
       print('=== STUDENT DOCUMENTS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
-      final studentId = prefs.getString('StudentId') ?? '';
-      final uid = prefs.getString('UId') ?? '';
+      
+      // Handle both string and int types for Id
+      String studentId = '';
+      if (prefs.containsKey('Id')) {
+        final idValue = prefs.get('Id');
+        if (idValue != null) {
+          studentId = idValue.toString();
+        }
+      }
+      
+      // Handle both string and int types for Uid
+      String uid = '';
+      if (prefs.containsKey('Uid')) {
+        final uidValue = prefs.get('Uid');
+        if (uidValue != null) {
+          uid = uidValue.toString();
+        }
+      }
 
       print('Student ID: $studentId');
       print('UID: $uid');

@@ -1,3 +1,4 @@
+import 'package:dps/screens/student/timetable_screen.dart';
 import 'package:dps/screens/teacher/allocated_subjects_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.studentStudyMaterial: (context) => const StudyMaterialScreen(),
         AppRoutes.studentExamination: (context) => const ExaminationScreen(),
         AppRoutes.studentProfile: (context) => const StudentProfileScreen(),
+        AppRoutes.studenttimetable: (context) => const TimetableScreen(),
 
         // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),
@@ -58,6 +60,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.teacherStudyMaterial: (context) => const TeacherStudyMaterialScreen(),
         AppRoutes.teacherAllocatedSubjects: (context) => const TeacherAllocatedSubjectsScreen(),
         AppRoutes.teacherprofile: (context) => const TeacherProfileScreen(),
+
+
+        // Admin routes
+        // AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
 
       },
       onGenerateRoute: (settings) {
