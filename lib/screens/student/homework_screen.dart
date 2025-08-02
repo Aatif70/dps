@@ -4,6 +4,10 @@ import 'package:dps/constants/app_strings.dart';
 import 'package:dps/services/homework_service.dart';
 import 'package:dps/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:dps/constants/api_constants.dart';
+import 'package:photo_view/photo_view.dart';
+
 
 class HomeworkScreen extends StatefulWidget {
   const HomeworkScreen({super.key});
@@ -120,6 +124,199 @@ class _HomeworkScreenState extends State<HomeworkScreen>
       }
     }
   }
+
+  // Add this method to handle document viewing
+  Future<void> _viewDocument(String docPath, String subject) async {
+    if (docPath.isEmpty || docPath == '/StudyMaterial/HomeWork/') {
+      CustomSnackbar.showError(
+        context,
+        message: 'No document attached to this homework',
+      );
+      return;
+    }
+
+    try {
+      final fullUrl = '${ApiConstants.baseUrl}$docPath';
+      print('Opening document: $fullUrl');
+
+      // Check file extension to determine how to handle it
+      final extension = docPath.toLowerCase().split('.').last;
+
+      if (['png', 'jpg', 'jpeg', 'gif', 'bmp'].contains(extension)) {
+        // Show image in modal
+        _showImageModal(fullUrl, subject);
+      } else if (['pdf'].contains(extension)) {
+        // Open PDF externally
+        await _openUrlExternally(fullUrl);
+      } else if (['txt', 'doc', 'docx'].contains(extension)) {
+        // For text files, try to open externally or show in modal
+        await _openUrlExternally(fullUrl);
+      } else {
+        // For other file types, try to open externally
+        await _openUrlExternally(fullUrl);
+      }
+    } catch (e) {
+      print('Error viewing document: $e');
+      CustomSnackbar.showError(
+        context,
+        message: 'Unable to open document. Please try again.',
+      );
+    }
+  }
+
+// Method to show image in modal
+  void _showImageModal(String imageUrl, String subject) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(10),
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '$subject - Attachment',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D3748),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Image
+                Expanded(
+                  child: Container(
+                    color: Colors.black,
+                    child: PhotoView(
+                      imageProvider: NetworkImage(imageUrl),
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.black,
+                      ),
+                      minScale: PhotoViewComputedScale.contained * 0.8,
+                      maxScale: PhotoViewComputedScale.covered * 2.0,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Unable to load image',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                // Footer with download button
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _openUrlExternally(imageUrl),
+                      icon: const Icon(Icons.download_rounded),
+                      label: const Text('Open in Browser'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4A90E2),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+// Method to open URL externally
+  Future<void> _openUrlExternally(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        CustomSnackbar.showError(
+          context,
+          message: 'Unable to open document',
+        );
+      }
+    }
+  }
+
+// Helper method to get file type icon
+  IconData _getFileTypeIcon(String docPath) {
+    if (docPath.isEmpty || docPath == '/StudyMaterial/HomeWork/') {
+      return Icons.attach_file_rounded;
+    }
+
+    final extension = docPath.toLowerCase().split('.').last;
+
+    switch (extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf_rounded;
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif':
+      case 'bmp':
+        return Icons.image_rounded;
+      case 'txt':
+        return Icons.text_snippet_rounded;
+      case 'doc':
+      case 'docx':
+        return Icons.description_rounded;
+      default:
+        return Icons.attach_file_rounded;
+    }
+  }
+
 
   void _groupDataByDate(List<StudentHomeworkRecord> records) {
     _groupedByDate.clear();
@@ -793,19 +990,37 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                   ],
                 ),
               ),
-              if (homework.doc != null)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF58CC02).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.attachment_rounded,
-                    color: Color(0xFF58CC02),
-                    size: 16,
+              if (homework.doc != null && homework.doc!.isNotEmpty)
+                GestureDetector(
+                  onTap: () => _viewDocument(homework.doc!, homework.subject),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF58CC02).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getFileTypeIcon(homework.doc!),
+                          color: const Color(0xFF58CC02),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'View',
+                          style: TextStyle(
+                            color: Color(0xFF58CC02),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+
             ],
           ),
           const SizedBox(height: 16),
