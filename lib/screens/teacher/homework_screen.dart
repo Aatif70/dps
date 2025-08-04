@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import '../../services/teacher_homework_service.dart';
+
 
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({super.key});
@@ -9,82 +14,24 @@ class TeacherHomeworkScreen extends StatefulWidget {
   State<TeacherHomeworkScreen> createState() => _TeacherHomeworkScreenState();
 }
 
-class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with SingleTickerProviderStateMixin {
+class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
+    with SingleTickerProviderStateMixin {
+
   late TabController _tabController;
-  
-  // Mock data for assignments
-  final List<Assignment> _assignments = [
-    Assignment(
-      id: 'HW-2023-001',
-      title: 'Linear Equations',
-      description: 'Solve problems 1-15 from Chapter 5',
-      subject: 'Mathematics',
-      classAssigned: 'Class 10-A',
-      assignedDate: DateTime.now().subtract(const Duration(days: 2)),
-      dueDate: DateTime.now().add(const Duration(days: 3)),
-      status: AssignmentStatus.active,
-      attachments: ['Chapter5_Problems.pdf'],
-      submissionCount: 18,
-      totalStudents: 32,
-    ),
-    Assignment(
-      id: 'HW-2023-002',
-      title: 'Photosynthesis',
-      description: 'Complete the experiment report and answer questions on page 45',
-      subject: 'Science',
-      classAssigned: 'Class 11-A',
-      assignedDate: DateTime.now().subtract(const Duration(days: 1)),
-      dueDate: DateTime.now().add(const Duration(days: 4)),
-      status: AssignmentStatus.active,
-      attachments: ['Experiment_Guide.pdf', 'Report_Template.docx'],
-      submissionCount: 12,
-      totalStudents: 28,
-    ),
-    Assignment(
-      id: 'HW-2023-003',
-      title: 'Essay Writing',
-      description: 'Write a 500-word essay on "Environmental Conservation"',
-      subject: 'English',
-      classAssigned: 'Class 10-B',
-      assignedDate: DateTime.now().subtract(const Duration(days: 3)),
-      dueDate: DateTime.now().add(const Duration(days: 1)),
-      status: AssignmentStatus.active,
-      submissionCount: 22,
-      totalStudents: 30,
-    ),
-    Assignment(
-      id: 'HW-2023-004',
-      title: 'Newton\'s Laws of Motion',
-      description: 'Complete the worksheet on Newton\'s Laws of Motion',
-      subject: 'Physics',
-      classAssigned: 'Class 11-A',
-      assignedDate: DateTime.now().subtract(const Duration(days: 10)),
-      dueDate: DateTime.now().subtract(const Duration(days: 3)),
-      status: AssignmentStatus.completed,
-      attachments: ['Newton_Laws_Worksheet.pdf'],
-      submissionCount: 26,
-      totalStudents: 28,
-      gradedCount: 26,
-    ),
-    Assignment(
-      id: 'HW-2023-005',
-      title: 'Quadratic Equations',
-      description: 'Solve the problems from Exercise 4.2',
-      subject: 'Mathematics',
-      classAssigned: 'Class 10-A',
-      assignedDate: DateTime.now().subtract(const Duration(days: 15)),
-      dueDate: DateTime.now().subtract(const Duration(days: 8)),
-      status: AssignmentStatus.completed,
-      submissionCount: 30,
-      totalStudents: 32,
-      gradedCount: 30,
-    ),
-  ];
+
+  // Real data from API
+  List<TeacherHomework> _homeworkList = [];
+  bool _isLoading = true;
+
+  // Date range for fetching data
+  DateTime _fromDate = DateTime.now().subtract(const Duration(days: 30));
+  DateTime _toDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadHomeworkData();
   }
 
   @override
@@ -93,15 +40,40 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
     super.dispose();
   }
 
+  Future<void> _loadHomeworkData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final homeworkList = await TeacherHomeworkService.getHomeworkList(
+        fromDate: _fromDate,
+        toDate: _toDate,
+      );
+
+      setState(() {
+        _homeworkList = homeworkList;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading homework data: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final activeAssignments = _assignments.where((a) => a.status == AssignmentStatus.active).toList();
-    final completedAssignments = _assignments.where((a) => a.status == AssignmentStatus.completed).toList();
-    
+    final activeHomework = _homeworkList;
+    final completedHomework = <TeacherHomework>[]; // You can filter based on your logic
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: Text(AppStrings.homework),
+        title: Text(
+          AppStrings.homework,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -116,37 +88,39 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
           ],
         ),
       ),
-      body: TabBarView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : TabBarView(
         controller: _tabController,
         children: [
-          _buildActiveAssignmentsTab(activeAssignments),
-          _buildCompletedAssignmentsTab(completedAssignments),
+          _buildActiveHomeworkTab(activeHomework),
+          _buildCompletedHomeworkTab(completedHomework),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showCreateAssignmentDialog(context);
+          _showCreateHomeworkDialog(context);
         },
         backgroundColor: const Color(0xFF58CC02),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  Widget _buildActiveAssignmentsTab(List<Assignment> assignments) {
-    if (assignments.isEmpty) {
-      return _buildEmptyState('No active assignments', 'Create a new assignment by tapping the + button');
+  Widget _buildActiveHomeworkTab(List<TeacherHomework> homework) {
+    if (homework.isEmpty) {
+      return _buildEmptyState('No homework found', 'Create homework by tapping the + button');
     }
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAssignmentSummary(assignments),
+          _buildHomeworkSummary(homework),
           const SizedBox(height: 24),
           Text(
-            'Active Assignments',
+            'Homework List',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -154,22 +128,22 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
             ),
           ),
           const SizedBox(height: 16),
-          ...assignments.map((assignment) => _buildAssignmentCard(assignment)).toList(),
+          ...homework.map((hw) => _buildHomeworkCard(hw)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildCompletedAssignmentsTab(List<Assignment> assignments) {
-    if (assignments.isEmpty) {
-      return _buildEmptyState('No completed assignments', 'Completed assignments will appear here');
+  Widget _buildCompletedHomeworkTab(List<TeacherHomework> homework) {
+    if (homework.isEmpty) {
+      return _buildEmptyState('No completed homework', 'Completed homework will appear here');
     }
-    
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: assignments.length,
+      itemCount: homework.length,
       itemBuilder: (context, index) {
-        return _buildCompletedAssignmentCard(assignments[index]);
+        return _buildHomeworkCard(homework[index]);
       },
     );
   }
@@ -208,11 +182,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
     );
   }
 
-  Widget _buildAssignmentSummary(List<Assignment> assignments) {
-    final totalSubmissions = assignments.fold<int>(0, (sum, a) => sum + a.submissionCount);
-    final totalStudents = assignments.fold<int>(0, (sum, a) => sum + a.totalStudents);
-    final submissionRate = totalStudents > 0 ? totalSubmissions / totalStudents : 0.0;
-    
+  Widget _buildHomeworkSummary(List<TeacherHomework> homework) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -225,7 +195,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Assignment Summary',
+              'Homework Summary',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -237,37 +207,19 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'Active',
-                    assignments.length.toString(),
+                    'Total',
+                    homework.length.toString(),
                     const Color(0xFF58CC02),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildStatCard(
-                    'Submission Rate',
-                    '${(submissionRate * 100).toStringAsFixed(1)}%',
+                    'This Week',
+                    homework.where((hw) =>
+                        hw.date.isAfter(DateTime.now().subtract(const Duration(days: 7)))
+                    ).length.toString(),
                     const Color(0xFF4A90E2),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Due Soon',
-                    _getDueSoonCount(assignments).toString(),
-                    const Color(0xFFFF9500),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatCard(
-                    'Pending Review',
-                    _getPendingReviewCount(assignments).toString(),
-                    const Color(0xFF8E44AD),
                   ),
                 ),
               ],
@@ -275,21 +227,6 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
           ],
         ),
       ),
-    );
-  }
-
-  int _getDueSoonCount(List<Assignment> assignments) {
-    final now = DateTime.now();
-    return assignments.where((a) => 
-      a.dueDate.difference(now).inDays <= 2 && 
-      a.dueDate.isAfter(now)
-    ).length;
-  }
-
-  int _getPendingReviewCount(List<Assignment> assignments) {
-    return assignments.fold<int>(
-      0, 
-      (sum, a) => sum + (a.submissionCount - (a.gradedCount ?? 0))
     );
   }
 
@@ -325,10 +262,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
     );
   }
 
-  Widget _buildAssignmentCard(Assignment assignment) {
-    final daysLeft = assignment.dueDate.difference(DateTime.now()).inDays;
-    final isUrgent = daysLeft <= 1;
-    
+  Widget _buildHomeworkCard(TeacherHomework homework) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 0,
@@ -336,248 +270,349 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey.shade200),
       ),
-      child: InkWell(
-        onTap: () {
-          // Navigate to assignment detail screen
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _getSubjectColor(assignment.subject).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      _getSubjectIcon(assignment.subject),
-                      color: _getSubjectColor(assignment.subject),
-                      size: 24,
-                    ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _getSubjectColor(homework.subject).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          assignment.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          '${assignment.subject} • ${assignment.classAssigned}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: Icon(
+                    _getSubjectIcon(homework.subject),
+                    color: _getSubjectColor(homework.subject),
+                    size: 24,
                   ),
-                  if (isUrgent)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE74C3C).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Due Soon',
-                        style: TextStyle(
-                          color: const Color(0xFFE74C3C),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                assignment.description,
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 14,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Due: ${DateFormat('d MMM, yyyy').format(assignment.dueDate)}',
-                    style: TextStyle(
-                      color: isUrgent ? const Color(0xFFE74C3C) : Colors.grey.shade600,
-                      fontWeight: isUrgent ? FontWeight.bold : FontWeight.normal,
-                      fontSize: 13,
-                    ),
-                  ),
-                  Row(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.people_outline,
-                        size: 16,
-                        color: Color(0xFF58CC02),
-                      ),
-                      const SizedBox(width: 4),
                       Text(
-                        '${assignment.submissionCount}/${assignment.totalStudents}',
+                        homework.subject,
                         style: const TextStyle(
-                          color: Color(0xFF58CC02),
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${homework.className} - Division ${homework.division}',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-              if (assignment.attachments.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const Divider(),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.attach_file,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${assignment.attachments.length} attachment${assignment.attachments.length > 1 ? 's' : ''}',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
                 ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCompletedAssignmentCard(Assignment assignment) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: InkWell(
-        onTap: () {
-          // Navigate to assignment detail screen
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _getSubjectColor(assignment.subject).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      _getSubjectIcon(assignment.subject),
-                      color: _getSubjectColor(assignment.subject),
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          assignment.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          '${assignment.subject} • ${assignment.classAssigned}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                if (homework.doc != null && homework.doc!.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: const Color(0xFF58CC02).withOpacity(0.1),
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      Icons.check,
+                      Icons.attachment_rounded,
                       color: Color(0xFF58CC02),
                       size: 16,
                     ),
                   ),
-                ],
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Due date: ${DateFormat('d MMM, yyyy').format(assignment.dueDate)}',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 13,
-                    ),
-                  ),
-                  Text(
-                    'Submissions: ${assignment.submissionCount}/${assignment.totalStudents}',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
+              child: Text(
+                homework.homeWork,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF2D3748),
+                  height: 1.5,
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  color: Colors.grey.shade600,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  DateFormat('MMM dd, yyyy').format(homework.date),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  'By: ${homework.employee}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _showCreateAssignmentDialog(BuildContext context) {
+  void _showCreateHomeworkDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => _buildCreateAssignmentForm(),
+      builder: (context) => const CreateHomeworkForm(),
     );
   }
 
-  Widget _buildCreateAssignmentForm() {
+  Color _getSubjectColor(String subject) {
+    switch (subject.toLowerCase()) {
+      case 'mathematics':
+      case 'maths':
+        return const Color(0xFF4A90E2);
+      case 'science':
+        return const Color(0xFF58CC02);
+      case 'english':
+        return const Color(0xFF8E44AD);
+      case 'physics':
+        return const Color(0xFFFF9500);
+      case 'marathi':
+        return const Color(0xFFE74C3C);
+      default:
+        return const Color(0xFF2ECC71);
+    }
+  }
+
+  IconData _getSubjectIcon(String subject) {
+    switch (subject.toLowerCase()) {
+      case 'mathematics':
+      case 'maths':
+        return Icons.calculate;
+      case 'science':
+        return Icons.science;
+      case 'english':
+        return Icons.menu_book;
+      case 'physics':
+        return Icons.flash_on;
+      case 'marathi':
+        return Icons.language;
+      default:
+        return Icons.school;
+    }
+  }
+}
+
+// Create Homework Form Widget
+class CreateHomeworkForm extends StatefulWidget {
+  const CreateHomeworkForm({Key? key}) : super(key: key);
+
+  @override
+  State<CreateHomeworkForm> createState() => _CreateHomeworkFormState();
+}
+
+class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _homeworkController = TextEditingController();
+
+  // Dropdown data
+  List<Course> _courses = [];
+  List<Batch> _batches = [];
+  List<Division> _divisions = [];
+  List<Subject> _subjects = [];
+
+  // Selected values
+  Course? _selectedCourse;
+  Batch? _selectedBatch;
+  Division? _selectedDivision;
+  Subject? _selectedSubject;
+  DateTime _selectedDate = DateTime.now();
+  File? _selectedFile;
+
+  bool _isLoading = false;
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
+
+  @override
+  void dispose() {
+    _homeworkController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadCourses() async {
+    setState(() => _isLoading = true);
+    try {
+      final courses = await TeacherHomeworkService.getCourses();
+      setState(() {
+        _courses = courses;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadBatches() async {
+    if (_selectedCourse == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final batches = await TeacherHomeworkService.getBatches(_selectedCourse!.courseMasterId);
+      setState(() {
+        _batches = batches;
+        _selectedBatch = null;
+        _divisions.clear();
+        _subjects.clear();
+        _selectedDivision = null;
+        _selectedSubject = null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadDivisions() async {
+    if (_selectedBatch == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final divisions = await TeacherHomeworkService.getDivisions(_selectedBatch!.classId);
+      setState(() {
+        _divisions = divisions;
+        _selectedDivision = null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadSubjects() async {
+    if (_selectedBatch == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final subjects = await TeacherHomeworkService.getSubjects(_selectedBatch!.classMasterId);
+      setState(() {
+        _subjects = subjects;
+        _selectedSubject = null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          _selectedFile = File(result.files.single.path!);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking file: $e')),
+      );
+    }
+  }
+
+  Future<void> _selectDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+
+    if (date != null) {
+      setState(() {
+        _selectedDate = date;
+      });
+    }
+  }
+
+  Future<void> _submitHomework() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedSubject == null || _selectedBatch == null || _selectedDivision == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final success = await TeacherHomeworkService.addHomework(
+        subjectId: _selectedSubject!.subjectId,
+        date: _selectedDate,
+        classMasterId: _selectedBatch!.classMasterId,
+        classId: _selectedBatch!.classId,
+        divisionId: _selectedDivision!.divisionId,
+        homework: _homeworkController.text,
+        file: _selectedFile,
+      );
+
+      if (success) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Homework created successfully!'),
+            backgroundColor: Color(0xFF58CC02),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create homework'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       maxChildSize: 0.9,
@@ -587,205 +622,249 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> with Sing
         return SingleChildScrollView(
           controller: scrollController,
           child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Create Assignment',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'This is just a placeholder form. In a real app, this would be a complete form to create new assignments.',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Subject',
-                          border: OutlineInputBorder(),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Create Homework',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
                         ),
-                        items: ['Mathematics', 'Science', 'English', 'Physics']
-                            .map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (value) {},
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Class',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: ['Class 10-A', 'Class 10-B', 'Class 11-A']
-                            .map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (value) {},
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Course Dropdown
+                  DropdownButtonFormField<Course>(
+                    decoration: const InputDecoration(
+                      labelText: 'Course',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.school_outlined),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Due Date',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () {
-                    // Show date picker
-                  },
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Upload attachment logic
-                  },
-                  icon: const Icon(Icons.attach_file),
-                  label: const Text('Add Attachment'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade200,
-                    foregroundColor: Colors.grey.shade800,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Assignment created successfully!'),
-                          backgroundColor: Color(0xFF58CC02),
-                        ),
+                    value: _selectedCourse,
+                    items: _courses.map((course) {
+                      return DropdownMenuItem(
+                        value: course,
+                        child: Text(course.courseName),
                       );
+                    }).toList(),
+                    onChanged: (course) {
+                      setState(() {
+                        _selectedCourse = course;
+                      });
+                      _loadBatches();
+                      _loadSubjects();
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF58CC02),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    validator: (value) => value == null ? 'Please select a course' : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Batch Dropdown
+                  DropdownButtonFormField<Batch>(
+                    decoration: const InputDecoration(
+                      labelText: 'Class',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.class_outlined),
                     ),
-                    child: const Text(
-                      'Create Assignment',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    value: _selectedBatch,
+                    items: _batches.map((batch) {
+                      return DropdownMenuItem(
+                        value: batch,
+                        child: Text(batch.batchName),
+                      );
+                    }).toList(),
+                    onChanged: (batch) {
+                      setState(() {
+                        _selectedBatch = batch;
+                      });
+                      _loadDivisions();
+                    },
+                    validator: (value) => value == null ? 'Please select a class' : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Division Dropdown
+                  DropdownButtonFormField<Division>(
+                    decoration: const InputDecoration(
+                      labelText: 'Division',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.group_outlined),
+                    ),
+                    value: _selectedDivision,
+                    items: _divisions.map((division) {
+                      return DropdownMenuItem(
+                        value: division,
+                        child: Text(division.name),
+                      );
+                    }).toList(),
+                    onChanged: (division) {
+                      setState(() {
+                        _selectedDivision = division;
+                      });
+                    },
+                    validator: (value) => value == null ? 'Please select a division' : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Subject Dropdown
+                  DropdownButtonFormField<Subject>(
+                    decoration: const InputDecoration(
+                      labelText: 'Subject',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.subject_outlined),
+                    ),
+                    value: _selectedSubject,
+                    items: _subjects.map((subject) {
+                      return DropdownMenuItem(
+                        value: subject,
+                        child: Text(subject.subjectName),
+                      );
+                    }).toList(),
+                    onChanged: (subject) {
+                      setState(() {
+                        _selectedSubject = subject;
+                      });
+                    },
+                    validator: (value) => value == null ? 'Please select a subject' : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Date Picker
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Due Date',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.calendar_today),
+                    ),
+                    readOnly: true,
+                    controller: TextEditingController(
+                      text: DateFormat('MMM dd, yyyy').format(_selectedDate),
+                    ),
+                    onTap: _selectDate,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Homework Description
+                  TextFormField(
+                    controller: _homeworkController,
+                    decoration: const InputDecoration(
+                      labelText: 'Homework Description',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.description_outlined),
+                    ),
+                    maxLines: 4,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter homework description';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // File Attachment
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        if (_selectedFile != null) ...[
+                          Row(
+                            children: [
+                              const Icon(Icons.attach_file, color: Color(0xFF58CC02)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _selectedFile!.path.split('/').last,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedFile = null;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          GestureDetector(
+                            onTap: _pickFile,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.attach_file, color: Color(0xFF58CC02)),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Attach File (Optional)',
+                                  style: TextStyle(
+                                    color: Color(0xFF58CC02),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submitHomework,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF58CC02),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: _isSubmitting
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                        'Create Homework',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
-
-  Color _getSubjectColor(String subject) {
-    switch (subject.toLowerCase()) {
-      case 'mathematics':
-        return const Color(0xFF4A90E2);
-      case 'science':
-        return const Color(0xFF58CC02);
-      case 'english':
-        return const Color(0xFF8E44AD);
-      case 'physics':
-        return const Color(0xFFFF9500);
-      default:
-        return const Color(0xFF2ECC71);
-    }
-  }
-
-  IconData _getSubjectIcon(String subject) {
-    switch (subject.toLowerCase()) {
-      case 'mathematics':
-        return Icons.calculate;
-      case 'science':
-        return Icons.science;
-      case 'english':
-        return Icons.menu_book;
-      case 'physics':
-        return Icons.flash_on;
-      default:
-        return Icons.school;
-    }
-  }
 }
-
-enum AssignmentStatus { active, completed }
-
-class Assignment {
-  final String id;
-  final String title;
-  final String description;
-  final String subject;
-  final String classAssigned;
-  final DateTime assignedDate;
-  final DateTime dueDate;
-  final AssignmentStatus status;
-  final List<String> attachments;
-  final int submissionCount;
-  final int totalStudents;
-  final int? gradedCount;
-
-  Assignment({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.subject,
-    required this.classAssigned,
-    required this.assignedDate,
-    required this.dueDate,
-    required this.status,
-    this.attachments = const [],
-    required this.submissionCount,
-    required this.totalStudents,
-    this.gradedCount,
-  });
-} 

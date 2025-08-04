@@ -3,7 +3,9 @@ import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dps/widgets/event_calendar_widget.dart'; // Add this import
+import 'package:dps/widgets/event_calendar_widget.dart';
+import 'package:dps/widgets/gallery_preview_widget.dart';
+
 
 class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
@@ -102,6 +104,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 const SizedBox(height: 20),
                 // Feature Grid 2
                 _buildEnhancedFeatureGrid2(context),
+
+
+                const SizedBox(height: 30),
+                // GALLERY PREVIEW - NEW ADDITION
+                const GalleryPreviewWidget(),
+                const SizedBox(height: 30),
+
+
               ],
             ),
           ),
