@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:intl/intl.dart';
+import '../../services/teacher_leave_service.dart';
 
 class TeacherLeaveScreen extends StatefulWidget {
   const TeacherLeaveScreen({super.key});
@@ -11,84 +12,19 @@ class TeacherLeaveScreen extends StatefulWidget {
 
 class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
-  // Mock data for leave requests
-  final List<LeaveRequest> _leaveRequests = [
-    LeaveRequest(
-      id: 'LR-2023-001',
-      studentName: 'Priya Sharma',
-      studentClass: 'Class 10-A',
-      rollNumber: '12',
-      reason: 'Medical Leave',
-      description: 'Suffering from viral fever and doctor has advised rest',
-      fromDate: DateTime.now().add(const Duration(days: 3)),
-      toDate: DateTime.now().add(const Duration(days: 5)),
-      status: LeaveStatus.pending,
-      appliedOn: DateTime.now().subtract(const Duration(hours: 3)),
-      attachments: ['Medical_Certificate.pdf'],
-    ),
-    LeaveRequest(
-      id: 'LR-2023-002',
-      studentName: 'Rahul Kumar',
-      studentClass: 'Class 10-B',
-      rollNumber: '05',
-      reason: 'Family Function',
-      description: 'Need to attend cousin\'s wedding',
-      fromDate: DateTime.now().add(const Duration(days: 10)),
-      toDate: DateTime.now().add(const Duration(days: 12)),
-      status: LeaveStatus.approved,
-      appliedOn: DateTime.now().subtract(const Duration(days: 5)),
-      actionBy: 'Dr. Rajesh Kumar',
-      actionOn: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    LeaveRequest(
-      id: 'LR-2023-003',
-      studentName: 'Amit Singh',
-      studentClass: 'Class 11-A',
-      rollNumber: '08',
-      reason: 'Personal Emergency',
-      description: 'Family emergency requiring immediate attention',
-      fromDate: DateTime.now().subtract(const Duration(days: 8)),
-      toDate: DateTime.now().subtract(const Duration(days: 7)),
-      status: LeaveStatus.approved,
-      appliedOn: DateTime.now().subtract(const Duration(days: 10)),
-      actionBy: 'Dr. Rajesh Kumar',
-      actionOn: DateTime.now().subtract(const Duration(days: 9)),
-    ),
-    LeaveRequest(
-      id: 'LR-2023-004',
-      studentName: 'Neha Gupta',
-      studentClass: 'Class 10-A',
-      rollNumber: '15',
-      reason: 'Sports Competition',
-      description: 'Selected for inter-school basketball tournament',
-      fromDate: DateTime.now().add(const Duration(days: 5)),
-      toDate: DateTime.now().add(const Duration(days: 7)),
-      status: LeaveStatus.pending,
-      appliedOn: DateTime.now().subtract(const Duration(days: 1)),
-      attachments: ['Selection_Letter.pdf'],
-    ),
-    LeaveRequest(
-      id: 'LR-2023-005',
-      studentName: 'Ravi Patel',
-      studentClass: 'Class 11-B',
-      rollNumber: '22',
-      reason: 'Religious Festival',
-      description: 'Need to attend important religious ceremony',
-      fromDate: DateTime.now().subtract(const Duration(days: 15)),
-      toDate: DateTime.now().subtract(const Duration(days: 14)),
-      status: LeaveStatus.rejected,
-      appliedOn: DateTime.now().subtract(const Duration(days: 20)),
-      actionBy: 'Dr. Rajesh Kumar',
-      actionOn: DateTime.now().subtract(const Duration(days: 18)),
-      comments: 'Request submitted too late and attendance is mandatory for pre-exam review.',
-    ),
-  ];
+
+  List<LeaveRequest> _leaveRequests = [];
+  bool _isLoading = true;
+
+  // Date range for fetching data
+  DateTime _fromDate = DateTime.now().subtract(const Duration(days: 30));
+  DateTime _toDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadLeaveData();
   }
 
   @override
@@ -97,12 +33,59 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
     super.dispose();
   }
 
+  Future<void> _loadLeaveData() async {
+    setState(() => _isLoading = true);
+    try {
+      final leaveList = await TeacherLeaveService.getLeaveList(
+        fromDate: _fromDate,
+        toDate: _toDate,
+      );
+      setState(() {
+        _leaveRequests = leaveList;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading leave data: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _selectDateRange() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDateRange: DateTimeRange(start: _fromDate, end: _toDate),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF8E44AD),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _fromDate = picked.start;
+        _toDate = picked.end;
+      });
+      _loadLeaveData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pendingLeaves = _leaveRequests.where((leave) => leave.status == LeaveStatus.pending).toList();
     final approvedLeaves = _leaveRequests.where((leave) => leave.status == LeaveStatus.approved).toList();
     final rejectedLeaves = _leaveRequests.where((leave) => leave.status == LeaveStatus.rejected).toList();
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -110,19 +93,31 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.date_range, color: Color(0xFF8E44AD)),
+            onPressed: _selectDateRange,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Color(0xFF8E44AD)),
+            onPressed: _loadLeaveData,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: const Color(0xFF8E44AD),
           unselectedLabelColor: Colors.grey,
           indicatorColor: const Color(0xFF8E44AD),
-          tabs: const [
-            Tab(text: 'Pending'),
-            Tab(text: 'Approved'),
-            Tab(text: 'Rejected'),
+          tabs: [
+            Tab(text: 'Pending (${pendingLeaves.length})'),
+            Tab(text: 'Approved (${approvedLeaves.length})'),
+            Tab(text: 'Rejected (${rejectedLeaves.length})'),
           ],
         ),
       ),
-      body: TabBarView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF8E44AD)))
+          : TabBarView(
         controller: _tabController,
         children: [
           _buildLeaveList(pendingLeaves, 'No pending leave requests'),
@@ -137,7 +132,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
     if (leaves.isEmpty) {
       return _buildEmptyState(emptyMessage);
     }
-    
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: leaves.length,
@@ -166,6 +161,14 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 16),
+          Text(
+            '${DateFormat('MMM dd').format(_fromDate)} - ${DateFormat('MMM dd, yyyy').format(_toDate)}',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
         ],
       ),
     );
@@ -173,7 +176,6 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
 
   Widget _buildLeaveCard(LeaveRequest leave) {
     final isPending = leave.status == LeaveStatus.pending;
-    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 0,
@@ -199,7 +201,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                     radius: 24,
                     backgroundColor: _getStatusColor(leave.status).withOpacity(0.1),
                     child: Text(
-                      leave.studentName.substring(0, 1),
+                      leave.student.isNotEmpty ? leave.student.substring(0, 1).toUpperCase() : 'S',
                       style: TextStyle(
                         color: _getStatusColor(leave.status),
                         fontWeight: FontWeight.bold,
@@ -213,14 +215,14 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          leave.studentName,
+                          leave.student,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
                         Text(
-                          '${leave.studentClass} • Roll No: ${leave.rollNumber}',
+                          '${leave.className} • Division ${leave.division}',
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 14,
@@ -259,14 +261,14 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                     Row(
                       children: [
                         const Icon(
-                          Icons.label_outline,
+                          Icons.description_outlined,
                           size: 16,
                           color: Color(0xFF8E44AD),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          leave.reason,
-                          style: const TextStyle(
+                        const Text(
+                          'Description',
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF8E44AD),
                           ),
@@ -315,7 +317,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                       ),
                     ],
                   ),
-                  if (leave.attachments.isNotEmpty)
+                  if (leave.doc != null && leave.doc!.isNotEmpty)
                     Row(
                       children: [
                         const Icon(
@@ -325,7 +327,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${leave.attachments.length}',
+                          'Attachment',
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 14,
@@ -335,50 +337,13 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                     ),
                 ],
               ),
-              if (!isPending) ...[
-                const SizedBox(height: 12),
-                const Divider(),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Action by: ${leave.actionBy}',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      DateFormat('d MMM, yyyy').format(leave.actionOn!),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-                if (leave.comments != null && leave.comments!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'Comment: ${leave.comments}',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
               if (isPending) ...[
                 const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => _showRejectDialog(leave),
+                        onPressed: () => _rejectLeave(leave),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFE74C3C),
                           side: const BorderSide(color: Color(0xFFE74C3C)),
@@ -395,6 +360,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                         onPressed: () => _approveLeave(leave),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF8E44AD),
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -422,17 +388,15 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailItem('Student', leave.studentName),
-              _buildDetailItem('Class', leave.studentClass),
-              _buildDetailItem('Roll Number', leave.rollNumber),
-              _buildDetailItem('Reason', leave.reason),
+              _buildDetailItem('Student', leave.student),
+              _buildDetailItem('Class', leave.className),
+              _buildDetailItem('Division', leave.division),
               _buildDetailItem('Description', leave.description),
               _buildDetailItem('From Date', DateFormat('dd MMM, yyyy').format(leave.fromDate)),
               _buildDetailItem('To Date', DateFormat('dd MMM, yyyy').format(leave.toDate)),
               _buildDetailItem('Duration', '${_calculateDays(leave.fromDate, leave.toDate)} days'),
-              _buildDetailItem('Applied On', DateFormat('dd MMM, yyyy').format(leave.appliedOn)),
-              if (leave.attachments.isNotEmpty)
-                _buildDetailItem('Attachments', leave.attachments.join(', ')),
+              if (leave.doc != null && leave.doc!.isNotEmpty)
+                _buildDetailItem('Attachment', 'Document attached'),
             ],
           ),
         ),
@@ -444,7 +408,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _showRejectDialog(leave);
+              _rejectLeave(leave);
             },
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFE74C3C),
@@ -458,6 +422,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8E44AD),
+              foregroundColor: Colors.white,
             ),
             child: const Text('Approve'),
           ),
@@ -491,107 +456,94 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
     );
   }
 
-  void _showRejectDialog(LeaveRequest leave) {
-    final commentController = TextEditingController();
-    
+  void _approveLeave(LeaveRequest leave) async {
+    // Show loading
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reject Leave Request'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Please provide a reason for rejection:'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: commentController,
-              decoration: const InputDecoration(
-                hintText: 'Enter comments',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF8E44AD)),
+      ),
+    );
+
+    try {
+      final success = await TeacherLeaveService.approveOrRejectLeave(
+        leaveId: leave.sleaveId,
+        status: 'Approved',
+      );
+
+      Navigator.pop(context); // Close loading dialog
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Leave request approved successfully'),
+            backgroundColor: Color(0xFF8E44AD),
+          ),
+        );
+        _loadLeaveData(); // Refresh data
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to approve leave request'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _rejectLeave(leave, commentController.text);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE74C3C),
-            ),
-            child: const Text('Reject'),
-          ),
-        ],
-      ),
-    );
+      );
+    }
   }
 
-  void _approveLeave(LeaveRequest leave) {
-    setState(() {
-      final index = _leaveRequests.indexWhere((l) => l.id == leave.id);
-      if (index != -1) {
-        _leaveRequests[index] = LeaveRequest(
-          id: leave.id,
-          studentName: leave.studentName,
-          studentClass: leave.studentClass,
-          rollNumber: leave.rollNumber,
-          reason: leave.reason,
-          description: leave.description,
-          fromDate: leave.fromDate,
-          toDate: leave.toDate,
-          status: LeaveStatus.approved,
-          appliedOn: leave.appliedOn,
-          actionBy: 'Dr. Rajesh Kumar', // Current teacher
-          actionOn: DateTime.now(),
-          attachments: leave.attachments,
-        );
-      }
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Leave request approved successfully'),
-        backgroundColor: Color(0xFF8E44AD),
+  void _rejectLeave(LeaveRequest leave) async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF8E44AD)),
       ),
     );
-  }
 
-  void _rejectLeave(LeaveRequest leave, String comments) {
-    setState(() {
-      final index = _leaveRequests.indexWhere((l) => l.id == leave.id);
-      if (index != -1) {
-        _leaveRequests[index] = LeaveRequest(
-          id: leave.id,
-          studentName: leave.studentName,
-          studentClass: leave.studentClass,
-          rollNumber: leave.rollNumber,
-          reason: leave.reason,
-          description: leave.description,
-          fromDate: leave.fromDate,
-          toDate: leave.toDate,
-          status: LeaveStatus.rejected,
-          appliedOn: leave.appliedOn,
-          actionBy: 'Dr. Rajesh Kumar', // Current teacher
-          actionOn: DateTime.now(),
-          attachments: leave.attachments,
-          comments: comments,
+    try {
+      final success = await TeacherLeaveService.approveOrRejectLeave(
+        leaveId: leave.sleaveId,
+        status: 'Rejected',
+      );
+
+      Navigator.pop(context); // Close loading dialog
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Leave request rejected'),
+            backgroundColor: Color(0xFFE74C3C),
+          ),
+        );
+        _loadLeaveData(); // Refresh data
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to reject leave request'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Leave request rejected'),
-        backgroundColor: Color(0xFFE74C3C),
-      ),
-    );
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   int _calculateDays(DateTime fromDate, DateTime toDate) {
@@ -620,39 +572,3 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
     }
   }
 }
-
-enum LeaveStatus { pending, approved, rejected }
-
-class LeaveRequest {
-  final String id;
-  final String studentName;
-  final String studentClass;
-  final String rollNumber;
-  final String reason;
-  final String description;
-  final DateTime fromDate;
-  final DateTime toDate;
-  final LeaveStatus status;
-  final DateTime appliedOn;
-  final String? actionBy;
-  final DateTime? actionOn;
-  final List<String> attachments;
-  final String? comments;
-
-  LeaveRequest({
-    required this.id,
-    required this.studentName,
-    required this.studentClass,
-    required this.rollNumber,
-    required this.reason,
-    required this.description,
-    required this.fromDate,
-    required this.toDate,
-    required this.status,
-    required this.appliedOn,
-    this.actionBy,
-    this.actionOn,
-    this.attachments = const [],
-    this.comments,
-  });
-} 
