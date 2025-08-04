@@ -31,5 +31,9 @@ class ApiConstants {
   static const String leaveList = '/api/user/LeaveList';
   static const String approveOrRejectLeave = '/api/User/ApproveOrRejectLeave';
 
+  // ------------- TEACHER STUDY MATERIAL -------------
+  static const String teacherStudyMaterial = '/api/OnlineExam/TeacherStudyMaterial';
+
+
 
 }
