@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import '../../services/allocated_subjects_service.dart';
+
 
 class TeacherAllocatedSubjectsScreen extends StatefulWidget {
   const TeacherAllocatedSubjectsScreen({super.key});
@@ -9,69 +11,209 @@ class TeacherAllocatedSubjectsScreen extends StatefulWidget {
   State<TeacherAllocatedSubjectsScreen> createState() => _TeacherAllocatedSubjectsScreenState();
 }
 
-class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubjectsScreen> {
-  // Mock data for allocated subjects
-  final List<AllocatedSubject> _allocatedSubjects = [
-    AllocatedSubject(
-      id: 'SUB-2023-001',
-      name: 'Mathematics',
-      className: 'Class 10-A',
-      schedule: [
-        ClassSchedule(day: 'Monday', startTime: '9:00 AM', endTime: '10:30 AM'),
-        ClassSchedule(day: 'Wednesday', startTime: '11:00 AM', endTime: '12:30 PM'),
-        ClassSchedule(day: 'Friday', startTime: '9:00 AM', endTime: '10:30 AM'),
-      ],
-      totalStudents: 32,
-      averageAttendance: 0.92,
-      averagePerformance: 0.85,
-      syllabusCoverage: 0.65,
-      upcomingTopic: 'Quadratic Equations',
-    ),
-    AllocatedSubject(
-      id: 'SUB-2023-002',
-      name: 'Mathematics',
-      className: 'Class 10-B',
-      schedule: [
-        ClassSchedule(day: 'Monday', startTime: '11:00 AM', endTime: '12:30 PM'),
-        ClassSchedule(day: 'Thursday', startTime: '9:00 AM', endTime: '10:30 AM'),
-      ],
-      totalStudents: 30,
-      averageAttendance: 0.88,
-      averagePerformance: 0.82,
-      syllabusCoverage: 0.62,
-      upcomingTopic: 'Quadratic Equations',
-    ),
-    AllocatedSubject(
-      id: 'SUB-2023-003',
-      name: 'Physics',
-      className: 'Class 11-A',
-      schedule: [
-        ClassSchedule(day: 'Tuesday', startTime: '9:00 AM', endTime: '10:30 AM'),
-        ClassSchedule(day: 'Thursday', startTime: '11:00 AM', endTime: '12:30 PM'),
-      ],
-      totalStudents: 28,
-      averageAttendance: 0.90,
-      averagePerformance: 0.78,
-      syllabusCoverage: 0.58,
-      upcomingTopic: 'Newton\'s Laws of Motion',
-    ),
-  ];
+class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubjectsScreen>
+    with SingleTickerProviderStateMixin {
+
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  List<AllocatedSubject> _allocatedSubjects = [];
+  bool _isLoading = true;
+
+  // Group subjects by class for better organization
+  Map<String, List<AllocatedSubject>> _groupedSubjects = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimation();
+    _fetchAllocatedSubjects();
+  }
+
+  void _initializeAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchAllocatedSubjects() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final subjects = await AllocatedSubjectsService.getAllocatedSubjects();
+
+      // Group subjects by class
+      _groupSubjectsByClass(subjects);
+
+      setState(() {
+        _allocatedSubjects = subjects;
+        _isLoading = false;
+      });
+
+      _animationController.forward();
+    } catch (e) {
+      print('Error loading allocated subjects: $e');
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load allocated subjects'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _groupSubjectsByClass(List<AllocatedSubject> subjects) {
+    _groupedSubjects.clear();
+    for (var subject in subjects) {
+      if (!_groupedSubjects.containsKey(subject.className)) {
+        _groupedSubjects[subject.className] = [];
+      }
+      _groupedSubjects[subject.className]!.add(subject);
+    }
+  }
+
+  Future<void> _refreshData() async {
+    HapticFeedback.lightImpact();
+    await _fetchAllocatedSubjects();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: Text(AppStrings.allocatedSubjects),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: Text(
+        AppStrings.allocatedSubjects,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2D3748),
+        ),
       ),
-      body: Column(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: Color(0xFF2D3748),
+          size: 20,
+        ),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.pop(context);
+        },
+      ),
+      actions: [
+        IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF58CC02).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.refresh_rounded,
+              color: Color(0xFF58CC02),
+              size: 20,
+            ),
+          ),
+          onPressed: _refreshData,
+        ),
+        const SizedBox(width: 12),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF58CC02)),
+        ),
+      );
+    }
+
+    if (_allocatedSubjects.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      color: const Color(0xFF58CC02),
+      child: AnimatedBuilder(
+        animation: _fadeAnimation,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _fadeAnimation.value,
+            child: Column(
+              children: [
+                _buildSummaryCard(),
+                Expanded(child: _buildSubjectsList()),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildSummaryCard(),
-          Expanded(
-            child: _buildSubjectsList(),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF58CC02).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.school_outlined,
+              size: 64,
+              color: Color(0xFF58CC02),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'No Subjects Allocated',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'You haven\'t been allocated any subjects yet.\nCheck back later or contact administration.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -79,41 +221,29 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
   }
 
   Widget _buildSummaryCard() {
-    // Calculate summary statistics
-    final totalClasses = _allocatedSubjects.length;
-    final totalStudents = _allocatedSubjects.fold<int>(
-      0,
-      (sum, subject) => sum + subject.totalStudents,
-    );
-    final averagePerformance = _allocatedSubjects.fold<double>(
-      0,
-      (sum, subject) => sum + subject.averagePerformance,
-    ) / totalClasses;
-    final averageSyllabusCoverage = _allocatedSubjects.fold<double>(
-      0,
-      (sum, subject) => sum + subject.syllabusCoverage,
-    ) / totalClasses;
+    final totalSubjects = _allocatedSubjects.length;
+    final uniqueSubjects = _allocatedSubjects.map((s) => s.subject).toSet().length;
+    final totalClasses = _groupedSubjects.keys.length;
 
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF2ECC71), Color(0xFF27AE60)],
+          colors: [Color(0xFF58CC02), Color(0xFF4CAF50)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2ECC71).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF58CC02).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,59 +251,46 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Subject Allocation Summary',
+                  Text(
+                    'Teaching Assignment',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.white.withOpacity(0.9),
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Academic Year 2023-24',
+                  const Text(
+                    'Academic Overview 📚',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  '$totalClasses Classes',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: const Icon(
+                  Icons.school_rounded,
+                  color: Colors.white,
+                  size: 28,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryItem(
-                'Total Students',
-                totalStudents.toString(),
-                Icons.people_rounded,
-              ),
-              _buildSummaryItem(
-                'Avg. Performance',
-                '${(averagePerformance * 100).toInt()}%',
-                Icons.trending_up_rounded,
-              ),
-              _buildSummaryItem(
-                'Syllabus Coverage',
-                '${(averageSyllabusCoverage * 100).toInt()}%',
-                Icons.menu_book_rounded,
-              ),
+              _buildSummaryItem('$totalSubjects', 'Total\nAssignments', Colors.white),
+              _buildSummaryItem('$uniqueSubjects', 'Unique\nSubjects', Colors.white),
+              _buildSummaryItem('$totalClasses', 'Classes\nTeaching', Colors.white),
             ],
           ),
         ],
@@ -181,250 +298,193 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
     );
   }
 
-  Widget _buildSummaryItem(String label, String value, IconData icon) {
+  Widget _buildSummaryItem(String value, String label, Color color) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
+            color: color,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.white,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: color.withOpacity(0.8),
             fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
   Widget _buildSubjectsList() {
+    final sortedClassNames = _groupedSubjects.keys.toList()..sort();
+
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _allocatedSubjects.length,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: sortedClassNames.length,
       itemBuilder: (context, index) {
-        return _buildSubjectCard(_allocatedSubjects[index]);
+        final className = sortedClassNames[index];
+        final subjects = _groupedSubjects[className]!;
+
+        return _buildClassSection(className, subjects);
       },
     );
   }
 
-  Widget _buildSubjectCard(AllocatedSubject subject) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
+  Widget _buildClassSection(String className, List<AllocatedSubject> subjects) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.all(16),
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: _getSubjectColor(subject.name).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            _getSubjectIcon(subject.name),
-            color: _getSubjectColor(subject.name),
-            size: 24,
-          ),
-        ),
-        title: Text(
-          subject.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          subject.className,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 14,
-          ),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
-          child: Text(
-            '${subject.totalStudents} Students',
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Class Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _getClassColor(className).withOpacity(0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _getClassColor(className).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.class_rounded,
+                    color: _getClassColor(className),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Class $className',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: _getClassColor(className),
+                        ),
+                      ),
+                      Text(
+                        '${subjects.length} subject${subjects.length > 1 ? 's' : ''}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        children: [
-          const Divider(),
-          const SizedBox(height: 8),
-          
-          // Schedule
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Schedule',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...subject.schedule.map((schedule) => _buildScheduleItem(schedule)).toList(),
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Performance Metrics
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Performance Metrics',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildPerformanceMetric(
-                'Attendance',
-                subject.averageAttendance,
-                const Color(0xFF4A90E2),
-              ),
-              const SizedBox(height: 8),
-              _buildPerformanceMetric(
-                'Performance',
-                subject.averagePerformance,
-                const Color(0xFF58CC02),
-              ),
-              const SizedBox(height: 8),
-              _buildPerformanceMetric(
-                'Syllabus Coverage',
-                subject.syllabusCoverage,
-                const Color(0xFFFF9500),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Upcoming Topic
-          Row(
-            children: [
-              const Icon(
-                Icons.lightbulb_outline,
-                color: Color(0xFFFF9500),
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Upcoming Topic: ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                subject.upcomingTopic,
-                style: const TextStyle(
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    // View class details
-                  },
-                  icon: const Icon(Icons.people),
-                  label: const Text('View Students'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF2ECC71),
-                    side: const BorderSide(color: Color(0xFF2ECC71)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Create lesson plan
-                  },
-                  icon: const Icon(Icons.assignment),
-                  label: const Text('Lesson Plan'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2ECC71),
-                  ),
-                ),
-              ),
-            ],
+
+          // Subjects List
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: subjects.length,
+            separatorBuilder: (context, index) => Divider(
+              color: Colors.grey.shade100,
+              height: 1,
+              indent: 20,
+              endIndent: 20,
+            ),
+            itemBuilder: (context, index) {
+              return _buildSubjectTile(subjects[index]);
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScheduleItem(ClassSchedule schedule) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+  Widget _buildSubjectTile(AllocatedSubject subject) {
+    return Container(
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(8),
+              color: _getSubjectColor(subject.subject).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              schedule.day.substring(0, 3),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
-                fontSize: 12,
-              ),
+            child: Icon(
+              _getSubjectIcon(subject.subject),
+              color: _getSubjectColor(subject.subject),
+              size: 24,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            '${schedule.startTime} - ${schedule.endTime}',
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 14,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  subject.subject,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subject.subjectType,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _getSubjectColor(subject.subject).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: _getSubjectColor(subject.subject).withOpacity(0.3),
+              ),
+            ),
+            child: Text(
+              subject.subjectType,
+              style: TextStyle(
+                color: _getSubjectColor(subject.subject),
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -432,48 +492,27 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
     );
   }
 
-  Widget _buildPerformanceMetric(String label, double value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 13,
-              ),
-            ),
-            Text(
-              '${(value * 100).toInt()}%',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: color,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        LinearPercentIndicator(
-          lineHeight: 8.0,
-          percent: value,
-          backgroundColor: Colors.grey.shade200,
-          progressColor: color,
-          barRadius: const Radius.circular(4),
-          padding: EdgeInsets.zero,
-          animation: true,
-          animationDuration: 1000,
-        ),
-      ],
-    );
+  Color _getClassColor(String className) {
+    switch (className) {
+      case '1st':
+        return const Color(0xFF4A90E2);
+      case '2nd':
+        return const Color(0xFF58CC02);
+      case '3rd':
+        return const Color(0xFFFF9500);
+      case '4th':
+        return const Color(0xFFE74C3C);
+      case '5th':
+        return const Color(0xFF8E44AD);
+      default:
+        return const Color(0xFF2ECC71);
+    }
   }
 
   Color _getSubjectColor(String subject) {
     switch (subject.toLowerCase()) {
       case 'mathematics':
+      case 'maths':
         return const Color(0xFF4A90E2);
       case 'science':
         return const Color(0xFF58CC02);
@@ -481,6 +520,16 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
         return const Color(0xFF8E44AD);
       case 'physics':
         return const Color(0xFFFF9500);
+      case 'marathi':
+        return const Color(0xFFE74C3C);
+      case 'gk':
+        return const Color(0xFF9B59B6);
+      case 'reading':
+        return const Color(0xFF34495E);
+      case 'p.t.':
+        return const Color(0xFF16A085);
+      case 'study hours':
+        return const Color(0xFFF39C12);
       default:
         return const Color(0xFF2ECC71);
     }
@@ -489,6 +538,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
   IconData _getSubjectIcon(String subject) {
     switch (subject.toLowerCase()) {
       case 'mathematics':
+      case 'maths':
         return Icons.calculate_rounded;
       case 'science':
         return Icons.science_rounded;
@@ -496,44 +546,18 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
         return Icons.menu_book_rounded;
       case 'physics':
         return Icons.flash_on_rounded;
+      case 'marathi':
+        return Icons.language_rounded;
+      case 'gk':
+        return Icons.lightbulb_rounded;
+      case 'reading':
+        return Icons.auto_stories_rounded;
+      case 'p.t.':
+        return Icons.sports_soccer_rounded;
+      case 'study hours':
+        return Icons.schedule_rounded;
       default:
         return Icons.school_rounded;
     }
   }
 }
-
-class AllocatedSubject {
-  final String id;
-  final String name;
-  final String className;
-  final List<ClassSchedule> schedule;
-  final int totalStudents;
-  final double averageAttendance;
-  final double averagePerformance;
-  final double syllabusCoverage;
-  final String upcomingTopic;
-
-  AllocatedSubject({
-    required this.id,
-    required this.name,
-    required this.className,
-    required this.schedule,
-    required this.totalStudents,
-    required this.averageAttendance,
-    required this.averagePerformance,
-    required this.syllabusCoverage,
-    required this.upcomingTopic,
-  });
-}
-
-class ClassSchedule {
-  final String day;
-  final String startTime;
-  final String endTime;
-
-  ClassSchedule({
-    required this.day,
-    required this.startTime,
-    required this.endTime,
-  });
-} 

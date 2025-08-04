@@ -23,6 +23,8 @@ class ApiConstants {
   static const String batches = '/api/User/Batches';
   static const String divisionList = '/api/user/DivisionList';
   static const String subjectList = '/api/user/SubjectList';
+// ------------- TEACHER ALLOCATED SUBJECTS -------------
+  static const String teacherAllocatedSubject = '/api/user/TeacherAllocatedSubject';
 
 
 }
