@@ -289,6 +289,7 @@ class TeacherHomeworkService {
 
 // Data Models
 class TeacherHomework {
+  final int hId;
   final String className;
   final String batch;
   final String employee;
@@ -299,6 +300,7 @@ class TeacherHomework {
   final String? doc;
 
   TeacherHomework({
+    required this.hId,
     required this.className,
     required this.batch,
     required this.employee,
@@ -311,6 +313,7 @@ class TeacherHomework {
 
   factory TeacherHomework.fromJson(Map<String, dynamic> json) {
     return TeacherHomework(
+      hId: json['HId'] ?? 0,
       className: json['ClassName'] ?? '',
       batch: json['Batch'] ?? '',
       employee: json['Employee'] ?? '',
@@ -326,6 +329,7 @@ class TeacherHomework {
       ? '${ApiConstants.baseUrl}$doc'
       : '';
 }
+
 
 class Course {
   final int courseMasterId;

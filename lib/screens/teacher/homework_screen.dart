@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../../services/teacher_homework_service.dart';
 
-
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({super.key});
 
@@ -14,35 +13,35 @@ class TeacherHomeworkScreen extends StatefulWidget {
   State<TeacherHomeworkScreen> createState() => _TeacherHomeworkScreenState();
 }
 
-class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
-    with SingleTickerProviderStateMixin {
-
-  late TabController _tabController;
-
-  // Real data from API
+class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   List<TeacherHomework> _homeworkList = [];
+  List<TeacherHomework> _filteredHomeworkList = [];
   bool _isLoading = true;
 
   // Date range for fetching data
   DateTime _fromDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _toDate = DateTime.now();
 
+  // Search and filter
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedSubjectFilter = 'All';
+  Set<String> _availableSubjects = {'All'};
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _loadHomeworkData();
+    _searchController.addListener(_filterHomework);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _loadHomeworkData() async {
     setState(() => _isLoading = true);
-
     try {
       final homeworkList = await TeacherHomeworkService.getHomeworkList(
         fromDate: _fromDate,
@@ -51,6 +50,8 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
 
       setState(() {
         _homeworkList = homeworkList;
+        _filteredHomeworkList = homeworkList;
+        _availableSubjects = {'All', ...homeworkList.map((hw) => hw.subject)};
         _isLoading = false;
       });
     } catch (e) {
@@ -59,11 +60,52 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
     }
   }
 
+  void _filterHomework() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredHomeworkList = _homeworkList.where((hw) {
+        final matchesSearch = hw.homeWork.toLowerCase().contains(query) ||
+            hw.subject.toLowerCase().contains(query) ||
+            hw.className.toLowerCase().contains(query);
+        final matchesSubject = _selectedSubjectFilter == 'All' ||
+            hw.subject == _selectedSubjectFilter;
+        return matchesSearch && matchesSubject;
+      }).toList();
+    });
+  }
+
+  Future<void> _selectDateRange() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDateRange: DateTimeRange(start: _fromDate, end: _toDate),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF58CC02),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _fromDate = picked.start;
+        _toDate = picked.end;
+      });
+      _loadHomeworkData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final activeHomework = _homeworkList;
-    final completedHomework = <TeacherHomework>[]; // You can filter based on your logic
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -77,78 +119,299 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: const Color(0xFF58CC02),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF58CC02),
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Completed'),
-          ],
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Color(0xFF58CC02)),
+            onPressed: _loadHomeworkData,
+          ),
+        ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-        controller: _tabController,
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF58CC02)))
+          : Column(
         children: [
-          _buildActiveHomeworkTab(activeHomework),
-          _buildCompletedHomeworkTab(completedHomework),
+          _buildHeaderSection(),
+          _buildSearchAndFilters(),
+          Expanded(child: _buildHomeworkList()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showCreateHomeworkDialog(context);
-        },
+        onPressed: () => _showCreateHomeworkDialog(context),
         backgroundColor: const Color(0xFF58CC02),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  Widget _buildActiveHomeworkTab(List<TeacherHomework> homework) {
-    if (homework.isEmpty) {
-      return _buildEmptyState('No homework found', 'Create homework by tapping the + button');
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHomeworkSummary(homework),
-          const SizedBox(height: 24),
-          Text(
-            'Homework List',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
-            ),
+  Widget _buildHeaderSection() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 16),
-          ...homework.map((hw) => _buildHomeworkCard(hw)).toList(),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Homework Overview',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${DateFormat('MMM dd').format(_fromDate)} - ${DateFormat('MMM dd, yyyy').format(_toDate)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: 100,
+                  maxWidth: 140,
+                  minHeight: 40,
+                  maxHeight: 40,
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: _selectDateRange,
+                  icon: const Icon(Icons.date_range, size: 18),
+                  label: const Text('Change'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF58CC02),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(height: 20),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: _buildStatCard(
+          //         'Homework',
+          //         _homeworkList.length.toString(),
+          //         const Color(0xFF58CC02),
+          //         Icons.assignment,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 12),
+          //     Expanded(
+          //       child: _buildStatCard(
+          //         'This Week',
+          //         _homeworkList.where((hw) =>
+          //             hw.date.isAfter(DateTime.now().subtract(const Duration(days: 7)))
+          //         ).length.toString(),
+          //         const Color(0xFF4A90E2),
+          //         Icons.today,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 12),
+          //     Expanded(
+          //       child: _buildStatCard(
+          //         'Subjects',
+          //         (_availableSubjects.length - 1).toString(), // -1 to exclude 'All'
+          //         const Color(0xFF8E44AD),
+          //         Icons.subject,
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
   }
 
-  Widget _buildCompletedHomeworkTab(List<TeacherHomework> homework) {
-    if (homework.isEmpty) {
-      return _buildEmptyState('No completed homework', 'Completed homework will appear here');
+  Widget _buildStatCard(String title, String value, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchAndFilters() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search homework...',
+              prefixIcon: const Icon(Icons.search, color: Color(0xFF58CC02)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFF58CC02)),
+              ),
+              filled: true,
+              fillColor: Colors.grey.shade50,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Show error if selected subject is not in the available subjects
+          if (!_availableSubjects.contains(_selectedSubjectFilter)) ...[
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Selected subject "$_selectedSubjectFilter" is not available. Please select another.',
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Filter by Subject:',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: _availableSubjects.contains(_selectedSubjectFilter)
+                      ? _selectedSubjectFilter
+                      : 'All',
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  items: _availableSubjects.map((subject) {
+                    return DropdownMenuItem<String>(
+                      value: subject,
+                      child: Text(
+                        subject,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedSubjectFilter = value;
+                      });
+                      _filterHomework();
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeworkList() {
+    if (_filteredHomeworkList.isEmpty) {
+      return _buildEmptyState();
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: homework.length,
+      itemCount: _filteredHomeworkList.length,
       itemBuilder: (context, index) {
-        return _buildHomeworkCard(homework[index]);
+        return _buildHomeworkCard(_filteredHomeworkList[index]);
       },
     );
   }
 
-  Widget _buildEmptyState(String title, String message) {
+  Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -160,101 +423,19 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
           ),
           const SizedBox(height: 16),
           Text(
-            title,
-            style: const TextStyle(
+            'No homework found',
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: TextStyle(
-              fontSize: 14,
               color: Colors.grey.shade600,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeworkSummary(List<TeacherHomework> homework) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Homework Summary',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Total',
-                    homework.length.toString(),
-                    const Color(0xFF58CC02),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatCard(
-                    'This Week',
-                    homework.where((hw) =>
-                        hw.date.isAfter(DateTime.now().subtract(const Duration(days: 7)))
-                    ).length.toString(),
-                    const Color(0xFF4A90E2),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-            ),
           ),
           const SizedBox(height: 8),
           Text(
-            value,
+            'Try adjusting your filters or date range',
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
+              fontSize: 14,
+              color: Colors.grey.shade500,
             ),
           ),
         ],
@@ -306,6 +487,13 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        'Batch: ${homework.batch}',
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -376,17 +564,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
     );
   }
 
-  void _showCreateHomeworkDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => const CreateHomeworkForm(),
-    );
-  }
-
+  // Helper methods remain the same
   Color _getSubjectColor(String subject) {
     switch (subject.toLowerCase()) {
       case 'mathematics':
@@ -422,9 +600,20 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen>
         return Icons.school;
     }
   }
+
+  void _showCreateHomeworkDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => const CreateHomeworkForm(),
+    );
+  }
 }
 
-// Create Homework Form Widget
+// CreateHomeworkForm remains exactly the same as in your original code
 class CreateHomeworkForm extends StatefulWidget {
   const CreateHomeworkForm({Key? key}) : super(key: key);
 
@@ -449,7 +638,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   Subject? _selectedSubject;
   DateTime _selectedDate = DateTime.now();
   File? _selectedFile;
-
   bool _isLoading = false;
   bool _isSubmitting = false;
 
@@ -480,7 +668,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
 
   Future<void> _loadBatches() async {
     if (_selectedCourse == null) return;
-
     setState(() => _isLoading = true);
     try {
       final batches = await TeacherHomeworkService.getBatches(_selectedCourse!.courseMasterId);
@@ -503,6 +690,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       print('[DEBUG] _loadDivisions: No batch selected');
       return;
     }
+
     print('[DEBUG] _loadDivisions: Fetching divisions for ClassId: ${_selectedBatch!.classId}');
     setState(() => _isLoading = true);
     try {
@@ -524,6 +712,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       print('[DEBUG] _loadSubjects: No batch selected');
       return;
     }
+
     print('[DEBUG] _loadSubjects: Fetching subjects for ClassMasterId: ${_selectedBatch!.classMasterId}');
     setState(() => _isLoading = true);
     try {
@@ -540,14 +729,12 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
     }
   }
 
-
   Future<void> _pickFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.any,
         allowMultiple: false,
       );
-
       if (result != null && result.files.single.path != null) {
         setState(() {
           _selectedFile = File(result.files.single.path!);
@@ -567,7 +754,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-
     if (date != null) {
       setState(() {
         _selectedDate = date;
@@ -585,7 +771,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
     }
 
     setState(() => _isSubmitting = true);
-
     try {
       final success = await TeacherHomeworkService.addHomework(
         subjectId: _selectedSubject!.subjectId,
@@ -596,7 +781,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         homework: _homeworkController.text,
         file: _selectedFile,
       );
-
       if (success) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -618,7 +802,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         SnackBar(content: Text('Error: $e')),
       );
     }
-
     setState(() => _isSubmitting = false);
   }
 
@@ -667,7 +850,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ],
                     ),
                     const SizedBox(height: 20),
-
                     // Course Dropdown
                     DropdownButtonFormField<Course>(
                       decoration: const InputDecoration(
@@ -677,7 +859,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ),
                       value: _selectedCourse,
                       items: _courses.map((course) {
-                        return DropdownMenuItem(
+                        return DropdownMenuItem<Course>(
                           value: course,
                           child: Text(course.courseName),
                         );
@@ -688,12 +870,10 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                           print('[DEBUG] Selected Course: ${course?.courseName}, id: ${course?.courseMasterId}');
                         });
                         _loadBatches();
-                        // _loadSubjects(); // REMOVED
                       },
                       validator: (value) => value == null ? 'Please select a course' : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Batch Dropdown
                     DropdownButtonFormField<Batch>(
                       decoration: const InputDecoration(
@@ -703,7 +883,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ),
                       value: _selectedBatch,
                       items: _batches.map((batch) {
-                        return DropdownMenuItem(
+                        return DropdownMenuItem<Batch>(
                           value: batch,
                           child: Text(batch.batchName),
                         );
@@ -712,8 +892,8 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                         setState(() {
                           _selectedBatch = batch;
                           print('[DEBUG] Selected Batch: ${batch?.batchName}, ClassId: ${batch?.classId}, ClassMasterId: ${batch?.classMasterId}');
-                          _selectedDivision = null; // Reset division when batch changes
-                          _divisions = [];          // Reset divisions list
+                          _selectedDivision = null;
+                          _divisions = [];
                         });
                         _loadDivisions();
                         _loadSubjects();
@@ -721,7 +901,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       validator: (value) => value == null ? 'Please select a class' : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Division Dropdown
                     DropdownButtonFormField<Division>(
                       decoration: const InputDecoration(
@@ -731,7 +910,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ),
                       value: _selectedDivision,
                       items: _divisions.map((division) {
-                        return DropdownMenuItem(
+                        return DropdownMenuItem<Division>(
                           value: division,
                           child: Text(division.name),
                         );
@@ -745,30 +924,28 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       validator: (value) => value == null ? 'Please select a division' : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Subject Dropdown
-                    DropdownButtonFormField<Subject>(  // ← Add generic type
+                    DropdownButtonFormField<Subject>(
                       decoration: const InputDecoration(
                         labelText: 'Subject',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.subject_outlined),
                       ),
                       value: _selectedSubject,
-                      items: _subjects.map<DropdownMenuItem<Subject>>((Subject subject) {  // ← Add explicit typing
-                        return DropdownMenuItem<Subject>(  // ← Add generic type
+                      items: _subjects.map<DropdownMenuItem<Subject>>((Subject subject) {
+                        return DropdownMenuItem<Subject>(
                           value: subject,
                           child: Text(subject.subjectName),
                         );
                       }).toList(),
-                      onChanged: (Subject? subject) {  // ← Add type parameter
+                      onChanged: (Subject? subject) {
                         setState(() {
                           _selectedSubject = subject;
                         });
                       },
-                      validator: (Subject? value) => value == null ? 'Please select a subject' : null,  // ← Add type
+                      validator: (Subject? value) => value == null ? 'Please select a subject' : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Date Picker
                     TextFormField(
                       decoration: const InputDecoration(
@@ -783,7 +960,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       onTap: _selectDate,
                     ),
                     const SizedBox(height: 16),
-
                     // Homework Description
                     TextFormField(
                       controller: _homeworkController,
@@ -801,7 +977,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       },
                     ),
                     const SizedBox(height: 16),
-
                     // File Attachment
                     Container(
                       width: double.infinity,
@@ -856,7 +1031,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ),
                     ),
                     const SizedBox(height: 30),
-
                     // Submit Button
                     SizedBox(
                       width: double.infinity,
