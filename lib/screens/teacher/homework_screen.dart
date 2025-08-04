@@ -499,36 +499,47 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   }
 
   Future<void> _loadDivisions() async {
-    if (_selectedBatch == null) return;
-
+    if (_selectedBatch == null) {
+      print('[DEBUG] _loadDivisions: No batch selected');
+      return;
+    }
+    print('[DEBUG] _loadDivisions: Fetching divisions for ClassId: ${_selectedBatch!.classId}');
     setState(() => _isLoading = true);
     try {
       final divisions = await TeacherHomeworkService.getDivisions(_selectedBatch!.classId);
+      print('[DEBUG] _loadDivisions: Divisions fetched: ${divisions.map((d) => d.name).toList()}');
       setState(() {
         _divisions = divisions;
         _selectedDivision = null;
         _isLoading = false;
       });
     } catch (e) {
+      print('[DEBUG] _loadDivisions: Error: $e');
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadSubjects() async {
-    if (_selectedBatch == null) return;
-
+    if (_selectedBatch == null) {
+      print('[DEBUG] _loadSubjects: No batch selected');
+      return;
+    }
+    print('[DEBUG] _loadSubjects: Fetching subjects for ClassMasterId: ${_selectedBatch!.classMasterId}');
     setState(() => _isLoading = true);
     try {
       final subjects = await TeacherHomeworkService.getSubjects(_selectedBatch!.classMasterId);
+      print('[DEBUG] _loadSubjects: Subjects fetched: ${subjects.map((s) => s.subjectName).toList()}');
       setState(() {
         _subjects = subjects;
         _selectedSubject = null;
         _isLoading = false;
       });
     } catch (e) {
+      print('[DEBUG] _loadSubjects: Error: $e');
       setState(() => _isLoading = false);
     }
   }
+
 
   Future<void> _pickFile() async {
     try {
@@ -619,247 +630,259 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       minChildSize: 0.5,
       expand: false,
       builder: (context, scrollController) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Create Homework',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3748),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Course Dropdown
-                  DropdownButtonFormField<Course>(
-                    decoration: const InputDecoration(
-                      labelText: 'Course',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.school_outlined),
-                    ),
-                    value: _selectedCourse,
-                    items: _courses.map((course) {
-                      return DropdownMenuItem(
-                        value: course,
-                        child: Text(course.courseName),
-                      );
-                    }).toList(),
-                    onChanged: (course) {
-                      setState(() {
-                        _selectedCourse = course;
-                      });
-                      _loadBatches();
-                      _loadSubjects();
-                    },
-                    validator: (value) => value == null ? 'Please select a course' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Batch Dropdown
-                  DropdownButtonFormField<Batch>(
-                    decoration: const InputDecoration(
-                      labelText: 'Class',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.class_outlined),
-                    ),
-                    value: _selectedBatch,
-                    items: _batches.map((batch) {
-                      return DropdownMenuItem(
-                        value: batch,
-                        child: Text(batch.batchName),
-                      );
-                    }).toList(),
-                    onChanged: (batch) {
-                      setState(() {
-                        _selectedBatch = batch;
-                      });
-                      _loadDivisions();
-                    },
-                    validator: (value) => value == null ? 'Please select a class' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Division Dropdown
-                  DropdownButtonFormField<Division>(
-                    decoration: const InputDecoration(
-                      labelText: 'Division',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.group_outlined),
-                    ),
-                    value: _selectedDivision,
-                    items: _divisions.map((division) {
-                      return DropdownMenuItem(
-                        value: division,
-                        child: Text(division.name),
-                      );
-                    }).toList(),
-                    onChanged: (division) {
-                      setState(() {
-                        _selectedDivision = division;
-                      });
-                    },
-                    validator: (value) => value == null ? 'Please select a division' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Subject Dropdown
-                  DropdownButtonFormField<Subject>(
-                    decoration: const InputDecoration(
-                      labelText: 'Subject',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.subject_outlined),
-                    ),
-                    value: _selectedSubject,
-                    items: _subjects.map((subject) {
-                      return DropdownMenuItem(
-                        value: subject,
-                        child: Text(subject.subjectName),
-                      );
-                    }).toList(),
-                    onChanged: (subject) {
-                      setState(() {
-                        _selectedSubject = subject;
-                      });
-                    },
-                    validator: (value) => value == null ? 'Please select a subject' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Date Picker
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Due Date',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.calendar_today),
-                    ),
-                    readOnly: true,
-                    controller: TextEditingController(
-                      text: DateFormat('MMM dd, yyyy').format(_selectedDate),
-                    ),
-                    onTap: _selectDate,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Homework Description
-                  TextFormField(
-                    controller: _homeworkController,
-                    decoration: const InputDecoration(
-                      labelText: 'Homework Description',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.description_outlined),
-                    ),
-                    maxLines: 4,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter homework description';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // File Attachment
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (_selectedFile != null) ...[
-                          Row(
-                            children: [
-                              const Icon(Icons.attach_file, color: Color(0xFF58CC02)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _selectedFile!.path.split('/').last,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedFile = null;
-                                  });
-                                },
-                              ),
-                            ],
+                        const Text(
+                          'Create Homework',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D3748),
                           ),
-                        ] else ...[
-                          GestureDetector(
-                            onTap: _pickFile,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Course Dropdown
+                    DropdownButtonFormField<Course>(
+                      decoration: const InputDecoration(
+                        labelText: 'Course',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.school_outlined),
+                      ),
+                      value: _selectedCourse,
+                      items: _courses.map((course) {
+                        return DropdownMenuItem(
+                          value: course,
+                          child: Text(course.courseName),
+                        );
+                      }).toList(),
+                      onChanged: (course) {
+                        setState(() {
+                          _selectedCourse = course;
+                          print('[DEBUG] Selected Course: ${course?.courseName}, id: ${course?.courseMasterId}');
+                        });
+                        _loadBatches();
+                        // _loadSubjects(); // REMOVED
+                      },
+                      validator: (value) => value == null ? 'Please select a course' : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Batch Dropdown
+                    DropdownButtonFormField<Batch>(
+                      decoration: const InputDecoration(
+                        labelText: 'Class',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.class_outlined),
+                      ),
+                      value: _selectedBatch,
+                      items: _batches.map((batch) {
+                        return DropdownMenuItem(
+                          value: batch,
+                          child: Text(batch.batchName),
+                        );
+                      }).toList(),
+                      onChanged: (batch) {
+                        setState(() {
+                          _selectedBatch = batch;
+                          print('[DEBUG] Selected Batch: ${batch?.batchName}, ClassId: ${batch?.classId}, ClassMasterId: ${batch?.classMasterId}');
+                          _selectedDivision = null; // Reset division when batch changes
+                          _divisions = [];          // Reset divisions list
+                        });
+                        _loadDivisions();
+                        _loadSubjects();
+                      },
+                      validator: (value) => value == null ? 'Please select a class' : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Division Dropdown
+                    DropdownButtonFormField<Division>(
+                      decoration: const InputDecoration(
+                        labelText: 'Division',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.group_outlined),
+                      ),
+                      value: _selectedDivision,
+                      items: _divisions.map((division) {
+                        return DropdownMenuItem(
+                          value: division,
+                          child: Text(division.name),
+                        );
+                      }).toList(),
+                      onChanged: (division) {
+                        setState(() {
+                          _selectedDivision = division;
+                          print('[DEBUG] Selected Division: ${division?.name}, id: ${division?.divisionId}');
+                        });
+                      },
+                      validator: (value) => value == null ? 'Please select a division' : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Subject Dropdown
+                    DropdownButtonFormField<Subject>(  // ← Add generic type
+                      decoration: const InputDecoration(
+                        labelText: 'Subject',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.subject_outlined),
+                      ),
+                      value: _selectedSubject,
+                      items: _subjects.map<DropdownMenuItem<Subject>>((Subject subject) {  // ← Add explicit typing
+                        return DropdownMenuItem<Subject>(  // ← Add generic type
+                          value: subject,
+                          child: Text(subject.subjectName),
+                        );
+                      }).toList(),
+                      onChanged: (Subject? subject) {  // ← Add type parameter
+                        setState(() {
+                          _selectedSubject = subject;
+                        });
+                      },
+                      validator: (Subject? value) => value == null ? 'Please select a subject' : null,  // ← Add type
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Date Picker
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Due Date',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                      ),
+                      readOnly: true,
+                      controller: TextEditingController(
+                        text: DateFormat('MMM dd, yyyy').format(_selectedDate),
+                      ),
+                      onTap: _selectDate,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Homework Description
+                    TextFormField(
+                      controller: _homeworkController,
+                      decoration: const InputDecoration(
+                        labelText: 'Homework Description',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.description_outlined),
+                      ),
+                      maxLines: 4,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter homework description';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // File Attachment
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          if (_selectedFile != null) ...[
+                            Row(
                               children: [
-                                Icon(Icons.attach_file, color: Color(0xFF58CC02)),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Attach File (Optional)',
-                                  style: TextStyle(
-                                    color: Color(0xFF58CC02),
-                                    fontWeight: FontWeight.w500,
+                                const Icon(Icons.attach_file, color: Color(0xFF58CC02)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _selectedFile!.path.split('/').last,
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
                                   ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedFile = null;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
-                          ),
+                          ] else ...[
+                            GestureDetector(
+                              onTap: _pickFile,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.attach_file, color: Color(0xFF58CC02)),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Attach File (Optional)',
+                                    style: TextStyle(
+                                      color: Color(0xFF58CC02),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitHomework,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF58CC02),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    // Submit Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitHomework,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF58CC02),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                      ),
-                      child: _isSubmitting
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                        'Create Homework',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        child: _isSubmitting
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                          'Create Homework',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
