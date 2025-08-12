@@ -321,7 +321,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
   Widget _buildMaterialsList() {
     if (_filteredStudyMaterials.isEmpty && !_isLoading) {
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
           child: Column(
@@ -522,21 +522,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Edit functionality to be implemented')),
-                        );
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Edit'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                    ),
-                  ),
+
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
@@ -895,7 +881,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 widget.material.fileUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
+                  return SizedBox(
                     height: 200,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -918,7 +904,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return Container(
+                  return SizedBox(
                     height: 200,
                     child: Center(
                       child: CircularProgressIndicator(
