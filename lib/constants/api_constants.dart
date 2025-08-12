@@ -34,6 +34,11 @@ class ApiConstants {
   // ------------- TEACHER STUDY MATERIAL -------------
   static const String teacherStudyMaterial = '/api/OnlineExam/TeacherStudyMaterial';
 
+  // ------------- ADMIN  -------------
+  static const String dashboardcounter = '/api/user/DashboardCounter';
+  static const String last10feesreceipt = '/api/user/Last10FeesReceipt';
+  static const String last10concessionfeesreceipt = '/api/user/Last10ConcessionFeesReceipt';
+  static const String last10paymentvouchers = '/api/user/Last10PaymentVouchers';
 
 
 }
