@@ -1,5 +1,6 @@
 import 'package:dps/screens/student/timetable_screen.dart';
 import 'package:dps/screens/teacher/allocated_subjects_screen.dart';
+import 'package:dps/screens/admin/admin_dashboard_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
 
 
         // Admin routes
-        // AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
+        AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
 
       },
       onGenerateRoute: (settings) {

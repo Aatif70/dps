@@ -89,13 +89,19 @@ class _LoginScreenState extends State<LoginScreen>
         print('User role: $role');
 
         // Navigate based on role
-        if (role.toLowerCase() == 'admin' || role.toLowerCase() == 'teacher') {
+        if (role.toLowerCase() == 'admin') {
+          print('Navigating to admin dashboard');
+          Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
+
+        } else if (role.toLowerCase() == 'teacher') {
           print('Navigating to teacher dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
-        } else if (role.toLowerCase() == 'student') {
+        }
+          else if (role.toLowerCase() == 'student') {
           print('Navigating to student dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
-        } else {
+        }
+          else {
           print('Unknown role, defaulting to student dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
         }

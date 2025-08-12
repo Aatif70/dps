@@ -346,7 +346,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
   Widget _buildMaterialsList() {
     if (_filteredStudyMaterials.isEmpty && !_isLoading) {
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
           child: Column(
@@ -1390,7 +1390,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 widget.material.fileUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
+                  return SizedBox(
                     height: 200,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1413,7 +1413,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return Container(
+                  return SizedBox(
                     height: 200,
                     child: Center(
                       child: CircularProgressIndicator(
