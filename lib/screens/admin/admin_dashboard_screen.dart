@@ -15,6 +15,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
+  late TabController _tabController;
 
   // Data variables
   DashboardCounterData? _dashboardCounter;
@@ -54,7 +55,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     });
 
     try {
-      // Load all data in parallel
       final results = await Future.wait([
         AdminDashboardService.getDashboardCounter(),
         AdminDashboardService.getLast10FeesReceipt(),
@@ -71,10 +71,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       });
 
       print('=== ADMIN DASHBOARD DATA LOADED ===');
-      print('Dashboard Counter: $_dashboardCounter');
-      print('Fees Receipts: ${_feesReceipts.length}');
-      print('Concession Receipts: ${_concessionReceipts.length}');
-      print('Payment Vouchers: ${_paymentVouchers.length}');
     } catch (e) {
       print('=== ADMIN DASHBOARD DATA ERROR ===');
       print('Error: $e');
@@ -93,7 +89,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -114,13 +110,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         children: [
           CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6C5CE7)),
+            strokeWidth: 3,
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 20),
           Text(
-            'Loading Admin Dashboard...',
+            'Loading Dashboard...',
             style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF74B9FF),
+              color: Color(0xFF64748B),
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -134,136 +132,147 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAdminHeader(context),
-          const SizedBox(height: 25),
-          _buildStatsOverview(context),
-          const SizedBox(height: 30),
-          _buildRecentTransactions(context),
-          const SizedBox(height: 30),
+          _buildCompactHeader(),
+          const SizedBox(height: 20),
+          _buildCompactStats(),
+          const SizedBox(height: 24),
+          _buildCleanTransactions(),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _buildAdminHeader(BuildContext context) {
+  Widget _buildCompactHeader() {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(25),
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF6C5CE7), Color(0xFF74B9FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C5CE7).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF6C5CE7).withOpacity(0.25),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Admin Dashboard',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'School Management',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, color: Color(0xFF00CEC9), size: 8),
+                      SizedBox(width: 6),
+                      Text(
+                        'System Active',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.admin_panel_settings,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactStats() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Admin Dashboard 👨‍💼',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'School Management',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.admin_panel_settings,
-                            color: Color(0xFF00CEC9),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'System Active 🟢',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                child: _buildSmallStatCard(
+                  'Total Students',
+                  _dashboardCounter?.totalStudent.toString() ?? '0',
+                  const Color(0xFF6C5CE7),
+                  Icons.school_rounded,
                 ),
               ),
-              Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: const CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.admin_panel_settings,
-                        color: Color(0xFF6C5CE7),
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00CEC9),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSmallStatCard(
+                  'Active Students',
+                  _dashboardCounter?.activeStudent.toString() ?? '0',
+                  const Color(0xFF00CEC9),
+                  Icons.people_rounded,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSmallStatCard(
+                  'Today\'s Fees',
+                  '₹${_dashboardCounter?.todayFees ?? '0.00'}',
+                  const Color(0xFFFD79A8),
+                  Icons.today_rounded,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSmallStatCard(
+                  '7 Days Fees',
+                  '₹${_dashboardCounter?.lastSevenDays ?? '0.00'}',
+                  const Color(0xFFE17055),
+                  Icons.calendar_view_week_rounded,
+                ),
               ),
             ],
           ),
@@ -272,127 +281,51 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
-  Widget _buildStatsOverview(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'School Overview',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D3748),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        _buildCounterStats(),
-        const SizedBox(height: 20),
-        _buildFinancialStats(),
-      ],
-    );
-  }
-
-  Widget _buildCounterStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatCard(
-              'Total Students',
-              _dashboardCounter?.totalStudent.toString() ?? '0',
-              const Color(0xFF6C5CE7),
-              Icons.school_rounded,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildStatCard(
-              'Active Students',
-              _dashboardCounter?.activeStudent.toString() ?? '0',
-              const Color(0xFF00CEC9),
-              Icons.people_rounded,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFinancialStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatCard(
-              'Today\'s Fees',
-              '₹${_dashboardCounter?.todayFees ?? '0.00'}',
-              const Color(0xFFFD79A8),
-              Icons.today_rounded,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildStatCard(
-              '7 Days Fees',
-              '₹${_dashboardCounter?.lastSevenDays ?? '0.00'}',
-              const Color(0xFFE17055),
-              Icons.calendar_view_week_rounded,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, Color color, IconData icon) {
+  Widget _buildSmallStatCard(String title, String value, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: color.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF718096),
+              fontSize: 12,
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
             ),
           ),
         ],
@@ -400,67 +333,78 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
-  Widget _buildRecentTransactions(BuildContext context) {
+  Widget _buildCleanTransactions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Recent Transactions',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            style: TextStyle(
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D3748),
+              color: Color(0xFF1E293B),
             ),
           ),
         ),
-        const SizedBox(height: 20),
-        _buildTransactionTabs(),
+        const SizedBox(height: 16),
+        _buildSeamlessTransactionTabs(),
       ],
     );
   }
 
-  Widget _buildTransactionTabs() {
+  Widget _buildSeamlessTransactionTabs() {
     return DefaultTabController(
       length: 3,
       child: Column(
         children: [
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: TabBar(
               indicator: BoxDecoration(
-                color: const Color(0xFF6C5CE7),
-                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              labelColor: Colors.white,
-              unselectedLabelColor: const Color(0xFF718096),
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              labelColor: const Color(0xFF6C5CE7),
+              unselectedLabelColor: const Color(0xFF64748B),
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+              ),
+              indicatorPadding: const EdgeInsets.symmetric(horizontal: -18),
+              dividerColor: Colors.transparent,
               tabs: const [
-                Tab(text: 'Fees Receipts'),
+                Tab(text: 'Fees'),
                 Tab(text: 'Concessions'),
                 Tab(text: 'Payments'),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           SizedBox(
-            height: 400,
+            height: 350,
             child: TabBarView(
               children: [
-                _buildReceiptsList(_feesReceipts, 'fees'),
-                _buildReceiptsList(_concessionReceipts, 'concession'),
-                _buildPaymentsList(_paymentVouchers),
+                _buildCleanReceiptsList(_feesReceipts, 'fees'),
+                _buildCleanReceiptsList(_concessionReceipts, 'concession'),
+                _buildCleanPaymentsList(_paymentVouchers),
               ],
             ),
           ),
@@ -469,70 +413,64 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
-  Widget _buildReceiptsList(List<FeesReceiptData> receipts, String type) {
+  Widget _buildCleanReceiptsList(List<FeesReceiptData> receipts, String type) {
     if (receipts.isEmpty) {
       return _buildEmptyState('No ${type} receipts found');
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: receipts.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final receipt = receipts[index];
-        return _buildReceiptCard(receipt, type);
+        return _buildCleanReceiptCard(receipt, type);
       },
     );
   }
 
-  Widget _buildPaymentsList(List<PaymentVoucherData> payments) {
+  Widget _buildCleanPaymentsList(List<PaymentVoucherData> payments) {
     if (payments.isEmpty) {
       return _buildEmptyState('No payment vouchers found');
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: payments.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final payment = payments[index];
-        return _buildPaymentCard(payment);
+        return _buildCleanPaymentCard(payment);
       },
     );
   }
 
-  Widget _buildReceiptCard(FeesReceiptData receipt, String type) {
+  Widget _buildCleanReceiptCard(FeesReceiptData receipt, String type) {
+    final color = type == 'fees' ? const Color(0xFF6C5CE7) : const Color(0xFFFD79A8);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: type == 'fees'
-                  ? const Color(0xFF74B9FF).withOpacity(0.1)
-                  : const Color(0xFFFD79A8).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              type == 'fees' ? Icons.receipt_long : Icons.discount,
-              color: type == 'fees'
-                  ? const Color(0xFF74B9FF)
-                  : const Color(0xFFFD79A8),
-              size: 24,
+              type == 'fees' ? Icons.receipt : Icons.discount,
+              color: color,
+              size: 20,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,26 +478,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 Text(
                   receipt.studentName,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Receipt: ${receipt.receiptNo}',
-                  style: const TextStyle(
-                    color: Color(0xFF718096),
+                    fontWeight: FontWeight.w600,
                     fontSize: 14,
+                    color: Color(0xFF1E293B),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  receipt.formattedDate,
-                  style: const TextStyle(
-                    color: Color(0xFF718096),
-                    fontSize: 12,
-                  ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      receipt.receiptNo,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const Text(
+                      ' • ',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                    ),
+                    Text(
+                      receipt.formattedDate,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -568,10 +516,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             receipt.formattedAmount,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: type == 'fees'
-                  ? const Color(0xFF74B9FF)
-                  : const Color(0xFFFD79A8),
+              fontSize: 14,
+              color: color,
             ),
           ),
         ],
@@ -579,36 +525,30 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
-  Widget _buildPaymentCard(PaymentVoucherData payment) {
+  Widget _buildCleanPaymentCard(PaymentVoucherData payment) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: const Color(0xFFE17055).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.payment,
               color: Color(0xFFE17055),
-              size: 24,
+              size: 20,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -616,26 +556,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 Text(
                   payment.paidTo,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  payment.mHead,
-                  style: const TextStyle(
-                    color: Color(0xFF718096),
+                    fontWeight: FontWeight.w600,
                     fontSize: 14,
+                    color: Color(0xFF1E293B),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  payment.formattedDate,
-                  style: const TextStyle(
-                    color: Color(0xFF718096),
-                    fontSize: 12,
-                  ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      payment.mHead,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const Text(
+                      ' • ',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                    ),
+                    Text(
+                      payment.formattedDate,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -644,7 +594,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             payment.formattedAmount,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 14,
               color: Color(0xFFE17055),
             ),
           ),
@@ -658,17 +608,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 64,
-            color: Colors.grey.shade300,
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_outlined,
+              size: 40,
+              color: Colors.grey.shade400,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
             message,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
