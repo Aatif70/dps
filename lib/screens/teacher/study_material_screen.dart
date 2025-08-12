@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import '../../services/teacher_study_material_service.dart';
-
 
 class TeacherStudyMaterialScreen extends StatefulWidget {
   const TeacherStudyMaterialScreen({super.key});
@@ -24,10 +25,34 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   List<String> _subjects = ['All'];
   List<String> _classes = ['All'];
 
+  // Upload form variables
+  List<BatchData> _batches = [];
+  List<SubjectData> _subjectsForUpload = [];
+  BatchData? _selectedBatch;
+  SubjectData? _selectedUploadSubject;
+  bool _isLoadingBatches = false;
+  bool _isLoadingSubjects = false;
+  bool _isUploading = false;
+
+  // Controllers
+  final _chapterController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _youtubeLinkController = TextEditingController();
+  String _uploadType = 'File';
+  File? _selectedFile;
+
   @override
   void initState() {
     super.initState();
     _loadStudyMaterials();
+  }
+
+  @override
+  void dispose() {
+    _chapterController.dispose();
+    _descriptionController.dispose();
+    _youtubeLinkController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadStudyMaterials() async {
@@ -321,7 +346,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
   Widget _buildMaterialsList() {
     if (_filteredStudyMaterials.isEmpty && !_isLoading) {
-      return SizedBox(
+      return Container(
         height: 300,
         child: Center(
           child: Column(
@@ -470,7 +495,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                 ],
               ),
               const SizedBox(height: 16),
-              const Divider(),
+              // const Divider(),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -530,8 +555,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                       icon: Icon(material.uploadType == 'YTLink' ? Icons.play_arrow : Icons.visibility),
                       label: Text(material.uploadType == 'YTLink' ? 'Open' : 'Preview'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE74C3C),
-                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blue.shade50,
+                        foregroundColor: Colors.black87,
                       ),
                     ),
                   ),
@@ -544,10 +569,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
     );
   }
 
-  // New method to show file preview in popup
   void _showFilePreview(StudyMaterial material) {
     if (material.uploadType == 'YTLink') {
-      // For YouTube links, still open externally for better experience
       _handleExternalLink(material.fileName);
       return;
     }
@@ -566,14 +589,586 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not open the link');
+        _showErrorMessage('Could not open the link');
       }
     } catch (e) {
-      _showErrorSnackBar('Invalid URL format');
+      _showErrorMessage('Invalid URL format');
     }
   }
 
-  void _showErrorSnackBar(String message) {
+  void _showUploadDialog(BuildContext context) {
+    print('=== SHOWING UPLOAD DIALOG ===');
+    // Reset form data
+    _selectedBatch = null;
+    _selectedUploadSubject = null;
+    _batches.clear();
+    _subjectsForUpload.clear();
+    _chapterController.clear();
+    _descriptionController.clear();
+    _youtubeLinkController.clear();
+    _selectedFile = null;
+    _uploadType = 'File';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => _buildUploadForm(setModalState),
+      ),
+    );
+  }
+
+  Widget _buildUploadForm(StateSetter setModalState) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      maxChildSize: 0.95,
+      minChildSize: 0.5,
+      expand: false,
+      builder: (context, scrollController) {
+        return SingleChildScrollView(
+          controller: scrollController,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Upload Study Material',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Chapter field
+                TextFormField(
+                  controller: _chapterController,
+                  decoration: const InputDecoration(
+                    labelText: 'Chapter *',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.book),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Description field
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description *',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.description),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+
+                // Class dropdown
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.class_, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Class *',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (_isLoadingBatches)
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (_batches.isEmpty && !_isLoadingBatches)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _loadBatches(setModalState),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Load Classes'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFE74C3C),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        )
+                      else if (_batches.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: DropdownButtonFormField<BatchData>(
+                            value: _selectedBatch,
+                            decoration: const InputDecoration(
+                              hintText: 'Select Class',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: _batches.map((batch) {
+                              return DropdownMenuItem<BatchData>(
+                                value: batch,
+                                child: Text(batch.batchName),
+                              );
+                            }).toList(),
+                            onChanged: (BatchData? newValue) {
+                              print('=== CLASS SELECTION CHANGED ===');
+                              print('Selected Class: ${newValue?.batchName}');
+                              print('ClassMasterId: ${newValue?.classMasterId}');
+
+                              setModalState(() {
+                                _selectedBatch = newValue;
+                               _selectedUploadSubject = null;
+                                _subjectsForUpload.clear();
+                              });
+                              if (newValue != null) {
+                                _loadSubjects(newValue.classMasterId, setModalState);
+                              }
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Subject dropdown
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.subject, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Subject *',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (_isLoadingSubjects)
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (_selectedBatch == null)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            'Please select a class first',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        )
+                      else if (_subjectsForUpload.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: DropdownButtonFormField<SubjectData>(
+                            value: _selectedUploadSubject,
+                            decoration: const InputDecoration(
+                              hintText: 'Select Subject',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: _subjectsForUpload.map((subject) {
+                              return DropdownMenuItem<SubjectData>(
+                                value: subject,
+                                child: Text(subject.subjectName),
+                              );
+                            }).toList(),
+                            onChanged: (SubjectData? newValue) {
+                              print('=== SUBJECT SELECTION CHANGED ===');
+                              print('Selected Subject: ${newValue?.subjectName}');
+                              print('SubjectId: ${newValue?.subjectId}');
+
+                              setModalState(() {
+                                _selectedUploadSubject = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Upload Type Selection
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Upload Type *',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text('File'),
+                              value: 'File',
+                              groupValue: _uploadType,
+                              onChanged: (value) {
+                                print('=== UPLOAD TYPE CHANGED ===');
+                                print('Selected Type: $value');
+                                setModalState(() {
+                                  _uploadType = value!;
+                                });
+                              },
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text('YouTube Link'),
+                              value: 'YTLink',
+                              groupValue: _uploadType,
+                              onChanged: (value) {
+                                print('=== UPLOAD TYPE CHANGED ===');
+                                print('Selected Type: $value');
+                                setModalState(() {
+                                  _uploadType = value!;
+                                });
+                              },
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Conditional content based on upload type
+                if (_uploadType == 'YTLink') ...[
+                  // YouTube Link field
+                  TextFormField(
+                    controller: _youtubeLinkController,
+                    decoration: const InputDecoration(
+                      labelText: 'YouTube Link',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.link),
+                      hintText: 'https://www.youtube.com/watch?v=...',
+                    ),
+                  ),
+                ] else ...[
+                  // File upload section
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          _selectedFile != null ? Icons.check_circle : Icons.cloud_upload,
+                          size: 48,
+                          color: _selectedFile != null ? Colors.green : const Color(0xFFE74C3C),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _selectedFile != null
+                              ? 'File Selected: ${_selectedFile!.path.split('/').last}'
+                              : 'Drag and drop files here',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_selectedFile == null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'or',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () => _pickFile(setModalState),
+                            icon: const Icon(Icons.folder_open),
+                            label: const Text('Browse Files'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFFE74C3C),
+                              side: const BorderSide(color: Color(0xFFE74C3C)),
+                            ),
+                          ),
+                        ] else ...[
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () => _pickFile(setModalState),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Change File'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 30),
+
+                // Upload button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isUploading ? null : () => _uploadMaterial(setModalState),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE74C3C),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: _isUploading
+                        ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Uploading...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    )
+                        : const Text(
+                      'Upload Material',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _loadBatches(StateSetter setModalState) async {
+    print('=== LOADING BATCHES ===');
+    setModalState(() {
+      _isLoadingBatches = true;
+    });
+
+    try {
+      final batches = await TeacherStudyMaterialService.getBatches();
+      print('=== BATCHES LOADED ===');
+      print('Number of batches: ${batches.length}');
+
+      setModalState(() {
+        _batches = batches;
+        _isLoadingBatches = false;
+      });
+    } catch (e) {
+      print('=== LOAD BATCHES ERROR ===');
+      print('Error: $e');
+      setModalState(() {
+        _isLoadingBatches = false;
+      });
+    }
+  }
+
+  Future<void> _loadSubjects(int classMasterId, StateSetter setModalState) async {
+    print('=== LOADING SUBJECTS ===');
+    print('ClassMasterId: $classMasterId');
+
+    setModalState(() {
+      _isLoadingSubjects = true;
+    });
+
+    try {
+      final subjects = await TeacherStudyMaterialService.getSubjects(classMasterId);
+      print('=== SUBJECTS LOADED ===');
+      print('Number of subjects: ${subjects.length}');
+
+      setModalState(() {
+        _subjectsForUpload = subjects;
+        _isLoadingSubjects = false;
+      });
+    } catch (e) {
+      print('=== LOAD SUBJECTS ERROR ===');
+      print('Error: $e');
+      setModalState(() {
+        _isLoadingSubjects = false;
+      });
+    }
+  }
+
+  Future<void> _pickFile(StateSetter setModalState) async {
+    print('=== PICKING FILE ===');
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+
+      if (result != null) {
+        print('=== FILE PICKED ===');
+        print('File path: ${result.files.single.path}');
+        print('File name: ${result.files.single.name}');
+        print('File size: ${result.files.single.size}');
+
+        setModalState(() {
+          _selectedFile = File(result.files.single.path!);
+        });
+      } else {
+        print('=== FILE PICKER CANCELLED ===');
+      }
+    } catch (e) {
+      print('=== FILE PICKER ERROR ===');
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _uploadMaterial(StateSetter setModalState) async {
+    print('=== STARTING UPLOAD MATERIAL ===');
+
+    // Validation
+    if (_chapterController.text.isEmpty) {
+      _showErrorMessage('Chapter is required');
+      return;
+    }
+    if (_descriptionController.text.isEmpty) {
+      _showErrorMessage('Description is required');
+      return;
+    }
+    if (_selectedBatch == null) {
+      _showErrorMessage('Please select a class');
+      return;
+    }
+    if (_selectedUploadSubject == null) {
+      _showErrorMessage('Please select a subject');
+      return;
+    }
+    if (_uploadType == 'YTLink' && _youtubeLinkController.text.isEmpty) {
+      _showErrorMessage('YouTube link is required');
+      return;
+    }
+    if (_uploadType == 'File' && _selectedFile == null) {
+      _showErrorMessage('Please select a file');
+      return;
+    }
+
+    print('=== VALIDATION PASSED ===');
+
+    setModalState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final success = await TeacherStudyMaterialService.addStudyMaterial(
+        classMasterId: _selectedBatch!.classMasterId,
+        subjectId: _selectedUploadSubject!.subjectId,
+        chapter: _chapterController.text.trim(),
+        description: _descriptionController.text.trim(),
+        uploadType: _uploadType,
+        youtubeLink: _uploadType == 'YTLink' ? _youtubeLinkController.text.trim() : null,
+        file: _uploadType == 'File' ? _selectedFile : null,
+      );
+
+      setModalState(() {
+        _isUploading = false;
+      });
+
+      if (success) {
+        print('=== UPLOAD SUCCESSFUL ===');
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Study material uploaded successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Reload the materials list
+        _loadStudyMaterials();
+      } else {
+        print('=== UPLOAD FAILED ===');
+        _showErrorMessage('Failed to upload study material. Please try again.');
+      }
+    } catch (e) {
+      print('=== UPLOAD ERROR ===');
+      print('Error: $e');
+      setModalState(() {
+        _isUploading = false;
+      });
+      _showErrorMessage('An error occurred while uploading. Please try again.');
+    }
+  }
+
+  void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -582,7 +1177,6 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
     );
   }
 
-  // Helper methods (keep existing ones)
   Color _getTypeColor(StudyMaterialType type) {
     switch (type) {
       case StudyMaterialType.pdf:
@@ -636,94 +1230,9 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         return const Color(0xFF2ECC71);
     }
   }
-
-  void _showUploadDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _buildUploadForm(),
-    );
-  }
-
-  Widget _buildUploadForm() {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      maxChildSize: 0.9,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Upload Study Material',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'This is just a placeholder form. In a real app, this would be a complete form to upload study materials.',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Upload functionality to be implemented'),
-                          backgroundColor: Color(0xFFE74C3C),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE74C3C),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      'Upload Material',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
 
-// New FilePreviewModal widget
+// FilePreviewModal widget
 class FilePreviewModal extends StatefulWidget {
   final StudyMaterial material;
 
@@ -881,7 +1390,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 widget.material.fileUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return SizedBox(
+                  return Container(
                     height: 200,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -904,7 +1413,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return SizedBox(
+                  return Container(
                     height: 200,
                     child: Center(
                       child: CircularProgressIndicator(
