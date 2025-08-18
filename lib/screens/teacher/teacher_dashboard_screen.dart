@@ -142,13 +142,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       ),
 
       const SizedBox(height: 4),
-    Text(
-    'Mathematics & Physics',
-    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-    color: Colors.white.withOpacity(0.8),
-    fontSize: 14,
-    ),
-    ),
+
 
     // Static Achievement Badge (no animation)
 
