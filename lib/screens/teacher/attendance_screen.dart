@@ -12,7 +12,6 @@ class TeacherAttendanceScreen extends StatefulWidget {
 
 class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     with TickerProviderStateMixin {
-  late TabController _tabController;
   AnimationController? _animationController;
   AnimationController? _slideAnimationController;
   Animation<double>? _fadeAnimation;
@@ -49,7 +48,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _initializeAnimation();
     _loadClasses();
   }
@@ -78,7 +76,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
     _animationController?.dispose();
     _slideAnimationController?.dispose();
     super.dispose();
@@ -413,32 +410,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             tooltip: 'Edit Selection',
           ),
         ] : null,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: const Color(0xFF4A90E2),
-              unselectedLabelColor: Colors.grey.shade600,
-              indicatorColor: const Color(0xFF4A90E2),
-              indicatorWeight: 3,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-              tabs: const [
-                Tab(text: 'Mark Attendance'),
-                Tab(text: 'Reports'),
-              ],
-            ),
-          ),
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildMarkAttendanceTab(),
-          _buildReportsTab(),
-        ],
-      ),
+      body: _buildMarkAttendanceTab(),
     );
   }
 
@@ -1226,7 +1199,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   Widget _buildSubmitButton() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -1238,6 +1211,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         ],
       ),
       child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 6),
         child: ElevatedButton(
           onPressed: () async {
             print('=== SUBMIT ATTENDANCE CLICKED ===');
@@ -1298,13 +1273,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             ),
             elevation: 0,
           ),
-          child: const Text(
-            'Submit Attendance',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: const Text('Submit Attendance', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         ),
       ),
     );
@@ -1334,12 +1303,5 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     }
   }
 
-  Widget _buildReportsTab() {
-    return const Center(
-      child: Text(
-        'Reports functionality will be implemented here',
-        style: TextStyle(fontSize: 16, color: Colors.grey),
-      ),
-    );
-  }
+
 }

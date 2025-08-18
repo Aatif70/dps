@@ -370,7 +370,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         title: AppStrings.attendance,
         icon: Icons.calendar_today_rounded,
         color: const Color(0xFF4A90E2),
-        value: '94%',
+
         subtitle: 'Average',
         route: AppRoutes.teacherAttendance,
         description: 'Mark & view class attendance',
@@ -379,7 +379,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         title: AppStrings.homework,
         icon: Icons.assignment_rounded,
         color: const Color(0xFF58CC02),
-        value: '15',
         subtitle: 'Active',
         route: AppRoutes.teacherHomework,
         description: 'Create & grade assignments',
@@ -388,7 +387,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         title: AppStrings.leave,
         icon: Icons.event_busy_rounded,
         color: const Color(0xFF8E44AD),
-        value: '8',
         subtitle: 'Requests',
         route: AppRoutes.teacherLeave,
         description: 'Manage leave requests',
@@ -397,7 +395,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         title: AppStrings.studyMaterial,
         icon: Icons.menu_book_rounded,
         color: const Color(0xFFE74C3C),
-        value: '67',
         subtitle: 'Resources',
         route: AppRoutes.teacherStudyMaterial,
         description: 'Upload & share materials',
@@ -406,7 +403,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         title: AppStrings.allocatedSubjects,
         icon: Icons.school_rounded,
         color: const Color(0xFF2ECC71),
-        value: '2',
         subtitle: 'Subjects',
         route: AppRoutes.teacherAllocatedSubjects,
         description: 'View assigned subjects',
@@ -490,31 +486,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 ),
               ),
 
-              const Spacer(),
-
-              // Value and Subtitle
-              Row(
-                children: [
-                  Text(
-                    feature.value,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: feature.color,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      feature.subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF718096),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -686,7 +657,6 @@ class TeacherFeatureData {
   final String title;
   final IconData icon;
   final Color color;
-  final String value;
   final String subtitle;
   final String route;
   final String description;
@@ -695,7 +665,6 @@ class TeacherFeatureData {
     required this.title,
     required this.icon,
     required this.color,
-    required this.value,
     required this.subtitle,
     required this.route,
     required this.description,
