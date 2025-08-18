@@ -149,41 +149,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     fontSize: 14,
     ),
     ),
-    const SizedBox(height: 12),
+
     // Static Achievement Badge (no animation)
-    Container(
-    padding: const EdgeInsets.symmetric(
-    horizontal: 12,
-    vertical: 8,
-    ),
-    decoration: BoxDecoration(
-    color: Colors.white.withOpacity(0.2),
-    borderRadius: BorderRadius.circular(25),
-    border: Border.all(
-    color: Colors.white.withOpacity(0.3),
-    width: 1,
-    ),
-    ),
-    child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-    const Icon(
-    Icons.stars_rounded,
-    color: Color(0xFFFF9500),
-    size: 18,
-    ),
-    const SizedBox(width: 8),
-    const Text(
-    'Top Educator ⭐',
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 13,
-    fontWeight: FontWeight.w600,
-    ),
-    ),
-    ],
-    ),
-    ),
+
     ],
     ),
     ),
