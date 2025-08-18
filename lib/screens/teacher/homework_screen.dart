@@ -34,6 +34,118 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
     _searchController.addListener(_filterHomework);
   }
 
+  void _showHomeworkPreview(TeacherHomework homework) {
+    final String url = homework.docUrl;
+    if (url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No attachment available')),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Homework Attachment',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.grey.shade200,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: InteractiveViewer(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              url,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return SizedBox(
+                                  height: 200,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.broken_image,
+                                        size: 64,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Could not load attachment',
+                                        style: TextStyle(color: Colors.grey.shade600),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
   @override
   void dispose() {
     _searchController.dispose();
@@ -500,16 +612,20 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                   ),
                 ),
                 if (homework.doc != null && homework.doc!.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF58CC02).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.attachment_rounded,
-                      color: Color(0xFF58CC02),
-                      size: 16,
+                  InkWell(
+                    onTap: () => _showHomeworkPreview(homework),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF58CC02).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.attachment_rounded,
+                        color: Color(0xFF58CC02),
+                        size: 16,
+                      ),
                     ),
                   ),
               ],
@@ -558,6 +674,21 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                 ),
               ],
             ),
+            if (homework.doc != null && homework.doc!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _showHomeworkPreview(homework),
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('Preview Attachment'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade50,
+                    foregroundColor: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
