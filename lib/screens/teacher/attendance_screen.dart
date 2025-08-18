@@ -43,8 +43,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   bool _isParametersConfirmed = false;
   bool _showParametersCard = true;
 
-  // Mock students data
-  List<Student> _students = [];
+  // UPDATED: Real students data instead of mock
+  List<AttendanceStudent> _students = [];
 
   @override
   void initState() {
@@ -84,19 +84,34 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     super.dispose();
   }
 
-  void _generateMockStudents() {
-    setState(() {
-      _students = List.generate(
-        20,
-            (index) => Student(
-          id: 'STU${10001 + index}',
-          name: 'Student ${index + 1}',
-          rollNumber: (index + 1).toString().padLeft(2, '0'),
-          profileImage: '',
-          attendanceHistory: {},
-        ),
+  // UPDATED: Load real students data instead of generating mock data
+  Future<void> _loadStudentList() async {
+    if (!_canShowStudentList()) {
+      print('Cannot load students - missing parameters');
+      return;
+    }
+
+    setState(() => _isLoadingStudents = true);
+
+    try {
+      print('=== LOADING STUDENT LIST ===');
+      final students = await TeacherAttendanceService.getAttendanceStudentList(
+        subjectId: _selectedSubject!.subjectId,
+        classId: _selectedBatch!.classId,
+        divisionId: _selectedDivision!.divisionId,
       );
-    });
+
+      setState(() {
+        _students = students;
+      });
+
+      print('Loaded ${_students.length} students successfully');
+    } catch (e) {
+      print('Error loading students: $e');
+      _showErrorSnackBar('Failed to load students');
+    } finally {
+      setState(() => _isLoadingStudents = false);
+    }
   }
 
   void _showConfirmationDialog() {
@@ -157,9 +172,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildConfirmationRow('Batch', _selectedBatch?.batch ?? ''),
-                      const SizedBox(height: 8),
                       _buildConfirmationRow('Class', _selectedClass?.className ?? ''),
+                      const SizedBox(height: 8),
+                      _buildConfirmationRow('Batch', _selectedBatch?.batch ?? ''),
                       const SizedBox(height: 8),
                       _buildConfirmationRow('Division', _selectedDivision?.name ?? ''),
                       const SizedBox(height: 8),
@@ -170,11 +185,11 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'This will load ${_students.length} students for attendance marking.',
+                const Text(
+                  'This will load students for attendance marking.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: Colors.grey,
                   ),
                 ),
               ],
@@ -250,7 +265,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       setState(() {
         _showParametersCard = false;
       });
-      _animationController?.forward();
+      // Load real students instead of generating mock data
+      _loadStudentList().then((_) {
+        _animationController?.forward();
+      });
     });
   }
 
@@ -264,7 +282,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     _resetSelections();
   }
 
-  // Keep all the existing API loading methods unchanged
+  // Keep all existing API loading methods unchanged
   Future<void> _loadClasses() async {
     setState(() => _isLoadingClasses = true);
     try {
@@ -345,6 +363,17 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
@@ -491,16 +520,13 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 
-  // NEW REDESIGNED SELECT PARAMETERS CARD
+  // Keep all the existing parameter selection card methods...
   Widget _buildParameterSelectionCard() {
     return Container(
       margin: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Header Section
           _buildNewCardHeader(),
-
-          // Content Section
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -521,15 +547,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Date Selection
                   _buildNewDateSelector(),
-
                   const SizedBox(height: 24),
-
-                  // Parameters Grid
                   _buildNewParametersGrid(),
-
-                  // Proceed Button
                   if (_canShowStudentList()) ...[
                     const SizedBox(height: 32),
                     _buildProceedButton(),
@@ -543,6 +563,62 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 
+  Widget _buildProceedButton() {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          // No longer generate mock students, just show confirmation
+          _showConfirmationDialog();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.arrow_forward,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Proceed to Attendance',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Keep all existing header and date selector methods...
   Widget _buildNewCardHeader() {
     final completedSteps = _getCompletedSteps();
     final progress = completedSteps / 4.0;
@@ -729,8 +805,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           ),
         ),
         const SizedBox(height: 16),
-
-        // Class and Batch Row
         Row(
           children: [
             Expanded(
@@ -770,10 +844,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             ),
           ],
         ),
-
         const SizedBox(height: 20),
-
-        // Division and Subject Row
         Row(
           children: [
             Expanded(
@@ -829,6 +900,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     final bool isInItems = selectedItem != null && itemValues.contains(selectedItem);
     final T? dropdownValue = isInItems ? selectedItem : null;
     final bool showInvalidSelection = selectedItem != null && !isInItems;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -912,79 +984,24 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           curve: Curves.easeInOut,
           child: showInvalidSelection
               ? Padding(
-                  padding: const EdgeInsets.only(top: 6, left: 4),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info_outline, size: 14, color: Color(0xFFEF4444)),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          'Previous selection is unavailable. Please reselect.',
-                          style: TextStyle(fontSize: 12, color: Colors.red.shade600),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+            padding: const EdgeInsets.only(top: 6, left: 4),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, size: 14, color: Color(0xFFEF4444)),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    'Previous selection is unavailable. Please reselect.',
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade600),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                )
+                ),
+              ],
+            ),
+          )
               : const SizedBox.shrink(),
         ),
       ],
-    );
-  }
-
-  Widget _buildProceedButton() {
-    return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: () {
-          _generateMockStudents();
-          _showConfirmationDialog();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.arrow_forward,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Proceed to Attendance',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1027,8 +1044,28 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 
-  // Keep all existing methods for student list, buttons, etc.
   Widget _buildStudentList() {
+    if (_isLoadingStudents) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: Color(0xFF4A90E2),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Loading students...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return _fadeAnimation != null
         ? FadeTransition(
       opacity: _fadeAnimation!,
@@ -1063,9 +1100,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 
-  Widget _buildStudentCard(Student student, int index) {
-    final attendance = student.attendanceHistory[_selectedDate] ?? AttendanceStatus.pending;
-
+  Widget _buildStudentCard(AttendanceStudent student, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Card(
@@ -1073,10 +1108,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: attendance == AttendanceStatus.present
+            color: student.attendanceStatus
                 ? const Color(0xFF10B981).withOpacity(0.3)
-                : attendance == AttendanceStatus.absent
-                ? const Color(0xFFEF4444).withOpacity(0.3)
                 : Colors.grey.shade200,
           ),
         ),
@@ -1088,7 +1121,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 radius: 24,
                 backgroundColor: const Color(0xFF4A90E2).withOpacity(0.1),
                 child: Text(
-                  student.name.substring(0, 1),
+                  student.name.isNotEmpty ? student.name.substring(0, 1).toUpperCase() : '?',
                   style: const TextStyle(
                     color: Color(0xFF4A90E2),
                     fontWeight: FontWeight.bold,
@@ -1111,7 +1144,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Roll No: ${student.rollNumber}',
+                      'Roll No: ${student.studentRollNo}',
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 14,
@@ -1128,34 +1161,32 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 
-  Widget _buildAttendanceToggle(Student student) {
-    final currentStatus = student.attendanceHistory[_selectedDate] ?? AttendanceStatus.pending;
-
+  Widget _buildAttendanceToggle(AttendanceStudent student) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildAttendanceButton(
           student,
-          AttendanceStatus.present,
+          true,
           'P',
           const Color(0xFF10B981),
-          currentStatus == AttendanceStatus.present,
+          student.attendanceStatus == true,
         ),
         const SizedBox(width: 8),
         _buildAttendanceButton(
           student,
-          AttendanceStatus.absent,
+          false,
           'A',
           const Color(0xFFEF4444),
-          currentStatus == AttendanceStatus.absent,
+          student.attendanceStatus == false,
         ),
       ],
     );
   }
 
   Widget _buildAttendanceButton(
-      Student student,
-      AttendanceStatus status,
+      AttendanceStudent student,
+      bool status,
       String label,
       Color color,
       bool isSelected,
@@ -1163,8 +1194,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     return GestureDetector(
       onTap: () {
         setState(() {
-          student.attendanceHistory[_selectedDate] = status;
+          student.attendanceStatus = status;
         });
+        print('Updated ${student.name} attendance to: $status');
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -1207,20 +1239,55 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       ),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: () {
-            final markedStudents = _students.where((student) =>
-            student.attendanceHistory[_selectedDate] != null &&
-                student.attendanceHistory[_selectedDate] != AttendanceStatus.pending
-            ).length;
+          onPressed: () async {
+            print('=== SUBMIT ATTENDANCE CLICKED ===');
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Attendance saved for $markedStudents students!'),
-                backgroundColor: const Color(0xFF10B981),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            // Show loading dialog
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Saving attendance...'),
+                  ],
+                ),
               ),
             );
+
+            try {
+              // Format date for API (dd-MM-yyyy format)
+              final formattedDate = DateFormat('dd-MM-yyyy').format(_selectedDate);
+
+              final success = await TeacherAttendanceService.saveAttendance(
+                attendanceDate: formattedDate,
+                subjectId: _selectedSubject!.subjectId,
+                classMasterId: _selectedClass!.classMasterId,
+                classId: _selectedBatch!.classId,
+                divisionId: _selectedDivision!.divisionId,
+                students: _students,
+              );
+
+              Navigator.of(context).pop(); // Close loading dialog
+
+              if (success) {
+                final presentCount = _students.where((s) => s.attendanceStatus == true).length;
+                final absentCount = _students.where((s) => s.attendanceStatus == false).length;
+
+                _showSuccessSnackBar(
+                    'Attendance saved successfully! Present: $presentCount, Absent: $absentCount'
+                );
+              } else {
+                _showErrorSnackBar('Failed to save attendance. Please try again.');
+              }
+            } catch (e) {
+              Navigator.of(context).pop(); // Close loading dialog
+              print('Error saving attendance: $e');
+              _showErrorSnackBar('Error saving attendance: $e');
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF4A90E2),
@@ -1276,22 +1343,3 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     );
   }
 }
-
-// Data models remain the same
-class Student {
-  final String id;
-  final String name;
-  final String rollNumber;
-  final String profileImage;
-  final Map<DateTime, AttendanceStatus> attendanceHistory;
-
-  Student({
-    required this.id,
-    required this.name,
-    required this.rollNumber,
-    required this.profileImage,
-    required this.attendanceHistory,
-  });
-}
-
-enum AttendanceStatus { present, absent, pending }
