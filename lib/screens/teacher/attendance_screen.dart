@@ -157,9 +157,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildConfirmationRow('Class', _selectedClass?.className ?? ''),
-                      const SizedBox(height: 8),
                       _buildConfirmationRow('Batch', _selectedBatch?.batch ?? ''),
+                      const SizedBox(height: 8),
+                      _buildConfirmationRow('Class', _selectedClass?.className ?? ''),
                       const SizedBox(height: 8),
                       _buildConfirmationRow('Division', _selectedDivision?.name ?? ''),
                       const SizedBox(height: 8),
