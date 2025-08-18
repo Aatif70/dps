@@ -1234,8 +1234,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             );
 
             try {
-              // Format date for API (dd-MM-yyyy format)
-              final formattedDate = DateFormat('dd-MM-yyyy').format(_selectedDate);
+              // Format date for API (MM/dd/yyyy format)
+              final formattedDate = DateFormat('MM/dd/yyyy').format(_selectedDate);
 
               final success = await TeacherAttendanceService.saveAttendance(
                 attendanceDate: formattedDate,
