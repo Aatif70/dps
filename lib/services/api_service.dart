@@ -28,6 +28,22 @@ class ApiService {
         await prefs.setString('FullName', data['FullName'] ?? '');
         await prefs.setString('Role', data['Role'] ?? '');
         await prefs.setInt('Id', data['Id'] ?? 0);
+        // Persist ClassId if provided by login response (needed for exam APIs)
+        try {
+          final dynamic classIdValue = data['ClassId'] ?? data['ClassMasterId'];
+          if (classIdValue != null) {
+            int? classIdInt;
+            if (classIdValue is int) {
+              classIdInt = classIdValue;
+            } else if (classIdValue is String) {
+              classIdInt = int.tryParse(classIdValue);
+            }
+            if (classIdInt != null) {
+              await prefs.setInt('ClassId', classIdInt);
+              print('Stored ClassId: $classIdInt');
+            }
+          }
+        } catch (_) {}
         print('Login successful, Uid stored: ${data['Uid']}');
         return true;
       } else {

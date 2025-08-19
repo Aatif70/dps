@@ -15,6 +15,8 @@ class ApiConstants {
   static const String studentTimetable = '/api/User/StdTimeTable';
   static const String searchStudentDetail = '/api/user/SearchStudentDetail';
   static const String studentDocuments = '/api/user/StudentDocuments';
+  static const String studentExamList = '/api/OnlineExam/StudentExam';
+  static const String studentExamMarks = '/api/User/StudentExamMarks';
 
 
 
