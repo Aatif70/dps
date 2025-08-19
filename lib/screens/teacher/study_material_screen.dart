@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -94,23 +95,18 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        appBar: _buildEnhancedAppBar(context),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: Text(AppStrings.studyMaterial),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadStudyMaterials,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
+      appBar: _buildEnhancedAppBar(context),
+      body: _errorMessage != null
           ? _buildErrorWidget()
           : RefreshIndicator(
         onRefresh: _loadStudyMaterials,
@@ -118,6 +114,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
+              _buildEnhancedStudyHeader(context),
+              const SizedBox(height: 20),
               _buildFilters(),
               _buildUploadStats(),
               _buildMaterialsList(),
@@ -131,6 +129,138 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         },
         backgroundColor: const Color(0xFFE74C3C),
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildEnhancedAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text(
+        'Study Materials',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2D3748),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: Color(0xFF2D3748),
+          size: 20,
+        ),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.pop(context);
+        },
+      ),
+      actions: [
+        IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.refresh_rounded,
+              color: Color(0xFFE74C3C),
+              size: 20,
+            ),
+          ),
+          onPressed: _loadStudyMaterials,
+        ),
+        const SizedBox(width: 12),
+      ],
+    );
+  }
+
+  Widget _buildEnhancedStudyHeader(BuildContext context) {
+    final totalMaterials = _allStudyMaterials.length;
+    final totalClasses = _allStudyMaterials.map((m) => m.className).toSet().length;
+    final uniqueSubjects = _allStudyMaterials.map((m) => m.subject).toSet().length;
+
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE74C3C), Color(0xFFC0392B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE74C3C).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.menu_book_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Your Study Journey',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '$totalMaterials Resources',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$uniqueSubjects subjects • $totalClasses classes',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 2,
+              ),
+            ),
+            child: const Icon(
+              Icons.school_rounded,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
+        ],
       ),
     );
   }

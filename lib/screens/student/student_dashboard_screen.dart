@@ -5,6 +5,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/widgets/event_calendar_widget.dart';
 import 'package:dps/widgets/gallery_preview_widget.dart';
+import 'package:dps/services/student_profile_service.dart';
 
 
 class StudentDashboardScreen extends StatefulWidget {
@@ -20,11 +21,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
   String _fullName = '';
+  String _photoUrl = '';
 
   @override
   void initState() {
     super.initState();
     _loadFullName();
+    _loadStudentPhoto();
     // Initialize animation controller for fade effect
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
@@ -47,6 +50,18 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     setState(() {
       _fullName = prefs.getString('FullName') ?? 'cant get name';
     });
+  }
+
+  Future<void> _loadStudentPhoto() async {
+    try {
+      final details = await StudentProfileService.getStudentDetails();
+      if (!mounted) return;
+      setState(() {
+        _photoUrl = (details?.data.photo.isNotEmpty == true) ? details!.data.photoUrl : '';
+      });
+    } catch (_) {
+      // ignore errors, fallback will handle
+    }
   }
 
   @override
@@ -191,13 +206,16 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                             ),
                           ],
                         ),
-                        child: const CircleAvatar(
+                        child: CircleAvatar(
                           radius: 35,
                           backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.person,
-                            color: Colors.blueGrey,
-                          ),
+                          backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                          child: _photoUrl.isEmpty
+                              ? const Icon(
+                                  Icons.person,
+                                  color: Colors.blueGrey,
+                                )
+                              : null,
                         ),
                       ),
                     ),
