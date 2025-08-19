@@ -244,16 +244,16 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         title: 'Email',
         value: _email.isEmpty ? 'N/A' : _email,
       ),
-      ProfileInfoItem(
-        icon: Icons.badge_outlined,
-        title: 'User ID',
-        value: _id == 0 ? 'N/A' : _id.toString(),
-      ),
-      ProfileInfoItem(
-        icon: Icons.perm_identity_rounded,
-        title: 'UID',
-        value: _uid.isEmpty ? 'N/A' : _uid,
-      ),
+      // ProfileInfoItem(
+      //   icon: Icons.badge_outlined,
+      //   title: 'User ID',
+      //   value: _id == 0 ? 'N/A' : _id.toString(),
+      // ),
+      // ProfileInfoItem(
+      //   icon: Icons.perm_identity_rounded,
+      //   title: 'UID',
+      //   value: _uid.isEmpty ? 'N/A' : _uid,
+      // ),
       ProfileInfoItem(
         icon: Icons.verified_user_outlined,
         title: 'Role',

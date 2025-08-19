@@ -272,6 +272,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         route: AppRoutes.studenttimetable,
       ),
 
+      FeatureData(
+        title: AppStrings.studentmarks,
+        icon: Icons.note_add_outlined,
+        color: Colors.amberAccent,
+        // value: '85%',
+        // subtitle: 'This month',
+        route: AppRoutes.studentmarks,
+      ),
+
 
     ];
 

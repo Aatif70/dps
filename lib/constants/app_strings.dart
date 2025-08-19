@@ -40,6 +40,7 @@ class AppStrings {
   static const String studyMaterial = "Study Material";
   static const String examination = "Examination";
   static const String timetable = "Timetable";
+  static const String studentmarks = "Results";
   
   // Teacher Features
   static const String allocatedSubjects = "Allocated Subjects";
