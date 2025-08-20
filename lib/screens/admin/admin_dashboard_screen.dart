@@ -645,6 +645,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         color: const Color(0xFF6C5CE7),
         route: AppRoutes.adminFeesHub,
       ),
+      _AdminFeature(
+        title: 'Teachers',
+        icon: Icons.person_rounded,
+        color: Colors.red,
+        route: AppRoutes.adminFeesHub,
+      ),
     ];
 
     return Padding(

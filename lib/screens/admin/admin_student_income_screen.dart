@@ -38,7 +38,13 @@ class _AdminStudentIncomeScreenState extends State<AdminStudentIncomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Income')),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text('Income', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _data == null
@@ -48,13 +54,34 @@ class _AdminStudentIncomeScreenState extends State<AdminStudentIncomeScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      _kv('Have Certificate', _data!.haveCertificate),
-                      _kv('Amount', _data!.amount.toStringAsFixed(2)),
-                      _kv('Certificate No', _data!.certNo),
-                      _kv('Issued Date', _data!.issueDate),
-                      _kv('Valid Up To', _data!.validUpTo),
-                      _kv('PAN No', _data!.panNo),
-                      _kv('Aadhaar No', _data!.adharNo),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                          ],
+                          border: Border.all(color: const Color(0xFFF1F5F9)),
+                        ),
+                        child: Column(
+                          children: [
+                            _kv('Have Certificate', _data!.haveCertificate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Amount', _data!.amount.toStringAsFixed(2)),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Certificate No', _data!.certNo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Issued Date', _data!.issueDate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Valid Up To', _data!.validUpTo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('PAN No', _data!.panNo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Aadhaar No', _data!.adharNo),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -62,21 +89,12 @@ class _AdminStudentIncomeScreenState extends State<AdminStudentIncomeScreen> {
   }
 
   Widget _kv(String label, String value) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(width: 160, child: Text(label, style: const TextStyle(color: Color(0xFF64748B)))),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w600))),
-        ],
-      ),
+    return Row(
+      children: [
+        SizedBox(width: 160, child: Text(label, style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600))),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B)))),
+      ],
     );
   }
 }

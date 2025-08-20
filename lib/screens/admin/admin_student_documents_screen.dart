@@ -38,36 +38,50 @@ class _AdminStudentDocumentsScreenState extends State<AdminStudentDocumentsScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Documents')),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text('Documents', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _fetch,
               child: _cats.isEmpty
-                  ? const ListTile(title: Text('No documents'))
+                  ? const Center(child: Text('No documents'))
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemBuilder: (context, index) {
                         final DocumentCategory c = _cats[index];
                         return Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                            ],
                             border: Border.all(color: const Color(0xFFF1F5F9)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(c.category, style: const TextStyle(fontWeight: FontWeight.w700)),
+                              Text(c.category, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B))),
                               const SizedBox(height: 8),
-                              ...c.documents.map((d) => Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 6),
+                              ...c.documents.map((d) => Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 6),
+                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF8FAFC),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                     child: Row(
                                       children: [
                                         const Icon(Icons.insert_drive_file_rounded, color: Color(0xFF4A90E2)),
                                         const SizedBox(width: 8),
-                                        Expanded(child: Text(d.docType)),
+                                        Expanded(child: Text(d.docType, style: const TextStyle(fontWeight: FontWeight.w600))),
                                         if (d.documentUrl != null)
                                           TextButton(
                                             onPressed: () {
@@ -84,7 +98,7 @@ class _AdminStudentDocumentsScreenState extends State<AdminStudentDocumentsScree
                           ),
                         );
                       },
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemCount: _cats.length,
                     ),
             ),

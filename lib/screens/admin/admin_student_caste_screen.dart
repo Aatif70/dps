@@ -38,7 +38,13 @@ class _AdminStudentCasteScreenState extends State<AdminStudentCasteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Caste & Religion')),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text('Caste & Religion', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _data == null
@@ -48,25 +54,62 @@ class _AdminStudentCasteScreenState extends State<AdminStudentCasteScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      _kv('Religion', _data!.religion),
-                      _kv('Category', _data!.category),
-                      if (_data!.caste != null) _kv('Caste', _data!.caste!),
-                      if (_data!.subCaste != null) _kv('Sub Caste', _data!.subCaste!),
-                      _kv('Caste Certificate', _data!.castCertificate),
-                      _kv('Certificate No', _data!.certificateNo),
-                      _kv('Issued Date', _data!.issuedDate),
-                      _kv('Bar Code', _data!.barCode),
-                      _kv('Issued Authority', _data!.issuedAuthority),
-                      _kv('Caste Validity', _data!.castValidity),
-                      _kv('Cast Val No', _data!.castValNo),
-                      _kv('Cast Val Date', _data!.castValDate),
-                      _kv('Cast Val Code', _data!.castValCode),
-                      _kv('Obtained Authority', _data!.casteValObtnAuthority),
-                      _kv('Non-Creamy Layer', _data!.nonCreamyLayer),
-                      _kv('NOCL No', _data!.noclNo),
-                      _kv('NCL Date', _data!.nonCLDate),
-                      _kv('NCL Barcode', _data!.nclBarcode),
-                      _kv('NCL Issued Authority', _data!.nclIssuedAuthority),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                          ],
+                          border: Border.all(color: const Color(0xFFF1F5F9)),
+                        ),
+                        child: Column(
+                          children: [
+                            _kv('Religion', _data!.religion),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Category', _data!.category),
+                            if (_data!.caste != null) ...[
+                              Divider(height: 16, color: Colors.grey.shade200),
+                              _kv('Caste', _data!.caste!),
+                            ],
+                            if (_data!.subCaste != null) ...[
+                              Divider(height: 16, color: Colors.grey.shade200),
+                              _kv('Sub Caste', _data!.subCaste!),
+                            ],
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Caste Certificate', _data!.castCertificate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Certificate No', _data!.certificateNo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Issued Date', _data!.issuedDate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Bar Code', _data!.barCode),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Issued Authority', _data!.issuedAuthority),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Caste Validity', _data!.castValidity),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Cast Val No', _data!.castValNo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Cast Val Date', _data!.castValDate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Cast Val Code', _data!.castValCode),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Obtained Authority', _data!.casteValObtnAuthority),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('Non-Creamy Layer', _data!.nonCreamyLayer),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('NOCL No', _data!.noclNo),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('NCL Date', _data!.nonCLDate),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('NCL Barcode', _data!.nclBarcode),
+                            Divider(height: 16, color: Colors.grey.shade200),
+                            _kv('NCL Issued Authority', _data!.nclIssuedAuthority),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -74,21 +117,12 @@ class _AdminStudentCasteScreenState extends State<AdminStudentCasteScreen> {
   }
 
   Widget _kv(String label, String value) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(width: 160, child: Text(label, style: const TextStyle(color: Color(0xFF64748B)))),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w600))),
-        ],
-      ),
+    return Row(
+      children: [
+        SizedBox(width: 160, child: Text(label, style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600))),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B)))),
+      ],
     );
   }
 }
