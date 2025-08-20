@@ -480,20 +480,20 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
-        appBar: AppBar(
-          title: Text(AppStrings.attendance),
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF2C3E50),
-          elevation: 0,
-          centerTitle: true,
-          actions: _isParametersConfirmed ? [
-            IconButton(
-              onPressed: _resetSelection,
-              icon: const Icon(Icons.edit),
-              tooltip: 'Edit Selection',
-            ),
-          ] : null,
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        title: Text(AppStrings.attendance),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF2C3E50),
+        elevation: 0,
+        centerTitle: true,
+        actions: _isParametersConfirmed ? [
+          IconButton(
+            onPressed: _resetSelection,
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit Selection',
+          ),
+        ] : null,
           bottom: const TabBar(
             labelColor: Color(0xFF4A90E2),
             unselectedLabelColor: Colors.grey,
@@ -2084,12 +2084,13 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
       );
     }
 
-    return SliverList(
-      
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => _buildStudentDetailCard(_studentDetails[index]),
-        childCount: _studentDetails.length,
-
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildStudentDetailCard(_studentDetails[index]),
+          childCount: _studentDetails.length,
+        ),
       ),
     );
   }
