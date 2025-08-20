@@ -33,5 +33,14 @@ class AppRoutes {
   static const String adminFeesReceipts = '/admin/fees/receipts';
   static const String adminConcessionReceipts = '/admin/fees/concession-receipts';
   static const String adminPaymentVouchers = '/admin/fees/payment-vouchers';
+  static const String adminStudentDetails = '/admin/students/details';
+  static const String adminStudentCaste = '/admin/students/caste';
+  static const String adminStudentIncome = '/admin/students/income';
+  static const String adminStudentBank = '/admin/students/bank';
+  static const String adminStudentGuardian = '/admin/students/guardian';
+  static const String adminStudentDocuments = '/admin/students/documents';
+  static const String adminStudentPersonal = '/admin/students/personal';
+  static const String adminStudentPreviousSchool = '/admin/students/previous-school';
+  static const String adminStudentSmsDetails = '/admin/students/sms-details';
 
 } 

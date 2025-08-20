@@ -19,6 +19,12 @@ class ApiConstants {
   static const String studentExamList = '/api/OnlineExam/StudentExam';
   static const String studentExamMarks = '/api/User/StudentExamMarks';
   static const String searchStudent = '/api/User/SearchStudent';
+  static const String studentPersonalDetail = '/api/user/StudentPersonalDetail';
+  static const String guardianDetail = '/api/user/GuardianDetail';
+  static const String previousSchool = '/api/user/PreviousSchool';
+  static const String bankDetail = '/api/user/BankDetail';
+  static const String incomeDetail = '/api/user/IncomeDetail';
+  static const String casteReligionDetail = '/api/user/CasteReligionDetail';
 
 
 

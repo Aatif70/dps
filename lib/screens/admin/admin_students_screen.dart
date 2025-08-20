@@ -103,7 +103,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         ),
                         subtitle: Text('ID: ${item.id}'),
                         onTap: () {
-                          // Future: Navigate to student detail if available
+                          Navigator.pushNamed(
+                            context,
+                            '/admin/students/details',
+                            arguments: {'studentId': item.id},
+                          );
                         },
                       );
                     },

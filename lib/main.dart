@@ -6,6 +6,15 @@ import 'package:dps/screens/admin/admin_fees_receipts_screen.dart';
 import 'package:dps/screens/admin/admin_concession_receipts_screen.dart';
 import 'package:dps/screens/admin/admin_payment_vouchers_screen.dart';
 import 'package:dps/screens/admin/admin_fees_hub_screen.dart';
+import 'package:dps/screens/admin/admin_student_details_screen.dart';
+import 'package:dps/screens/admin/admin_student_caste_screen.dart';
+import 'package:dps/screens/admin/admin_student_income_screen.dart';
+import 'package:dps/screens/admin/admin_student_bank_screen.dart';
+import 'package:dps/screens/admin/admin_student_guardian_screen.dart';
+import 'package:dps/screens/admin/admin_student_documents_screen.dart';
+import 'package:dps/screens/admin/admin_student_personal_screen.dart';
+import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
+import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
@@ -74,6 +83,15 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
         AppRoutes.adminStudents: (context) => const AdminStudentsScreen(),
         AppRoutes.adminFeesHub: (context) => const AdminFeesHubScreen(),
+        AppRoutes.adminStudentDetails: (context) => const AdminStudentDetailsScreen(),
+        AppRoutes.adminStudentCaste: (context) => const AdminStudentCasteScreen(),
+        AppRoutes.adminStudentIncome: (context) => const AdminStudentIncomeScreen(),
+        AppRoutes.adminStudentBank: (context) => const AdminStudentBankScreen(),
+        AppRoutes.adminStudentGuardian: (context) => const AdminStudentGuardianScreen(),
+        AppRoutes.adminStudentDocuments: (context) => const AdminStudentDocumentsScreen(),
+        AppRoutes.adminStudentPersonal: (context) => const AdminStudentPersonalScreen(),
+        AppRoutes.adminStudentPreviousSchool: (context) => const AdminStudentPreviousSchoolScreen(),
+        AppRoutes.adminStudentSmsDetails: (context) => const AdminStudentSmsDetailsScreen(),
         AppRoutes.adminFeesReceipts: (context) => const AdminFeesReceiptsScreen(),
         AppRoutes.adminConcessionReceipts: (context) => const AdminConcessionReceiptsScreen(),
         AppRoutes.adminPaymentVouchers: (context) => const AdminPaymentVouchersScreen(),
