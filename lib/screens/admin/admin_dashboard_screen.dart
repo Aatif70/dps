@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
-import 'package:dps/constants/app_strings.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+
 import '../../services/admin_dashboard_service.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -134,9 +133,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         children: [
           _buildCompactHeader(),
           const SizedBox(height: 20),
-          _buildCompactStats(),
-          const SizedBox(height: 24),
-          _buildCleanTransactions(),
+          _buildCategoryGrid(context),
           const SizedBox(height: 20),
         ],
       ),
@@ -633,4 +630,101 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       ),
     );
   }
+
+  Widget _buildCategoryGrid(BuildContext context) {
+    final List<_AdminFeature> features = [
+      _AdminFeature(
+        title: 'Students',
+        icon: Icons.people_alt_rounded,
+        color: const Color(0xFF4A90E2),
+        route: AppRoutes.adminStudents,
+      ),
+      _AdminFeature(
+        title: 'Fees',
+        icon: Icons.account_balance_wallet_rounded,
+        color: const Color(0xFF6C5CE7),
+        route: AppRoutes.adminFeesHub,
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 1,
+        ),
+        itemCount: features.length,
+        itemBuilder: (context, index) {
+          final _AdminFeature feature = features[index];
+          return GestureDetector(
+            onTap: () => Navigator.pushNamed(context, feature.route),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: feature.color.withOpacity(0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            feature.color.withOpacity(0.1),
+                            feature.color.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(feature.icon, color: feature.color, size: 28),
+                    ),
+                    const SizedBox(height: 22),
+                    Text(
+                      feature.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3748),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _AdminFeature {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final String route;
+
+  const _AdminFeature({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.route,
+  });
 }
