@@ -42,5 +42,9 @@ class AppRoutes {
   static const String adminStudentPersonal = '/admin/students/personal';
   static const String adminStudentPreviousSchool = '/admin/students/previous-school';
   static const String adminStudentSmsDetails = '/admin/students/sms-details';
+  static const String adminClassesHub = '/admin/classes';
+  static const String adminClassMasters = '/admin/classes/class-masters';
+  static const String adminBatches = '/admin/classes/batches';
+  static const String adminDivisions = '/admin/classes/divisions';
 
 } 

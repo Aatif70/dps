@@ -7,6 +7,10 @@ import 'package:dps/screens/admin/admin_concession_receipts_screen.dart';
 import 'package:dps/screens/admin/admin_payment_vouchers_screen.dart';
 import 'package:dps/screens/admin/admin_fees_hub_screen.dart';
 import 'package:dps/screens/admin/admin_student_details_screen.dart';
+import 'package:dps/screens/admin/admin_classes_hub_screen.dart';
+import 'package:dps/screens/admin/admin_class_masters_screen.dart';
+import 'package:dps/screens/admin/admin_batches_screen.dart';
+import 'package:dps/screens/admin/admin_divisions_screen.dart';
 import 'package:dps/screens/admin/admin_student_caste_screen.dart';
 import 'package:dps/screens/admin/admin_student_income_screen.dart';
 import 'package:dps/screens/admin/admin_student_bank_screen.dart';
@@ -84,6 +88,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminStudents: (context) => const AdminStudentsScreen(),
         AppRoutes.adminFeesHub: (context) => const AdminFeesHubScreen(),
         AppRoutes.adminStudentDetails: (context) => const AdminStudentDetailsScreen(),
+        AppRoutes.adminClassesHub: (context) => const AdminClassesHubScreen(),
+        AppRoutes.adminClassMasters: (context) => const AdminClassMastersScreen(),
+        AppRoutes.adminBatches: (context) => const AdminBatchesScreen(),
+        AppRoutes.adminDivisions: (context) => const AdminDivisionsScreen(),
         AppRoutes.adminStudentCaste: (context) => const AdminStudentCasteScreen(),
         AppRoutes.adminStudentIncome: (context) => const AdminStudentIncomeScreen(),
         AppRoutes.adminStudentBank: (context) => const AdminStudentBankScreen(),
