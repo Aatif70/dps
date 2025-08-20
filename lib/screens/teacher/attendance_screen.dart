@@ -1805,14 +1805,14 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildAttendanceSummary(),
-            const SizedBox(height: 16),
-            _buildStudentList(),
-          ],
-        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _buildAttendanceSummary()),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+          SliverToBoxAdapter(child: _buildStudentsHeader()),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          _buildStudentSliver(),
+        ],
       ),
     );
   }
@@ -1820,99 +1820,175 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
   Widget _buildAttendanceSummary() {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF4A90E2),
+            const Color(0xFF357ABD).withOpacity(0.9),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF4A90E2).withOpacity(0.25),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.school,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.attendanceRecord.subjectName,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${widget.attendanceRecord.className} • ${widget.attendanceRecord.batch}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _buildInfoChip(
+                  icon: Icons.calendar_today,
+                  label: DateFormat('EEE, dd MMM yyyy').format(widget.attendanceRecord.attDate),
+                ),
+                _buildInfoChip(
+                  icon: Icons.access_time,
+                  label: '${widget.attendanceRecord.timeFrom} - ${widget.attendanceRecord.timeTo}',
+                ),
+                _buildInfoChip(
+                  icon: Icons.category,
+                  label: widget.attendanceRecord.subTypeName,
+                ),
+                _buildInfoChip(
+                  icon: Icons.person,
+                  label: widget.attendanceRecord.name,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.22)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.school,
-                  color: Color(0xFF4A90E2),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.attendanceRecord.subjectName,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
-                      ),
-                    ),
-                    Text(
-                      '${widget.attendanceRecord.className} - ${widget.attendanceRecord.batch}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  'Date',
-                  DateFormat('dd MMM yyyy').format(widget.attendanceRecord.attDate),
-                  Icons.calendar_today,
-                ),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  'Time',
-                  '${widget.attendanceRecord.timeFrom} - ${widget.attendanceRecord.timeTo}',
-                  Icons.access_time,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  'Teacher',
-                  widget.attendanceRecord.name,
-                  Icons.person,
-                ),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  'Type',
-                  widget.attendanceRecord.subTypeName,
-                  Icons.category,
-                ),
-              ),
-            ],
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  int _presentCount() => _studentDetails.where((s) => s.status).length;
+  int _absentCount() => _studentDetails.where((s) => !s.status).length;
+
+  Widget _buildStudentsHeader() {
+    final total = _studentDetails.length;
+    final present = _presentCount();
+    final absent = _absentCount();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          const Expanded(
+            child: Text(
+              'Students',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2C3E50),
+                letterSpacing: 0.2,
+              ),
+            ),
+          ),
+          _buildCountChip('$total Total', const Color(0xFF4A90E2)),
+          const SizedBox(width: 8),
+          _buildCountChip('$present Present', const Color(0xFF10B981)),
+          const SizedBox(width: 8),
+          _buildCountChip('$absent Absent', const Color(0xFFEF4444)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1952,9 +2028,9 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
     );
   }
 
-  Widget _buildStudentList() {
+  Widget _buildStudentSliver() {
     if (_isLoading) {
-      return const Center(
+      return const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.all(40),
           child: Column(
@@ -1977,43 +2053,44 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
     }
 
     if (_studentDetails.isEmpty) {
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(40),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Center(
-          child: Column(
-            children: [
-              Icon(
-                Icons.people_outline,
-                size: 48,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'No student details found',
-                style: TextStyle(
-                  fontSize: 16,
+      return SliverToBoxAdapter(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.people_outline,
+                  size: 48,
                   color: Colors.grey,
                 ),
-              ),
-            ],
+                SizedBox(height: 16),
+                Text(
+                  'No student details found',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _studentDetails.length,
-      itemBuilder: (context, index) {
-        return _buildStudentDetailCard(_studentDetails[index]);
-      },
+    return SliverList(
+      
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => _buildStudentDetailCard(_studentDetails[index]),
+        childCount: _studentDetails.length,
+
+      ),
     );
   }
 
