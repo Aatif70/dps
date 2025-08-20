@@ -5,6 +5,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_routes.dart';
 import '../theme/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -100,9 +101,63 @@ class _SplashScreenState extends State<SplashScreen>
     _textAnimationController.forward();
 
     // Navigate after animations complete
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    Timer(const Duration(seconds: 3), () async {
+      await _navigateNext();
     });
+  }
+
+  Future<void> _navigateNext() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      final role = prefs.getString('Role') ?? '';
+      final rememberMe = prefs.getBool('RememberMe') ?? false;
+      final sessionTemporary = prefs.getBool('SessionTemporary') ?? false;
+
+      print('=== SPLASH SESSION CHECK ===');
+      print('Stored Uid: ' + (uid.isEmpty ? 'EMPTY' : 'PRESENT'));
+      print('Stored Role: ' + (role.isEmpty ? 'EMPTY' : role));
+
+      if (!mounted) return;
+
+      if (uid.isEmpty || role.isEmpty) {
+        print('No active session found. Navigating to login.');
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+
+      // If Remember Me is off and session marked temporary, clear on app start
+      if (!rememberMe && sessionTemporary) {
+        print('Temporary session detected and Remember Me OFF. Clearing session.');
+        await prefs.clear();
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+
+      // Active session: route by role
+      switch (role.toLowerCase()) {
+        case 'admin':
+          print('Active session for ADMIN. Navigating to admin dashboard.');
+          Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
+          break;
+        case 'teacher':
+          print('Active session for TEACHER. Navigating to teacher dashboard.');
+          Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
+          break;
+        case 'student':
+          print('Active session for STUDENT. Navigating to student dashboard.');
+          Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
+          break;
+        default:
+          print('Unknown role. Defaulting to login.');
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          break;
+      }
+    } catch (e) {
+      print('Error during session check: $e');
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    }
   }
 
   @override

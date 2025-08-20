@@ -83,6 +83,16 @@ class _LoginScreenState extends State<LoginScreen>
 
         // Get role from SharedPreferences
         final prefs = await SharedPreferences.getInstance();
+        // Persist remember-me preference
+        await prefs.setBool('RememberMe', _rememberMe);
+        if (!_rememberMe) {
+          // Mark this session as temporary (will be cleared on next app start)
+          await prefs.setBool('SessionTemporary', true);
+          print('Remember Me: OFF (temporary session)');
+        } else {
+          await prefs.remove('SessionTemporary');
+          print('Remember Me: ON (persistent session)');
+        }
         final role = prefs.getString('Role') ?? '';
         print('Full Name: ${prefs.getString('FullName')}');
 
