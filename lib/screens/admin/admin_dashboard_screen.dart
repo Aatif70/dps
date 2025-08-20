@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/admin_dashboard_service.dart';
 
@@ -15,6 +16,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
   late TabController _tabController;
+  String _fullName = '';
 
   // Data variables
   DashboardCounterData? _dashboardCounter;
@@ -28,6 +30,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     super.initState();
     _initializeAnimation();
     _loadDashboardData();
+    _loadFullName();
+  }
+
+  Future<void> _loadFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fullName = prefs.getString('FullName') ?? 'Admin';
+    });
   }
 
   void _initializeAnimation() {
@@ -89,6 +99,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text(
+          'Admin Dashboard',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
+        actions: [
+          IconButton(
+            tooltip: 'Logout',
+            onPressed: _logout,
+            icon: const Icon(Icons.logout_rounded, color: Color(0xFFE74C3C)),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -166,25 +193,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Admin Dashboard',
+                  'Welcome back! 👋',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'School Management',
-                  style: TextStyle(
+                const SizedBox(height: 6),
+                Text(
+                  _fullName.isEmpty ? 'Admin' : _fullName,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    fontSize: 22,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -194,14 +222,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     children: [
                       Icon(Icons.circle, color: Color(0xFF00CEC9), size: 8),
                       SizedBox(width: 6),
-                      Text(
-                        'System Active',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text('System Active', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 11)),
                     ],
                   ),
                 ),
@@ -660,9 +681,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 14,
-          crossAxisSpacing: 14,
-          childAspectRatio: 1,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 0.9,
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
@@ -684,7 +705,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -704,7 +725,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     const SizedBox(height: 22),
                     Text(
                       feature.title,
-                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2D3748),
@@ -718,6 +738,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         },
       ),
     );
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
   }
 }
 
