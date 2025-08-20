@@ -1,6 +1,7 @@
 class ApiConstants {
   // static const String baseUrl = 'https://as.mokshasolutions.com/';
-  static const String baseUrl = 'http://192.168.1.19:8025';
+  // static const String baseUrl = 'http://192.168.1.15:8025';
+  static const String baseUrl = 'http://192.168.1.15:8025';
   static const String login = '/api/User/Login';
 
   // ------------- STUDENT -------------
@@ -39,7 +40,8 @@ class ApiConstants {
   static const String teacherStudyMaterial = '/api/OnlineExam/TeacherStudyMaterial';
 
   // ------------- TEACHER ATTENDANCE -------------
-  // static const String
+  static const String attendanceEmpIndex = '/api/user/AttendanceEmpIndex';
+  static const String studentDetails = '/api/user/StudentDetails';
 
 
 

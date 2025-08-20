@@ -45,6 +45,12 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   // UPDATED: Real students data instead of mock
   List<AttendanceStudent> _students = [];
 
+  // NEW: Attendance Records Tab
+  DateTime _fromDate = DateTime.now().subtract(const Duration(days: 7));
+  DateTime _toDate = DateTime.now();
+  List<AttendanceRecord> _attendanceRecords = [];
+  bool _isLoadingRecords = false;
+
   @override
   void initState() {
     super.initState();
@@ -108,6 +114,82 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       _showErrorSnackBar('Failed to load students');
     } finally {
       setState(() => _isLoadingStudents = false);
+    }
+  }
+
+  // NEW: Load attendance records for date range
+  Future<void> _loadAttendanceRecords() async {
+    print('=== LOADING ATTENDANCE RECORDS ===');
+    print('From Date: ${DateFormat('dd-MM-yyyy').format(_fromDate)}');
+    print('To Date: ${DateFormat('dd-MM-yyyy').format(_toDate)}');
+
+    setState(() => _isLoadingRecords = true);
+
+    try {
+      final records = await TeacherAttendanceService.getAttendanceRecords(
+        fromDate: DateFormat('dd-MM-yyyy').format(_fromDate),
+        toDate: DateFormat('dd-MM-yyyy').format(_toDate),
+      );
+
+      setState(() {
+        _attendanceRecords = records;
+      });
+
+      print('Loaded ${_attendanceRecords.length} attendance records successfully');
+    } catch (e) {
+      print('Error loading attendance records: $e');
+      _showErrorSnackBar('Failed to load attendance records');
+    } finally {
+      setState(() => _isLoadingRecords = false);
+    }
+  }
+
+  // NEW: Navigate to attendance details screen
+  void _navigateToAttendanceDetails(AttendanceRecord record) {
+    print('=== NAVIGATING TO ATTENDANCE DETAILS ===');
+    print('Attendance ID: ${record.attId}');
+    print('Date: ${record.attDate}');
+    print('Subject: ${record.subjectName}');
+    print('Class: ${record.className}');
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AttendanceDetailsScreen(attendanceRecord: record),
+      ),
+    );
+  }
+
+  // NEW: Show date range picker for records
+  Future<void> _showDateRangePicker() async {
+    print('=== SHOWING DATE RANGE PICKER ===');
+    
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023),
+      lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(
+        start: _fromDate,
+        end: _toDate,
+      ),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF4A90E2),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _fromDate = picked.start;
+        _toDate = picked.end;
+      });
+      print('Date range selected: ${DateFormat('dd-MM-yyyy').format(_fromDate)} to ${DateFormat('dd-MM-yyyy').format(_toDate)}');
+      _loadAttendanceRecords();
     }
   }
 
@@ -395,23 +477,46 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: Text(AppStrings.attendance),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF2C3E50),
-        elevation: 0,
-        centerTitle: true,
-        actions: _isParametersConfirmed ? [
-          IconButton(
-            onPressed: _resetSelection,
-            icon: const Icon(Icons.edit),
-            tooltip: 'Edit Selection',
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        appBar: AppBar(
+          title: Text(AppStrings.attendance),
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFF2C3E50),
+          elevation: 0,
+          centerTitle: true,
+          actions: _isParametersConfirmed ? [
+            IconButton(
+              onPressed: _resetSelection,
+              icon: const Icon(Icons.edit),
+              tooltip: 'Edit Selection',
+            ),
+          ] : null,
+          bottom: const TabBar(
+            labelColor: Color(0xFF4A90E2),
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: Color(0xFF4A90E2),
+            tabs: [
+              Tab(
+                icon: Icon(Icons.add_circle_outline),
+                text: 'Mark Attendance',
+              ),
+              Tab(
+                icon: Icon(Icons.history),
+                text: 'View Records',
+              ),
+            ],
           ),
-        ] : null,
+        ),
+        body: TabBarView(
+          children: [
+            _buildMarkAttendanceTab(),
+            _buildViewRecordsTab(),
+          ],
+        ),
       ),
-      body: _buildMarkAttendanceTab(),
     );
   }
 
@@ -440,6 +545,333 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               child: _buildEmptyState(),
             ),
         ],
+      ),
+    );
+  }
+
+  // NEW: View Records Tab
+  Widget _buildViewRecordsTab() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildDateRangeSelector(),
+          const SizedBox(height: 16),
+          _buildAttendanceRecordsList(),
+        ],
+      ),
+    );
+  }
+
+  // NEW: Date Range Selector
+  Widget _buildDateRangeSelector() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.date_range,
+                  color: Color(0xFF4A90E2),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Select Date Range',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: _showDateRangePicker,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A90E2).withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF4A90E2).withOpacity(0.2),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'From: ${DateFormat('dd MMM yyyy').format(_fromDate)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C3E50),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'To: ${DateFormat('dd MMM yyyy').format(_toDate)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.calendar_today,
+                    color: Color(0xFF4A90E2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _loadAttendanceRecords,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4A90E2),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: _isLoadingRecords
+                  ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Loading...'),
+                      ],
+                    )
+                  : const Text(
+                      'Load Records',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // NEW: Attendance Records List
+  Widget _buildAttendanceRecordsList() {
+    if (_attendanceRecords.isEmpty && !_isLoadingRecords) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+          child: Column(
+            children: [
+              Icon(
+                Icons.history,
+                size: 48,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No attendance records found',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Select a date range and load records',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _attendanceRecords.length,
+      itemBuilder: (context, index) {
+        return _buildAttendanceRecordCard(_attendanceRecords[index]);
+      },
+    );
+  }
+
+  // NEW: Attendance Record Card
+  Widget _buildAttendanceRecordCard(AttendanceRecord record) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade200),
+        ),
+        child: InkWell(
+          onTap: () => _navigateToAttendanceDetails(record),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.school,
+                        color: Color(0xFF4A90E2),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            record.subjectName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                          Text(
+                            '${record.className} - ${record.batch}',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        record.subTypeName,
+                        style: const TextStyle(
+                          color: Color(0xFF10B981),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('dd MMM yyyy').format(record.attDate),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Icon(
+                      Icons.access_time,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${record.timeFrom} - ${record.timeTo}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      record.name,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1302,6 +1734,365 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       });
     }
   }
+}
 
+// NEW: Attendance Details Screen
+class AttendanceDetailsScreen extends StatefulWidget {
+  final AttendanceRecord attendanceRecord;
 
+  const AttendanceDetailsScreen({
+    super.key,
+    required this.attendanceRecord,
+  });
+
+  @override
+  State<AttendanceDetailsScreen> createState() => _AttendanceDetailsScreenState();
+}
+
+class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
+  List<StudentAttendanceDetail> _studentDetails = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudentDetails();
+  }
+
+  Future<void> _loadStudentDetails() async {
+    print('=== LOADING STUDENT DETAILS ===');
+    print('Attendance ID: ${widget.attendanceRecord.attId}');
+
+    setState(() => _isLoading = true);
+
+    try {
+      final details = await TeacherAttendanceService.getStudentDetails(
+        attId: widget.attendanceRecord.attId,
+      );
+
+      setState(() {
+        _studentDetails = details;
+      });
+
+      print('Loaded ${_studentDetails.length} student details successfully');
+    } catch (e) {
+      print('Error loading student details: $e');
+      _showErrorSnackBar('Failed to load student details');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        title: const Text('Attendance Details'),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF2C3E50),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildAttendanceSummary(),
+            const SizedBox(height: 16),
+            _buildStudentList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceSummary() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.school,
+                  color: Color(0xFF4A90E2),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.attendanceRecord.subjectName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C3E50),
+                      ),
+                    ),
+                    Text(
+                      '${widget.attendanceRecord.className} - ${widget.attendanceRecord.batch}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryItem(
+                  'Date',
+                  DateFormat('dd MMM yyyy').format(widget.attendanceRecord.attDate),
+                  Icons.calendar_today,
+                ),
+              ),
+              Expanded(
+                child: _buildSummaryItem(
+                  'Time',
+                  '${widget.attendanceRecord.timeFrom} - ${widget.attendanceRecord.timeTo}',
+                  Icons.access_time,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryItem(
+                  'Teacher',
+                  widget.attendanceRecord.name,
+                  Icons.person,
+                ),
+              ),
+              Expanded(
+                child: _buildSummaryItem(
+                  'Type',
+                  widget.attendanceRecord.subTypeName,
+                  Icons.category,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: Colors.grey.shade600,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStudentList() {
+    if (_isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: Column(
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFF4A90E2),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Loading student details...',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_studentDetails.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+          child: Column(
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 48,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No student details found',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _studentDetails.length,
+      itemBuilder: (context, index) {
+        return _buildStudentDetailCard(_studentDetails[index]);
+      },
+    );
+  }
+
+  Widget _buildStudentDetailCard(StudentAttendanceDetail student) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: student.status
+                ? const Color(0xFF10B981).withOpacity(0.3)
+                : const Color(0xFFEF4444).withOpacity(0.3),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: student.status
+                    ? const Color(0xFF10B981).withOpacity(0.1)
+                    : const Color(0xFFEF4444).withOpacity(0.1),
+                child: Text(
+                  student.name.isNotEmpty ? student.name.substring(0, 1).toUpperCase() : '?',
+                  style: TextStyle(
+                    color: student.status ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      student.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF2C3E50),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'PRN: ${student.collegePRN}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: student.status
+                      ? const Color(0xFF10B981).withOpacity(0.1)
+                      : const Color(0xFFEF4444).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  student.status ? 'Present' : 'Absent',
+                  style: TextStyle(
+                    color: student.status ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

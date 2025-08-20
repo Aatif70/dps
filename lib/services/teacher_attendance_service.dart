@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dps/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -292,6 +291,108 @@ class TeacherAttendanceService {
       return false;
     }
   }
+
+  // NEW: Get attendance records for date range
+  static Future<List<AttendanceRecord>> getAttendanceRecords({
+    required String fromDate,
+    required String toDate,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      final empId = prefs.get('Id')?.toString() ?? '';
+
+      if (uid.isEmpty || empId.isEmpty) {
+        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        return [];
+      }
+
+      print('=== GETTING ATTENDANCE RECORDS ===');
+      print('From Date: $fromDate, To Date: $toDate');
+
+      final url = Uri.parse('$baseUrl${ApiConstants.attendanceEmpIndex}');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'EmpId': empId,
+          'FD': fromDate,
+          'TD': toDate,
+        },
+      );
+
+      print('Attendance Records API Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final records = (jsonData['data'] as List)
+              .map((item) => AttendanceRecord.fromJson(item))
+              .toList();
+          print('Successfully loaded ${records.length} attendance records');
+          return records;
+        } else {
+          print('API returned success=false or null data');
+        }
+      } else {
+        print('Get attendance records failed with status: ${response.statusCode}');
+      }
+      return [];
+    } catch (e) {
+      print('Error getting attendance records: $e');
+      return [];
+    }
+  }
+
+  // NEW: Get student details for specific attendance
+  static Future<List<StudentAttendanceDetail>> getStudentDetails({
+    required int attId,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+
+      if (uid.isEmpty) {
+        print('ERROR: Uid not found in SharedPreferences');
+        return [];
+      }
+
+      print('=== GETTING STUDENT DETAILS ===');
+      print('Attendance ID: $attId');
+
+      final url = Uri.parse('$baseUrl${ApiConstants.studentDetails}');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'Attid': attId.toString(),
+        },
+      );
+
+      print('Student Details API Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final details = (jsonData['data'] as List)
+              .map((item) => StudentAttendanceDetail.fromJson(item))
+              .toList();
+          print('Successfully loaded ${details.length} student details');
+          return details;
+        } else {
+          print('API returned success=false or null data');
+        }
+      } else {
+        print('Get student details failed with status: ${response.statusCode}');
+      }
+      return [];
+    } catch (e) {
+      print('Error getting student details: $e');
+      return [];
+    }
+  }
 }
 
 // Data Models
@@ -404,6 +505,78 @@ class AttendanceStudent {
       attendanceStatus: json['AttendanceStatus'] ?? false,
       collegePRN: json['CollegePRN'] ?? '',
       detailId: json['DetailId'],
+    );
+  }
+}
+
+// NEW: Attendance Record Model
+class AttendanceRecord {
+  final String name;
+  final DateTime attDate;
+  final String className;
+  final String batch;
+  final String subjectName;
+  final String? topicName;
+  final String? subTopicName;
+  final String timeFrom;
+  final String timeTo;
+  final int attId;
+  final String subTypeName;
+
+  AttendanceRecord({
+    required this.name,
+    required this.attDate,
+    required this.className,
+    required this.batch,
+    required this.subjectName,
+    this.topicName,
+    this.subTopicName,
+    required this.timeFrom,
+    required this.timeTo,
+    required this.attId,
+    required this.subTypeName,
+  });
+
+  factory AttendanceRecord.fromJson(Map<String, dynamic> json) {
+    return AttendanceRecord(
+      name: json['Name'] ?? '',
+      attDate: DateTime.tryParse(json['AttDate'] ?? '') ?? DateTime.now(),
+      className: json['ClassName'] ?? '',
+      batch: json['Batch'] ?? '',
+      subjectName: json['SubjectName'] ?? '',
+      topicName: json['TopicName'],
+      subTopicName: json['SubTopicName'],
+      timeFrom: json['TimeFrom'] ?? '',
+      timeTo: json['TimeTo'] ?? '',
+      attId: json['AttId'] ?? 0,
+      subTypeName: json['SubTypeName'] ?? '',
+    );
+  }
+}
+
+// NEW: Student Attendance Detail Model
+class StudentAttendanceDetail {
+  final int studentId;
+  final int? presentRno;
+  final bool status;
+  final String name;
+  final String collegePRN;
+
+  StudentAttendanceDetail({
+    required this.studentId,
+    this.presentRno,
+    required this.status,
+    required this.name,
+    required this.collegePRN,
+  });
+
+  factory StudentAttendanceDetail.fromJson(Map<String, dynamic> json) {
+    return StudentAttendanceDetail(
+      studentId: json['StudentId'] ?? 0,
+      presentRno: json['PresentRno'],
+      status: json['Status'] ?? false,
+      name: json['Name'] ?? '',
+      collegePRN: json['CollegePRN'] ?? '',
     );
   }
 }
