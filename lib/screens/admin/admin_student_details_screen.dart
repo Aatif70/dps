@@ -114,6 +114,12 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
                         route: AppRoutes.adminStudentDocuments,
                       ),
                       _buildNavTile(
+                        icon: Icons.payments_rounded,
+                        color: Colors.teal,
+                        title: 'Fees Details',
+                        route: AppRoutes.adminStudentFeesDetails,
+                      ),
+                      _buildNavTile(
                         icon: Icons.sms_rounded,
                         color: Colors.orange,
                         title: 'SMS Details',
@@ -137,7 +143,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.25),
+            color: const Color(0xFF4A90E2).withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -210,7 +216,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 6),
           ),
@@ -247,7 +253,14 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, route, arguments: {'studentId': _studentId}),
+        onTap: () {
+          final args = {'studentId': _studentId};
+          // Also forward ID if available in brief details (same as search result ID)
+          if (_details != null) {
+            args['id'] = _details!.studentId; // often same as StudentId, included for safety
+          }
+          Navigator.pushNamed(context, route, arguments: args);
+        },
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -256,7 +269,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.08),
+                color: color.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -269,7 +282,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color),

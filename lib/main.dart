@@ -23,6 +23,7 @@ import 'package:dps/screens/admin/admin_student_income_screen.dart';
 import 'package:dps/screens/admin/admin_student_bank_screen.dart';
 import 'package:dps/screens/admin/admin_student_guardian_screen.dart';
 import 'package:dps/screens/admin/admin_student_documents_screen.dart';
+import 'package:dps/screens/admin/admin_student_fees_details_screen.dart';
 import 'package:dps/screens/admin/admin_student_personal_screen.dart';
 import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
 import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
@@ -105,6 +106,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminStudentBank: (context) => const AdminStudentBankScreen(),
         AppRoutes.adminStudentGuardian: (context) => const AdminStudentGuardianScreen(),
         AppRoutes.adminStudentDocuments: (context) => const AdminStudentDocumentsScreen(),
+        AppRoutes.adminStudentFeesDetails: (context) => const AdminStudentFeesDetailsScreen(),
         AppRoutes.adminStudentPersonal: (context) => const AdminStudentPersonalScreen(),
         AppRoutes.adminStudentPreviousSchool: (context) => const AdminStudentPreviousSchoolScreen(),
         AppRoutes.adminStudentSmsDetails: (context) => const AdminStudentSmsDetailsScreen(),

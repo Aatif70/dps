@@ -219,6 +219,39 @@ class AdminStudentService {
       return [];
     }
   }
+
+  static Future<AdminFeesDetails?> fetchStudentFeesDetails({required int studentId}) async {
+    try {
+      // Try GET first as per API hint (expects Id in query)
+      final getUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentFeesDetails}?Id=$studentId');
+      final getRes = await http.get(getUrl, headers: {'Accept': 'application/json'});
+      if (getRes.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(getRes.body);
+        if (jsonData['success'] == true && jsonData['data'] is Map<String, dynamic>) {
+          return AdminFeesDetails.fromJson(jsonData['data'] as Map<String, dynamic>);
+        }
+      }
+
+      // Fallback to POST (multipart) with UId like other endpoints
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      final postUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentFeesDetails}');
+      final request = http.MultipartRequest('POST', postUrl);
+      request.fields['Id'] = studentId.toString();
+      request.fields['UId'] = uid;
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] is Map<String, dynamic>) {
+          return AdminFeesDetails.fromJson(jsonData['data'] as Map<String, dynamic>);
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 class StudentSearchResult {
@@ -692,6 +725,189 @@ class StudentDocument {
   }
 
   String? get documentUrl => (documentPath == null || documentPath!.isEmpty) ? null : '${ApiConstants.baseUrl}/Documents/$documentPath';
+}
+
+class AdminFeesDetails {
+  final List<ClassPaymentDetails> classWiseDetails;
+  final List<StudentPaymentItem> studentPayments;
+  final String studentName;
+  final String acadYear;
+  final int? classId;
+  final int studentId;
+  final String className;
+
+  const AdminFeesDetails({
+    required this.classWiseDetails,
+    required this.studentPayments,
+    required this.studentName,
+    required this.acadYear,
+    required this.classId,
+    required this.studentId,
+    required this.className,
+  });
+
+  factory AdminFeesDetails.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> cw = json['ClassWiseStdPaymentDetailsVM'] as List<dynamic>? ?? [];
+    final List<dynamic> sp = json['StudentPaymentDetails'] as List<dynamic>? ?? [];
+    return AdminFeesDetails(
+      classWiseDetails: cw.map((e) => ClassPaymentDetails.fromJson(e as Map<String, dynamic>)).toList(),
+      studentPayments: sp.map((e) => StudentPaymentItem.fromJson(e as Map<String, dynamic>)).toList(),
+      studentName: (json['StudentName'] ?? '').toString(),
+      acadYear: (json['AcadYear'] ?? '').toString(),
+      classId: (json['ClassId']) == null ? null : int.tryParse(json['ClassId'].toString()),
+      studentId: int.tryParse((json['StudentId'] ?? '0').toString()) ?? 0,
+      className: (json['ClassName'] ?? '').toString(),
+    );
+  }
+}
+
+class ClassPaymentDetails {
+  final int classId;
+  final int studentId;
+  final String className;
+  final List<PayDetail> payDetails;
+
+  const ClassPaymentDetails({required this.classId, required this.studentId, required this.className, required this.payDetails});
+
+  factory ClassPaymentDetails.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> p = json['PayDetails'] as List<dynamic>? ?? [];
+    return ClassPaymentDetails(
+      classId: int.tryParse((json['ClassId'] ?? '0').toString()) ?? 0,
+      studentId: int.tryParse((json['StudentId'] ?? '0').toString()) ?? 0,
+      className: (json['ClassName'] ?? '').toString(),
+      payDetails: p.map((e) => PayDetail.fromJson(e as Map<String, dynamic>)).toList(),
+    );
+  }
+}
+
+class PayDetail {
+  final int feeId;
+  final int classId;
+  final int studentId;
+  final double amount;
+  final String payMode;
+  final double fixedFee;
+  final double balanceFee;
+  final String particular;
+  final String feeType;
+  final int feesTypeId;
+  final bool isLateFee;
+  final double lateFeeAmount;
+  final String? lastDate;
+  final bool isPerDay;
+  final bool isLate;
+  final double? lateAmount;
+  final int feeHead;
+  final String? paymentMode;
+  final String? details;
+  final String? bankName;
+  final String? chequeNo;
+  final String className;
+
+  const PayDetail({
+    required this.feeId,
+    required this.classId,
+    required this.studentId,
+    required this.amount,
+    required this.payMode,
+    required this.fixedFee,
+    required this.balanceFee,
+    required this.particular,
+    required this.feeType,
+    required this.feesTypeId,
+    required this.isLateFee,
+    required this.lateFeeAmount,
+    required this.lastDate,
+    required this.isPerDay,
+    required this.isLate,
+    required this.lateAmount,
+    required this.feeHead,
+    required this.paymentMode,
+    required this.details,
+    required this.bankName,
+    required this.chequeNo,
+    required this.className,
+  });
+
+  factory PayDetail.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is num) return v.toDouble();
+      return double.tryParse(v.toString()) ?? 0.0;
+    }
+
+    return PayDetail(
+      feeId: int.tryParse((json['FeeId'] ?? '0').toString()) ?? 0,
+      classId: int.tryParse((json['ClassId'] ?? '0').toString()) ?? 0,
+      studentId: int.tryParse((json['StudentId'] ?? '0').toString()) ?? 0,
+      amount: parseDouble(json['Amount']),
+      payMode: (json['PayMode'] ?? '').toString(),
+      fixedFee: parseDouble(json['FixedFee']),
+      balanceFee: parseDouble(json['BalanceFee']),
+      particular: (json['Particular'] ?? '').toString(),
+      feeType: (json['FeeType'] ?? '').toString(),
+      feesTypeId: int.tryParse((json['FeesTypeId'] ?? '0').toString()) ?? 0,
+      isLateFee: json['IsLateFee'] == true,
+      lateFeeAmount: parseDouble(json['LateFeeAmount']),
+      lastDate: json['LastDate']?.toString(),
+      isPerDay: json['IsPerDay'] == true,
+      isLate: json['IsLate'] == true,
+      lateAmount: json['LateAmount'] == null ? null : parseDouble(json['LateAmount']),
+      feeHead: int.tryParse((json['FeeHead'] ?? '0').toString()) ?? 0,
+      paymentMode: json['PaymentMode']?.toString(),
+      details: json['Details']?.toString(),
+      bankName: json['BankName']?.toString(),
+      chequeNo: json['ChequeNo']?.toString(),
+      className: (json['ClassName'] ?? '').toString(),
+    );
+  }
+}
+
+class StudentPaymentItem {
+  final String className;
+  final String receiptNo;
+  final String? customerRefNo;
+  final String particular;
+  final String paymentMode;
+  final String? chequeNo;
+  final String? details;
+  final String createdDate;
+  final double? lateFeeAmount;
+  final double amount;
+
+  const StudentPaymentItem({
+    required this.className,
+    required this.receiptNo,
+    required this.customerRefNo,
+    required this.particular,
+    required this.paymentMode,
+    required this.chequeNo,
+    required this.details,
+    required this.createdDate,
+    required this.lateFeeAmount,
+    required this.amount,
+  });
+
+  factory StudentPaymentItem.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is num) return v.toDouble();
+      return double.tryParse(v.toString()) ?? 0.0;
+    }
+
+    return StudentPaymentItem(
+      className: (json['ClassName'] ?? '').toString(),
+      receiptNo: (json['RecpNo'] ?? '').toString(),
+      customerRefNo: json['CustomerRefNo']?.toString(),
+      particular: (json['Particular'] ?? '').toString(),
+      paymentMode: (json['PaymentMode'] ?? '').toString(),
+      chequeNo: json['ChequeNo']?.toString(),
+      details: json['Details']?.toString(),
+      createdDate: (json['CreatedDate'] ?? '').toString(),
+      lateFeeAmount: json['LateFeeAmount'] == null ? null : parseDouble(json['LateFeeAmount']),
+      amount: parseDouble(json['Amount']),
+    );
+  }
 }
 
 
