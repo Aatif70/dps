@@ -3,6 +3,10 @@ import 'package:dps/constants/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/admin_dashboard_service.dart';
+import '../../widgets/admin_calendar_widget.dart';
+import '../../widgets/admin_timetable_widget.dart';
+import '../../widgets/event_calendar_widget.dart';
+import '../../widgets/admin_event_calendar_widget.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -160,6 +164,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         children: [
           _buildCompactHeader(),
           const SizedBox(height: 20),
+          // Use the new admin event calendar widget
+          const AdminEventCalendarWidget(),
+          const SizedBox(height: 25),
           _buildCategoryGrid(context),
           const SizedBox(height: 20),
         ],
@@ -672,12 +679,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         color: const Color(0xFF2ECC71),
         route: AppRoutes.adminClassesHub,
       ),
-      // _AdminFeature(
-      //   title: 'Teachers',
-      //   icon: Icons.person_rounded,
-      //   color: Colors.red,
-      //   route: AppRoutes.adminFeesHub,
-      // ),
+      _AdminFeature(
+        title: 'Employees',
+        icon: Icons.people,
+        color: Colors.pink,
+        route: AppRoutes.adminClassesHub,
+      ),
+      _AdminFeature(
+        title: 'Timetable',
+        icon: Icons.schedule,
+        color: const Color(0xFFFD79A8),
+        route: AppRoutes.adminTimetable,
+      ),
     ];
 
     return Padding(

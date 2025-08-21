@@ -46,5 +46,6 @@ class AppRoutes {
   static const String adminClassMasters = '/admin/classes/class-masters';
   static const String adminBatches = '/admin/classes/batches';
   static const String adminDivisions = '/admin/classes/divisions';
+  static const String adminTimetable = '/admin/timetable';
 
 } 

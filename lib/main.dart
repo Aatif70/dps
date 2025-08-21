@@ -19,6 +19,7 @@ import 'package:dps/screens/admin/admin_student_documents_screen.dart';
 import 'package:dps/screens/admin/admin_student_personal_screen.dart';
 import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
 import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
+import 'package:dps/screens/admin/admin_timetable_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
@@ -103,6 +104,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminFeesReceipts: (context) => const AdminFeesReceiptsScreen(),
         AppRoutes.adminConcessionReceipts: (context) => const AdminConcessionReceiptsScreen(),
         AppRoutes.adminPaymentVouchers: (context) => const AdminPaymentVouchersScreen(),
+        AppRoutes.adminTimetable: (context) => const AdminTimetableScreen(),
 
       },
       onGenerateRoute: (settings) {
