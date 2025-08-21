@@ -110,38 +110,59 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
               itemBuilder: (context, index) {
                 final day = _days[index];
                 return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFF1F5F9))),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Row(children: [
-                      Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFFE17055).withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.event_note_rounded, color: Color(0xFFE17055))),
-                      const SizedBox(width: 12),
-                      Text(DateFormat('dd MMM, yyyy').format(day.date), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B))),
-                    ]),
-                    const SizedBox(height: 12),
-                    ...day.employees.map((emp) {
-                      final present = emp.isPresent;
-                      final color = present ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
-                      return InkWell(
-                        onTap: () => _edit(emp, day.date),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12)),
-                          child: Row(children: [
-                            Icon(present ? Icons.check_circle : Icons.cancel, color: color),
-                            const SizedBox(width: 10),
-                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(emp.employeeName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 2),
-                              Text(present ? 'In ${emp.inTime ?? '-'} · Out ${emp.outTime ?? '-'}' : 'Absent', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
-                            ])),
-                            const Icon(Icons.edit_rounded, color: Color(0xFF94A3B8)),
-                          ]),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFF1F5F9)),
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      maintainState: true,
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: const Color(0xFFE17055).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.event_note_rounded, color: Color(0xFFE17055)),
+                      ),
+                      title: Text(
+                        DateFormat('dd MMM, yyyy').format(day.date),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B)),
+                      ),
+                      children: [
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, empIndex) {
+                            final emp = day.employees[empIndex];
+                            final present = emp.isPresent;
+                            final color = present ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
+                            return InkWell(
+                              onTap: () => _edit(emp, day.date),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12)),
+                                child: Row(children: [
+                                  Icon(present ? Icons.check_circle : Icons.cancel, color: color),
+                                  const SizedBox(width: 10),
+                                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                    Text(emp.employeeName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    const SizedBox(height: 2),
+                                    Text(present ? 'In ${emp.inTime ?? '-'} · Out ${emp.outTime ?? '-'}' : 'Absent', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                                  ])),
+                                  const Icon(Icons.edit_rounded, color: Color(0xFF94A3B8)),
+                                ]),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemCount: day.employees.length,
                         ),
-                      );
-                    }).toList(),
-                  ]),
+                      ],
+                    ),
+                  ),
                 );
               },
               separatorBuilder: (_, __) => const SizedBox(height: 12),

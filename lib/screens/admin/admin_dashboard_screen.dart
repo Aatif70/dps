@@ -680,7 +680,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         route: AppRoutes.adminClassesHub,
       ),
       _AdminFeature(
-        title: 'Employees',
+        title: 'Employees & Attendance',
         icon: Icons.people,
         color: Colors.pink,
         route: AppRoutes.adminEmployeesHub,
