@@ -21,6 +21,24 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
 
   final DateFormat _df = DateFormat('dd MMM, yyyy');
 
+  TimeOfDay _parseTime(String text) {
+    final parts = text.split(':');
+    if (parts.length == 2) {
+      final h = int.tryParse(parts[0]);
+      final m = int.tryParse(parts[1]);
+      if (h != null && m != null) {
+        return TimeOfDay(hour: h.clamp(0, 23), minute: m.clamp(0, 59));
+      }
+    }
+    return TimeOfDay.now();
+  }
+
+  String _formatTimeOfDay24(TimeOfDay t) {
+    final h = t.hour.toString().padLeft(2, '0');
+    final m = t.minute.toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +66,26 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
       lastDate: DateTime(2100),
     );
     if (picked != null) setState(() => _date = picked);
+  }
+
+  Future<void> _pickInTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _parseTime(_inTimeCtrl.text),
+    );
+    if (picked != null) {
+      setState(() => _inTimeCtrl.text = _formatTimeOfDay24(picked));
+    }
+  }
+
+  Future<void> _pickOutTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _parseTime(_outTimeCtrl.text),
+    );
+    if (picked != null) {
+      setState(() => _outTimeCtrl.text = _formatTimeOfDay24(picked));
+    }
   }
 
   Future<void> _submit() async {
@@ -86,16 +124,86 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Expanded(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: _pickInTime,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFFDDE3EA)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.access_time_rounded, color: Color(0xFF6C5CE7)),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _inTimeCtrl.text,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text('In', style: TextStyle(color: Color(0xFF64748B))),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: InkWell(
+                              onTap: _pickOutTime,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFFDDE3EA)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.timelapse_rounded, color: Color(0xFF6C5CE7)),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _outTimeCtrl.text,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text('Out', style: TextStyle(color: Color(0xFF64748B))),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: InkWell(
                           onTap: _pickDate,
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFF1F5F9))),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFFDDE3EA)),
+                            ),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.date_range_rounded, color: Color(0xFF6C5CE7)),
                                 const SizedBox(width: 10),
@@ -103,22 +211,6 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        width: 100,
-                        child: TextField(
-                          controller: _inTimeCtrl,
-                          decoration: const InputDecoration(labelText: 'In', hintText: 'HH:MM'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 100,
-                        child: TextField(
-                          controller: _outTimeCtrl,
-                          decoration: const InputDecoration(labelText: 'Out', hintText: 'HH:MM'),
                         ),
                       ),
                     ],
