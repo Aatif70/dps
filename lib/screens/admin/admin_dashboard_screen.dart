@@ -683,7 +683,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         title: 'Employees',
         icon: Icons.people,
         color: Colors.pink,
-        route: AppRoutes.adminClassesHub,
+        route: AppRoutes.adminEmployees,
       ),
       _AdminFeature(
         title: 'Timetable',

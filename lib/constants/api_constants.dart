@@ -57,6 +57,7 @@ class ApiConstants {
   static const String last10feesreceipt = '/api/user/Last10FeesReceipt';
   static const String last10concessionfeesreceipt = '/api/user/Last10ConcessionFeesReceipt';
   static const String last10paymentvouchers = '/api/user/Last10PaymentVouchers';
+  static const String employeesList = '/api/User/EmployeesList';
 
   // ------------- ADMIN CLASSES -------------
   static const String classMasters = '/api/User/ClassMasters';

@@ -48,7 +48,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C5CE7).withOpacity(0.08),
+            color: const Color(0xFF6C5CE7).withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -72,7 +72,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -279,7 +279,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                  color: const Color(0xFF6C5CE7).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -413,7 +413,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF2ECC71).withOpacity(0.1),
+                                    color: const Color(0xFF2ECC71).withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -456,7 +456,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFD79A8).withOpacity(0.1),
+                                    color: const Color(0xFFFD79A8).withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
