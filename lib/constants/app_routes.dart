@@ -47,6 +47,13 @@ class AppRoutes {
   static const String adminBatches = '/admin/classes/batches';
   static const String adminDivisions = '/admin/classes/divisions';
   static const String adminTimetable = '/admin/timetable';
-  static const String adminEmployees = '/admin/employees';
+  // Employees
+  static const String adminEmployees = '/admin/employees/list';
+  static const String adminEmployeesHub = '/admin/employees';
+  static const String adminEmployeeAttendanceHub = '/admin/employees/attendance';
+  static const String adminEmployeeAttendanceList = '/admin/employees/attendance/list';
+  static const String adminAddEmployeeAttendance = '/admin/employees/attendance/add';
+  static const String adminUpdateEmployeeAttendance = '/admin/employees/attendance/update';
+  static const String adminEmployeeAttendanceReport = '/admin/employees/attendance/report';
 
 } 
