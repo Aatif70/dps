@@ -178,6 +178,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
                           controller: _tabController,
                           children: [
                             _buildEventsTab(),
@@ -251,12 +252,23 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
         controller: _tabController,
         indicator: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
+        indicatorPadding: const EdgeInsets.symmetric(horizontal: -12, vertical: 0),
+        dividerColor: Colors.transparent,
         labelColor: const Color(0xFF4A90E2),
         unselectedLabelColor: const Color(0xFF64748B),
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        overlayColor: MaterialStatePropertyAll(Colors.transparent),
+        labelPadding: const EdgeInsets.symmetric(vertical: 8),
         tabs: const [
           Tab(text: 'Events'),
           Tab(text: 'Annual'),
@@ -277,6 +289,9 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           lastDay: DateTime.utc(2030, 12, 31),
           focusedDay: _focusedDay,
           calendarFormat: _calendarFormat,
+          availableGestures: AvailableGestures.horizontalSwipe,
+          availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+          rowHeight: 36,
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
@@ -284,10 +299,9 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
               _focusedDay = focusedDay;
             });
           },
-          onFormatChanged: (format) {
-            setState(() {
-              _calendarFormat = format;
-            });
+          onFormatChanged: (_) {
+            // Force month view
+            setState(() => _calendarFormat = CalendarFormat.month);
           },
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
@@ -371,6 +385,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
               onPressed: () {
                 setState(() {
                   _selectedYear--;
+                  _annualFocusedDay = DateTime(_selectedYear, 1, 1);
+                  _annualSelectedDay = DateTime(_selectedYear, 1, 1);
                 });
                 _loadData();
               },
@@ -384,6 +400,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
               onPressed: () {
                 setState(() {
                   _selectedYear++;
+                  _annualFocusedDay = DateTime(_selectedYear, 1, 1);
+                  _annualSelectedDay = DateTime(_selectedYear, 1, 1);
                 });
                 _loadData();
               },
@@ -395,6 +413,9 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           lastDay: DateTime.utc(_selectedYear, 12, 31),
           focusedDay: _annualFocusedDay,
           calendarFormat: _annualCalendarFormat,
+          availableGestures: AvailableGestures.horizontalSwipe,
+          availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+          rowHeight: 36,
           selectedDayPredicate: (day) => isSameDay(_annualSelectedDay, day),
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
@@ -402,10 +423,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
               _annualFocusedDay = focusedDay;
             });
           },
-          onFormatChanged: (format) {
-            setState(() {
-              _annualCalendarFormat = format;
-            });
+          onFormatChanged: (_) {
+            setState(() => _annualCalendarFormat = CalendarFormat.month);
           },
           onPageChanged: (focusedDay) {
             _annualFocusedDay = focusedDay;
