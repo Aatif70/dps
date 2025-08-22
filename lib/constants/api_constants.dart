@@ -63,6 +63,7 @@ class ApiConstants {
   static const String addEmpAttendance = '/api/User/AddEmpAttendance';
   static const String updateEmpAttendance = '/api/User/UpdateEmpAttendance';
   static const String empAttendanceReport = '/api/User/EmpAttendanceReport';
+  static const String employeeCount = '/api/Employee/EmpCount';
 
   // ------------- ADMIN CLASSES -------------
   static const String classMasters = '/api/User/ClassMasters';

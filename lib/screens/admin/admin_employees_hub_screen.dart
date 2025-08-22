@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
+import 'package:dps/services/admin_employee_metrics_service.dart';
 
-class AdminEmployeesHubScreen extends StatelessWidget {
+class AdminEmployeesHubScreen extends StatefulWidget {
   const AdminEmployeesHubScreen({super.key});
+
+  @override
+  State<AdminEmployeesHubScreen> createState() => _AdminEmployeesHubScreenState();
+}
+
+class _AdminEmployeesHubScreenState extends State<AdminEmployeesHubScreen> {
+  EmployeeMetrics? _metrics;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final m = await AdminEmployeeMetricsService.fetchMetrics();
+    if (!mounted) return;
+    setState(() {
+      _metrics = m;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final List<_HubItem> items = [
+
+
       _HubItem(
         title: 'Employee List',
         subtitle: 'Browse all employees and their contact info',
@@ -34,10 +61,16 @@ class AdminEmployeesHubScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
       ),
       backgroundColor: const Color(0xFFF8FAFC),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemBuilder: (context, index) {
-          final _HubItem item = items[index];
+      body: RefreshIndicator(
+        onRefresh: _load,
+        color: const Color(0xFFE74C3C),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return _buildMetricsCard(context);
+            }
+          final _HubItem item = items[index - 1];
           return InkWell(
             onTap: () => Navigator.pushNamed(context, item.route),
             borderRadius: BorderRadius.circular(16),
@@ -82,9 +115,10 @@ class AdminEmployeesHubScreen extends StatelessWidget {
               ),
             ),
           );
-        },
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemCount: items.length,
+          },
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemCount: items.length + 1,
+        ),
       ),
     );
   }
@@ -104,6 +138,99 @@ class _HubItem {
     required this.color,
     required this.route,
   });
+}
+
+Widget _buildMetricsPill(String label, String value, Color color, {Color? bg}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    decoration: BoxDecoration(
+      color: (bg ?? color.withOpacity(0.12)),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.circle, size: 8, color: color),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+        const SizedBox(width: 6),
+        Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w800)),
+      ],
+    ),
+  );
+}
+
+extension on _AdminEmployeesHubScreenState {
+  Widget _buildMetricsCard(BuildContext context) {
+    if (_loading) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.grey.shade100, blurRadius: 16, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final int total = _metrics?.empCount ?? 0;
+    final int present = _metrics?.presentCount ?? 0;
+    final int absent = _metrics?.absentCount ?? 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: const Color(0xFFFF6B6B).withOpacity(0.25), blurRadius: 18, offset: const Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.group_rounded, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('Staff Overview', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(height: 6),
+                  Text('$total Employees', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+                ]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _buildMetricsPill('Present', present.toString(), const Color(0xFF34D399), bg: Colors.white.withOpacity(0.2)),
+              _buildMetricsPill('Absent', absent.toString(), const Color(0xFFFFCDD2), bg: Colors.white.withOpacity(0.2)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 
