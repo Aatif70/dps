@@ -31,6 +31,61 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
     }
   }
 
+  Widget _buildMeta(AdminFeesDetails d) {
+    final items = <Widget>[];
+    void addMeta(String label, String? value) {
+      if (value != null && value.toString().trim().isNotEmpty) {
+        items.add(_metaItem(label, value));
+      }
+    }
+    void addMetaNum(String label, num? value) {
+      if (value != null) {
+        items.add(_metaItem(label, value.toString()));
+      }
+    }
+
+    addMeta('Category', d.category);
+    addMeta('Caste', d.caste);
+    addMetaNum('Admission Year', d.admissionYear);
+    addMeta('Admission Category', d.admissionCategory);
+    addMetaNum('Refund Amount', d.refundAmount);
+
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Student Meta', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: items,
+        ),
+      ]),
+    );
+  }
+
+  Widget _metaItem(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF334155))),
+        Text(value, style: const TextStyle(color: Color(0xFF64748B))),
+      ]),
+    );
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     final res = await AdminStudentService.fetchStudentFeesDetails(studentId: _studentId!);
@@ -62,6 +117,8 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
                     children: [
                       _buildHeader(_data!),
                       const SizedBox(height: 16),
+                      _buildMeta(_data!),
+                      const SizedBox(height: 16),
                       ..._buildClassWise(_data!),
                       const SizedBox(height: 16),
                       _buildReceipts(_data!),
@@ -79,12 +136,26 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(d.studentName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF1E293B))),
-        const SizedBox(height: 6),
-        Text('Class: ${d.className}', style: const TextStyle(color: Color(0xFF64748B))),
-        const SizedBox(height: 2),
-        Text('Year: ${d.acadYear}', style: const TextStyle(color: Color(0xFF64748B))),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: const Color(0xFF4A90E2).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(d.studentName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF1E293B))),
+            const SizedBox(height: 4),
+            Text(d.className, style: const TextStyle(color: Color(0xFF64748B))),
+            const SizedBox(height: 2),
+            Text(d.acadYear, style: const TextStyle(color: Color(0xFF64748B))),
+          ]),
+        )
       ]),
     );
   }
@@ -133,9 +204,11 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
                             Text(p.particular, style: const TextStyle(fontWeight: FontWeight.w700)),
                             const SizedBox(height: 2),
                             Text('Fixed: ${p.fixedFee.toStringAsFixed(2)}  ·  Balance: ${p.balanceFee.toStringAsFixed(2)}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                            // Text('Fixed: ${p.bankName}  ·  Balance: ${p.amount}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+
                           ]),
                         ),
-                        Text(p.feeType, style: const TextStyle(color: Color(0xFF64748B))),
+                        // Text(p.feeType, style: const TextStyle(color: Color(0xFF64748B))),
                       ]),
                     );
                   },
@@ -175,12 +248,21 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(r.particular, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 2),
+                      Text(r.particular, style: const TextStyle(fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+
+                      // RCPT BOLD
                       Text('${r.paymentMode} · ${when != null ? _df.format(when) : r.createdDate}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+
+                      // CLASS BOLD
+                      Text(r.className, style: const TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.normal )),
+
+                      // RCPT BOLD
+                      Text( 'Receipt: ${r.receiptNo}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold)),
+
                     ]),
                   ),
-                  Text(r.amount.toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
+                  Text(    r.amount.toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
                 ]),
               );
             },

@@ -735,6 +735,13 @@ class AdminFeesDetails {
   final int? classId;
   final int studentId;
   final String className;
+  final String? photo;
+  final String? category;
+  final String? caste;
+  final int? admissionYear;
+  final String? admissionCategory;
+  final double? refundAmount;
+  final dynamic tempFees;
 
   const AdminFeesDetails({
     required this.classWiseDetails,
@@ -744,6 +751,13 @@ class AdminFeesDetails {
     required this.classId,
     required this.studentId,
     required this.className,
+    required this.photo,
+    required this.category,
+    required this.caste,
+    required this.admissionYear,
+    required this.admissionCategory,
+    required this.refundAmount,
+    required this.tempFees,
   });
 
   factory AdminFeesDetails.fromJson(Map<String, dynamic> json) {
@@ -757,6 +771,13 @@ class AdminFeesDetails {
       classId: (json['ClassId']) == null ? null : int.tryParse(json['ClassId'].toString()),
       studentId: int.tryParse((json['StudentId'] ?? '0').toString()) ?? 0,
       className: (json['ClassName'] ?? '').toString(),
+      photo: json['Photo']?.toString(),
+      category: json['Category']?.toString(),
+      caste: json['Caste']?.toString(),
+      admissionYear: json['AdmissionYear'] == null ? null : int.tryParse(json['AdmissionYear'].toString()),
+      admissionCategory: json['AdmissionCategory']?.toString(),
+      refundAmount: json['RefundAmount'] == null ? null : (json['RefundAmount'] is num ? (json['RefundAmount'] as num).toDouble() : double.tryParse(json['RefundAmount'].toString())),
+      tempFees: json['TempFees'],
     );
   }
 }
