@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dps/services/admin_employee_list_service.dart';
+import 'package:dps/constants/app_routes.dart';
 
 class AdminEmployeeListScreen extends StatefulWidget {
   const AdminEmployeeListScreen({super.key});
@@ -66,7 +67,18 @@ class _AdminEmployeeListScreenState extends State<AdminEmployeeListScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final emp = _employees[index];
-                        return _EmployeeCard(item: emp);
+                        return InkWell(
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.adminEmployeeDetails,
+                            arguments: () {
+                              print('[AdminEmployeeList] Tapped EmpId: ' + emp.empId.toString() + ', Name: ' + emp.name);
+                              return emp.empId;
+                            }(),
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          child: _EmployeeCard(item: emp),
+                        );
                       },
                     ),
             ),

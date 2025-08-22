@@ -56,5 +56,6 @@ class AppRoutes {
   static const String adminAddEmployeeAttendance = '/admin/employees/attendance/add';
   static const String adminUpdateEmployeeAttendance = '/admin/employees/attendance/update';
   static const String adminEmployeeAttendanceReport = '/admin/employees/attendance/report';
+  static const String adminEmployeeDetails = '/admin/employees/details';
 
 } 
