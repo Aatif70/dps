@@ -19,6 +19,9 @@ import 'package:dps/screens/admin/admin_add_employee_attendance_screen.dart';
 import 'package:dps/screens/admin/admin_update_employee_attendance_screen.dart';
 import 'package:dps/screens/admin/admin_employee_attendance_report_screen.dart';
 import 'package:dps/screens/admin/admin_employee_details_screen.dart';
+import 'package:dps/screens/admin/admin_attendance_hub_screen.dart';
+import 'package:dps/screens/admin/admin_student_attendance_screen.dart';
+import 'package:dps/screens/admin/admin_student_attendance_by_date_screen.dart';
 import 'package:dps/screens/admin/admin_student_caste_screen.dart';
 import 'package:dps/screens/admin/admin_student_income_screen.dart';
 import 'package:dps/screens/admin/admin_student_bank_screen.dart';
@@ -123,6 +126,9 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminUpdateEmployeeAttendance: (context) => const AdminUpdateEmployeeAttendanceScreen(),
         AppRoutes.adminEmployeeAttendanceReport: (context) => const AdminEmployeeAttendanceReportScreen(),
         AppRoutes.adminEmployeeDetails: (context) => const AdminEmployeeDetailsScreen(),
+        AppRoutes.adminAttendanceHub: (context) => const AdminAttendanceHubScreen(),
+        AppRoutes.adminStudentAttendance: (context) => const AdminStudentAttendanceScreen(),
+        AppRoutes.adminStudentAttendanceByDate: (context) => const AdminStudentAttendanceByDateScreen(),
 
       },
       onGenerateRoute: (settings) {

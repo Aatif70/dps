@@ -680,7 +680,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         route: AppRoutes.adminClassesHub,
       ),
       _AdminFeature(
-        title: 'Employees & Attendance',
+        title: 'Attendance',
+        icon: Icons.document_scanner_rounded,
+        color: const Color(0xFFE17055),
+        route: AppRoutes.adminAttendanceHub,
+      ),
+      _AdminFeature(
+        title: 'Employees',
         icon: Icons.people,
         color: Colors.pink,
         route: AppRoutes.adminEmployeesHub,
@@ -702,7 +708,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 0.9,
+          childAspectRatio: 0.85,
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {

@@ -48,6 +48,10 @@ class AppRoutes {
   static const String adminBatches = '/admin/classes/batches';
   static const String adminDivisions = '/admin/classes/divisions';
   static const String adminTimetable = '/admin/timetable';
+  // Attendance
+  static const String adminAttendanceHub = '/admin/attendance';
+  static const String adminStudentAttendance = '/admin/attendance/student';
+  static const String adminStudentAttendanceByDate = '/admin/attendance/student-by-date';
   // Employees
   static const String adminEmployees = '/admin/employees/list';
   static const String adminEmployeesHub = '/admin/employees';
