@@ -156,12 +156,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 3),
             ),
-            child: CircleAvatar(
-              radius: 34,
-              backgroundColor: Colors.white,
-              backgroundImage: d.photoUrl.isNotEmpty ? NetworkImage(d.photoUrl) : null,
-              child: d.photoUrl.isEmpty ? const Icon(Icons.person, color: Colors.blueGrey) : null,
-            ),
+            child: _buildStudentAvatar(d.photoUrl),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -299,6 +294,52 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
     );
   }
 }
+
+  Widget _buildStudentAvatar(String photoUrl) {
+    if (photoUrl.isEmpty) {
+      return CircleAvatar(
+        radius: 34,
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.person, color: Colors.blueGrey, size: 34),
+      );
+    }
+
+    return CircleAvatar(
+      radius: 34,
+      backgroundColor: Colors.white,
+      child: ClipOval(
+        child: Image.network(
+          photoUrl,
+          width: 68,
+          height: 68,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 68,
+              height: 68,
+              color: Colors.white,
+              child: const Icon(Icons.person, color: Colors.blueGrey, size: 34),
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 68,
+              height: 68,
+              color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
 
 class _InfoItem {
   final String label;
