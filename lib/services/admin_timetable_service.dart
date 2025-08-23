@@ -288,11 +288,12 @@ class AdminTimetableService {
     }
   }
 
-  // Get subjects by class master ID
-  static Future<List<SubjectItem>> getSubjectsByClassMaster(int classMasterId) async {
+  // Get subjects by class master ID and employee ID
+  static Future<List<SubjectItem>> getSubjectsByClassMasterAndEmployee(int classMasterId, int empId) async {
     try {
-      print('🔍 === GETTING SUBJECTS BY CLASS MASTER ===');
+      print('🔍 === GETTING SUBJECTS BY CLASS MASTER AND EMPLOYEE ===');
       print('   📚 ClassMasterId: $classMasterId');
+      print('    EmployeeId: $empId');
       
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
@@ -303,16 +304,18 @@ class AdminTimetableService {
       }
 
       print('    Uid: $uid');
-      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/Subjects');
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/SubByEmpId');
       
       print('   🌐 Subjects API URL: $url');
-      print('   📤 Request body: Uid=$uid');
+      print('   📤 Request body: Uid=$uid, classMasterId=$classMasterId, empId=$empId');
 
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: {
           'Uid': uid,
+          'classMasterId': classMasterId.toString(),
+          'empId': empId.toString(),
         },
       );
 
@@ -351,6 +354,13 @@ class AdminTimetableService {
       print('   Stack trace: ${StackTrace.current}');
       return [];
     }
+  }
+
+  // Keep the old method for backward compatibility but mark it as deprecated
+  @deprecated
+  static Future<List<SubjectItem>> getSubjectsByClassMaster(int classMasterId) async {
+    print('⚠️ DEPRECATED: Use getSubjectsByClassMasterAndEmployee instead');
+    return getSubjectsByClassMasterAndEmployee(classMasterId, 0);
   }
 }
 

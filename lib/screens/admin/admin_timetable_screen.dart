@@ -171,13 +171,14 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
   }
 
   Future<void> _loadSubjects() async {
-    if (_selectedClass == null) return;
+    if (_selectedClass == null || _selectedEmployee == null) return;
     try {
       print('🎯 === LOADING SUBJECTS ===');
       print('   📚 Selected Class: ID=${_selectedClass!.classMasterId}, Name="${_selectedClass!.className}"');
+      print('   👤 Selected Employee: ID=${_selectedEmployee!.empId}, Name="${_selectedEmployee!.name}"');
       
-      final subjects = await AdminTimetableService.getSubjectsByClassMaster(
-          _selectedClass!.classMasterId);
+      final subjects = await AdminTimetableService.getSubjectsByClassMasterAndEmployee(
+          _selectedClass!.classMasterId, _selectedEmployee!.empId);
       
       print('✅ Subjects loaded: ${subjects.length}');
       for (int i = 0; i < subjects.length; i++) {
@@ -410,7 +411,10 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
                });
                if (value != null) {
                  _loadBatches();
-                 _loadSubjects();
+                 // Only load subjects if both class and employee are selected
+                 if (_selectedEmployee != null) {
+                   _loadSubjects();
+                 }
                }
              },
              displayText: (item) => item.className,
@@ -452,7 +456,13 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
              onChanged: (value) {
                setState(() {
                  _selectedEmployee = value;
+                 _selectedSubject = null;
+                 _subjects = [];
                });
+               // Only load subjects if both class and employee are selected
+               if (value != null && _selectedClass != null) {
+                 _loadSubjects();
+               }
              },
              displayText: (item) => '${item.name} (${item.designationName})',
            ),
