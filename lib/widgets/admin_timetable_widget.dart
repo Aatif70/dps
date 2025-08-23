@@ -5,13 +5,19 @@ class AdminTimetableWidget extends StatefulWidget {
   const AdminTimetableWidget({super.key});
 
   @override
-  State<AdminTimetableWidget> createState() => _AdminTimetableWidgetState();
+  State createState() => _AdminTimetableWidgetState();
 }
 
 class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
-  List<TeacherTimetableData> _teacherTimetables = [];
+  List _teacherTimetables = [];
   bool _isLoading = true;
   TeacherTimetableData? _selectedTeacher;
+  String _selectedDay = 'Monday';
+  DateTime _baseDate = DateTime.now();
+
+  final List<String> _weekDays = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  ];
 
   @override
   void initState() {
@@ -23,7 +29,6 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     setState(() {
       _isLoading = true;
     });
-
     try {
       final timetables = await AdminTimetableService.getTeacherTimetables();
       setState(() {
@@ -31,92 +36,218 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading teacher timetables: $e');
       setState(() {
         _isLoading = false;
       });
     }
   }
 
+  int _getDateForDay(String day) {
+    int dayIndex = _weekDays.indexOf(day);
+    return _baseDate.day + dayIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 700, // Fixed height to provide constraints
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C5CE7).withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF6C5CE7),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          // Header with back button and Add Task button
+          _buildHeader(),
+          // Day selector
+          _buildDaySelector(),
+          // Teacher info
+          if (_selectedTeacher != null)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Color(0xFF6366F1),
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _selectedTeacher!.teacherName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF1E293B),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_selectedTeacher!.timetables.length} classes scheduled',
+                          style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
+          // Content
+          Expanded(
+            child: _isLoading
+                ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Color(0xFF6366F1)),
+              ),
+            )
+                : _teacherTimetables.isEmpty
+                ? _buildEmptyState()
+                : _buildTimelineView(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 20),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const Spacer(),
+                               // Teacher selector
+          if (_teacherTimetables.isNotEmpty)
+            Container(
+              constraints: const BoxConstraints(maxWidth: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<TeacherTimetableData>(
+                  value: _selectedTeacher,
+                  hint: const Text(
+                    'Select Teacher',
+                    style: TextStyle(color: Colors.white, fontSize: 11),
+                  ),
+                  dropdownColor: const Color(0xFF6366F1),
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
+                  items: _teacherTimetables.cast<TeacherTimetableData>().map((teacher) {
+                    return DropdownMenuItem<TeacherTimetableData>(
+                      value: teacher,
+                      child: Text(
+                        teacher.teacherName,
+                        style: const TextStyle(color: Colors.white, fontSize: 11),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (TeacherTimetableData? value) {
+                    setState(() {
+                      _selectedTeacher = value;
+                    });
+                  },
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDaySelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: _weekDays.map((day) {
+          final isSelected = day == _selectedDay;
+          final dayDate = _getDateForDay(day);
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedDay = day;
+              });
+            },
+            child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.schedule,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Teacher Timetables',
+                Text(
+                  day.substring(0, 3),
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: isSelected ? Colors.black87 : Colors.black54,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Spacer(),
-                if (_teacherTimetables.isNotEmpty)
-                  Text(
-                    '${_teacherTimetables.length} Teachers',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                const SizedBox(height: 4),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$dayDate',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (isSelected)
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF6366F1),
+                      shape: BoxShape.circle,
                     ),
                   ),
               ],
             ),
-          ),
-          
-          // Content
-          Flexible(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6C5CE7)),
-                    ),
-                  )
-                : _teacherTimetables.isEmpty
-                    ? _buildEmptyState()
-                    : _buildTimetableContent(),
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -127,22 +258,22 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.schedule_outlined,
+            Icons.event_busy_outlined,
             size: 64,
             color: Color(0xFFCBD5E0),
           ),
           SizedBox(height: 16),
           Text(
-            'No teacher timetables available',
+            'No tasks scheduled',
             style: TextStyle(
               color: Color(0xFF64748B),
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(height: 8),
           Text(
-            'Timetables will appear here once added',
+            'Add your first task to get started',
             style: TextStyle(
               color: Color(0xFF94A3B8),
               fontSize: 14,
@@ -153,352 +284,156 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     );
   }
 
-  Widget _buildTimetableContent() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Teacher selector
-        Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Select Teacher',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<TeacherTimetableData>(
-                    value: _selectedTeacher,
-                    hint: const Text(
-                      'Choose a teacher...',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 14,
-                      ),
-                    ),
-                    isExpanded: true,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF64748B)),
-                    items: _teacherTimetables.map((teacher) {
-                      return DropdownMenuItem<TeacherTimetableData>(
-                        value: teacher,
-                        child: Text(
-                          teacher.teacherName,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF1E293B),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (TeacherTimetableData? value) {
-                      setState(() {
-                        _selectedTeacher = value;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        // Timetable display
-        Flexible(
-          child: _selectedTeacher == null
-              ? _buildNoTeacherSelected()
-              : _buildTeacherTimetable(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNoTeacherSelected() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.person_search,
-            size: 48,
-            color: Color(0xFFCBD5E0),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Select a teacher to view timetable',
-            style: TextStyle(
-              color: Color(0xFF64748B),
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTeacherTimetable() {
-    final teacher = _selectedTeacher!;
-    final weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
-    // Group timetables by weekday
-    final timetablesByDay = <String, List<TimetableEntry>>{};
-    for (final day in weekDays) {
-      timetablesByDay[day] = teacher.timetables
-          .where((entry) => entry.weekDay == day)
-          .toList()
-        ..sort((a, b) => a.fromTime.compareTo(b.fromTime));
+  Widget _buildTimelineView() {
+    if (_selectedTeacher == null && _teacherTimetables.isNotEmpty) {
+      setState(() {
+        _selectedTeacher = _teacherTimetables.first;
+      });
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    if (_selectedTeacher == null) {
+      return _buildEmptyState();
+    }
+
+    final teacher = _selectedTeacher!;
+    final dayTimetables = teacher.timetables
+        .where((entry) => entry.weekDay == _selectedDay)
+        .toList()
+      ..sort((a, b) => a.fromTime.compareTo(b.fromTime));
+
+    if (dayTimetables.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: dayTimetables.length,
+      itemBuilder: (context, index) {
+        final entry = dayTimetables[index];
+        final isLast = index == dayTimetables.length - 1;
+        return _buildTimelineItem(entry, isLast);
+      },
+    );
+  }
+
+  Widget _buildTimelineItem(TimetableEntry entry, bool isLast) {
+    final color = _getSubjectColor(entry.subject);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Teacher info
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: Row(
-            children: [
+        // Timeline indicator
+        Column(
+          children: [
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+            if (!isLast)
               Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6C5CE7).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF6C5CE7),
-                  size: 20,
-                ),
+                width: 2,
+                height: 80,
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                color: color.withOpacity(0.3),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      teacher.teacherName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color(0xFF1E293B),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${teacher.timetables.length} classes scheduled',
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
-        
-        const SizedBox(height: 16),
-        
-        // Timetable
-        Flexible(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: weekDays.length,
-            itemBuilder: (context, index) {
-              final day = weekDays[index];
-              final dayTimetables = timetablesByDay[day] ?? [];
-              
-              return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+        const SizedBox(width: 16),
+        // Task card
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Day header
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6C5CE7).withOpacity(0.05),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
+                    Expanded(
+                      child: Text(
+                        entry.subject,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _getDayIcon(day),
-                            color: const Color(0xFF6C5CE7),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            day,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Color(0xFF6C5CE7),
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '${dayTimetables.length} classes',
-                            style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                    
-                    // Classes
-                    if (dayTimetables.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(
-                          child: Text(
-                            'No classes scheduled',
-                            style: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: dayTimetables.length,
-                        itemBuilder: (context, classIndex) {
-                          final entry = dayTimetables[classIndex];
-                          return Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: classIndex < dayTimetables.length - 1
-                                      ? const Color(0xFFE2E8F0)
-                                      : Colors.transparent,
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                // Time
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2ECC71).withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    '${entry.fromTime} - ${entry.toTime}',
-                                    style: const TextStyle(
-                                      color: Color(0xFF2ECC71),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                
-                                // Subject and class info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        entry.subject,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Color(0xFF1E293B),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '${entry.className} ${entry.division} • ${entry.subType}',
-                                        style: const TextStyle(
-                                          color: Color(0xFF64748B),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                
-                                // Course info
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFD79A8).withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    entry.courseName,
-                                    style: const TextStyle(
-                                      color: Color(0xFFFD79A8),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                    Text(
+                      _formatTime(entry.fromTime),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
                   ],
                 ),
-              );
-            },
+                const SizedBox(height: 8),
+                Text(
+                  '${entry.className} ${entry.division} • ${entry.subType}',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  IconData _getDayIcon(String day) {
-    switch (day) {
-      case 'Monday':
-        return Icons.calendar_view_week;
-      case 'Tuesday':
-        return Icons.calendar_view_week;
-      case 'Wednesday':
-        return Icons.calendar_view_week;
-      case 'Thursday':
-        return Icons.calendar_view_week;
-      case 'Friday':
-        return Icons.calendar_view_week;
-      case 'Saturday':
-        return Icons.calendar_view_week;
-      default:
-        return Icons.calendar_today;
+  Color _getSubjectColor(String subject) {
+    final colors = [
+      const Color(0xFFEF4444), // Red
+      const Color(0xFF6366F1), // Blue
+      const Color(0xFFF59E0B), // Yellow
+      const Color(0xFF10B981), // Green
+      const Color(0xFFEC4899), // Pink
+      const Color(0xFF8B5CF6), // Purple
+      const Color(0xFF06B6D4), // Cyan
+      const Color(0xFFF97316), // Orange
+    ];
+    final index = subject.hashCode.abs() % colors.length;
+    return colors[index];
+  }
+
+  String _formatTime(String time24) {
+    try {
+      final parts = time24.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts[1];
+
+      if (hour == 0) {
+        return '12:$minute AM';
+      } else if (hour < 12) {
+        return '$hour:$minute AM';
+      } else if (hour == 12) {
+        return '12:$minute PM';
+      } else {
+        return '${hour - 12}:$minute PM';
+      }
+    } catch (e) {
+      return time24;
     }
   }
 }

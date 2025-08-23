@@ -210,6 +210,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                           radius: 35,
                           backgroundColor: Colors.white,
                           backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                          onBackgroundImageError: (exception, stackTrace) {
+                            print('Image loading failed for student dashboard: $_photoUrl');
+                          },
                           child: _photoUrl.isEmpty
                               ? const Icon(
                                   Icons.person,

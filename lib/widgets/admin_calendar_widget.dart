@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:dps/services/calendar_service.dart';
+import 'package:dps/services/admin_timetable_service.dart';
 
 class AdminCalendarWidget extends StatefulWidget {
   const AdminCalendarWidget({super.key});
@@ -21,6 +22,10 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
   AnnualCalendarData? _annualCalendar;
   bool _isLoading = true;
   int _selectedYear = DateTime.now().year;
+  
+  // Teacher selection
+  List<TeacherTimetableData> _teacherTimetables = [];
+  TeacherTimetableData? _selectedTeacher;
 
   @override
   void initState() {
@@ -44,13 +49,20 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
       final results = await Future.wait([
         CalendarService.getEvents(),
         CalendarService.getAnnualCalendar(_selectedYear),
+        AdminTimetableService.getTeacherTimetables(),
       ]);
 
       setState(() {
         _events = results[0] as List<EventData>;
         _annualCalendar = results[1] as AnnualCalendarData;
+        _teacherTimetables = results[2] as List<TeacherTimetableData>;
         _isLoading = false;
       });
+      
+      // Auto-select first teacher if available
+      if (_teacherTimetables.isNotEmpty && _selectedTeacher == null) {
+        _selectedTeacher = _teacherTimetables.first;
+      }
     } catch (e) {
       print('Error loading calendar data: $e');
       setState(() {
@@ -60,10 +72,43 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
   }
 
   List<EventData> _getEventsForDay(DateTime day) {
-    return _events.where((event) =>
+    final regularEvents = _events.where((event) =>
         event.startDate.year == day.year &&
         event.startDate.month == day.month &&
         event.startDate.day == day.day).toList();
+    
+    // Add timetable events for the selected teacher
+    final timetableEvents = _getTimetableEventsForDay(day);
+    
+    return [...regularEvents, ...timetableEvents];
+  }
+
+  bool _isTimetableEvent(EventData event) {
+    // Check if this event was created from a timetable entry
+    return event.venue.contains('CBSE') && event.description.contains('•');
+  }
+
+  List<EventData> _getTimetableEventsForDay(DateTime day) {
+    if (_selectedTeacher == null) return [];
+    
+    final weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final dayName = weekDays[day.weekday - 1];
+    
+    final dayTimetables = _selectedTeacher!.timetables
+        .where((entry) => entry.weekDay == dayName)
+        .toList();
+    
+    return dayTimetables.map((timetable) => EventData(
+      eventId: timetable.timeTableId,
+      eventName: timetable.subject,
+      description: '${timetable.className} ${timetable.division} • ${timetable.subType}',
+      startDate: day,
+      endDate: day,
+      startTime: timetable.fromTime,
+      endTime: timetable.toTime,
+      venue: '${timetable.courseName} - ${timetable.batch}',
+      className: '${timetable.className} ${timetable.division}',
+    )).toList();
   }
 
   List<CalendarItem> _getAnnualEventsForDay(DateTime day) {
@@ -127,13 +172,27 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'School Calendar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'School Calendar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (_selectedTeacher != null)
+                          Text(
+                            '${_selectedTeacher!.teacherName}',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                      ],
                     ),
                     const Spacer(),
                     if (_tabController.index == 1) // Annual Calendar tab
@@ -246,6 +305,59 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Teacher selector and calendar controls
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Back button
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              const Spacer(),
+              // Teacher selector
+              if (_teacherTimetables.isNotEmpty)
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<TeacherTimetableData>(
+                      value: _selectedTeacher,
+                      hint: const Text(
+                        'Select Teacher',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                      dropdownColor: const Color(0xFF6366F1),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
+                      items: _teacherTimetables.map((teacher) {
+                        return DropdownMenuItem<TeacherTimetableData>(
+                          value: teacher,
+                          child: Text(
+                            teacher.teacherName,
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (TeacherTimetableData? value) {
+                        setState(() {
+                          _selectedTeacher = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
         TableCalendar<EventData>(
           firstDay: DateTime.utc(2020, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
@@ -297,6 +409,57 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
             formatButtonTextStyle: TextStyle(color: Colors.white),
           ),
         ),
+        const SizedBox(height: 16),
+        // Show selected teacher info
+        if (_selectedTeacher != null)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    color: Color(0xFF6366F1),
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _selectedTeacher!.teacherName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      Text(
+                        '${_selectedTeacher!.timetables.length} classes scheduled',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         const SizedBox(height: 16),
         Flexible(
           child: _buildEventsList(),
@@ -415,24 +578,50 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6C5CE7).withValues(alpha: 0.1),
+                      color: _isTimetableEvent(event) 
+                          ? const Color(0xFF6366F1).withValues(alpha: 0.1)
+                          : const Color(0xFF6C5CE7).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.event,
-                      color: Color(0xFF6C5CE7),
+                    child: Icon(
+                      _isTimetableEvent(event) ? Icons.schedule : Icons.event,
+                      color: _isTimetableEvent(event) 
+                          ? const Color(0xFF6366F1)
+                          : const Color(0xFF6C5CE7),
                       size: 16,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      event.eventName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color(0xFF1E293B),
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.eventName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF1E293B),
+                          ),
+                        ),
+                        if (_isTimetableEvent(event))
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Timetable',
+                              style: TextStyle(
+                                color: Color(0xFF6366F1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
