@@ -346,6 +346,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Color(0xFF2D3748),
+
         ),
       ),
       backgroundColor: Colors.white,

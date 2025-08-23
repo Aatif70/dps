@@ -141,20 +141,20 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 20),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          const Spacer(),
+          // IconButton(
+          //   onPressed: () => Navigator.of(context).pop(),
+          //   icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 20),
+          //   padding: EdgeInsets.zero,
+          //   constraints: const BoxConstraints(),
+          // ),
+          // const Spacer(),
                                // Teacher selector
           if (_teacherTimetables.isNotEmpty)
             Container(
-              constraints: const BoxConstraints(maxWidth: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              constraints: const BoxConstraints(maxWidth: 330),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1),
+                color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: DropdownButtonHideUnderline(
@@ -162,17 +162,20 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                   value: _selectedTeacher,
                   hint: const Text(
                     'Select Teacher',
-                    style: TextStyle(color: Colors.white, fontSize: 11),
+                    style: TextStyle(color: Colors.deepPurple, fontSize: 14),
                   ),
-                  dropdownColor: const Color(0xFF6366F1),
-                  style: const TextStyle(color: Colors.white, fontSize: 11),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
+                  dropdownColor: Colors.grey.shade50,
+                  // dropdownColor: const Color(0xFF6366F1),
+
+                  style: const TextStyle(color: Colors.black38, fontSize: 14,),
+
+                  // icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
                   items: _teacherTimetables.cast<TeacherTimetableData>().map((teacher) {
                     return DropdownMenuItem<TeacherTimetableData>(
                       value: teacher,
                       child: Text(
                         teacher.teacherName,
-                        style: const TextStyle(color: Colors.white, fontSize: 11),
+                        style: const TextStyle(color: Colors.black87, fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     );
@@ -264,7 +267,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           ),
           SizedBox(height: 16),
           Text(
-            'No tasks scheduled',
+            'No class scheduled',
             style: TextStyle(
               color: Color(0xFF64748B),
               fontSize: 18,
@@ -273,7 +276,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           ),
           SizedBox(height: 8),
           Text(
-            'Add your first task to get started',
+            'Add your classes to get started',
             style: TextStyle(
               color: Color(0xFF94A3B8),
               fontSize: 14,
@@ -339,7 +342,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                 width: 2,
                 height: 80,
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                color: color.withOpacity(0.3),
+                color: color.withValues(alpha: 0.3),
               ),
           ],
         ),
@@ -354,7 +357,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -390,7 +393,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                 Text(
                   '${entry.className} ${entry.division} • ${entry.subType}',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 14,
                   ),
                 ),
