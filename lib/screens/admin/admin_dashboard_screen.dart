@@ -663,40 +663,52 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     final List<_AdminFeature> features = [
       _AdminFeature(
         title: 'Students',
+        subtitle: 'Manage student information and records',
         icon: Icons.people_alt_rounded,
         color: const Color(0xFF4A90E2),
         route: AppRoutes.adminStudents,
       ),
-      _AdminFeature(
-        title: 'Fees',
-        icon: Icons.account_balance_wallet_rounded,
-        color: const Color(0xFF6C5CE7),
-        route: AppRoutes.adminFeesHub,
-      ),
-      _AdminFeature(
-        title: 'Classes',
-        icon: Icons.class_,
-        color: const Color(0xFF2ECC71),
-        route: AppRoutes.adminClassesHub,
-      ),
-      _AdminFeature(
-        title: 'Attendance',
-        icon: Icons.document_scanner_rounded,
-        color: const Color(0xFFE17055),
-        route: AppRoutes.adminAttendanceHub,
-      ),
+
       _AdminFeature(
         title: 'Employees',
+        subtitle: 'Manage staff and employee records',
         icon: Icons.people,
         color: Colors.pink,
         route: AppRoutes.adminEmployeesHub,
       ),
+
+      _AdminFeature(
+        title: 'Classes',
+        subtitle: 'Manage classes, batches and divisions',
+        icon: Icons.class_,
+        color: const Color(0xFF2ECC71),
+        route: AppRoutes.adminClassesHub,
+      ),
+
+      _AdminFeature(
+        title: 'Attendance',
+        subtitle: 'Track student and employee attendance',
+        icon: Icons.document_scanner_rounded,
+        color: const Color(0xFFE17055),
+        route: AppRoutes.adminAttendanceHub,
+      ),
+
       _AdminFeature(
         title: 'Timetable',
+        subtitle: 'Create and manage class schedules',
         icon: Icons.schedule,
         color: const Color(0xFFFD79A8),
         route: AppRoutes.adminTimetable,
       ),
+
+      _AdminFeature(
+        title: 'Fees',
+        subtitle: 'Handle fee collection and payments',
+        icon: Icons.account_balance_wallet_rounded,
+        color: const Color(0xFF6C5CE7),
+        route: AppRoutes.adminFeesHub,
+      ),
+
     ];
 
     return Padding(
@@ -708,7 +720,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 0.85,
+          childAspectRatio: 0.85, // Increased to give more height for subtitles
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
@@ -747,12 +759,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                       ),
                       child: Icon(feature.icon, color: feature.color, size: 28),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 20),
                     Text(
                       feature.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2D3748),
+                        fontSize: 14,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Text(
+                        feature.subtitle,
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -775,12 +802,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
 class _AdminFeature {
   final String title;
+  final String subtitle;
   final IconData icon;
   final Color color;
   final String route;
 
   const _AdminFeature({
     required this.title,
+    required this.subtitle,
     required this.icon,
     required this.color,
     required this.route,
