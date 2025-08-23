@@ -28,21 +28,18 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
   int _subTypeId = 1;
 
   // Data lists
-  List _classes = [];
-  List _batches = [];
-  List _divisions = [];
-  List _employees = [];
-  List _subjects = [];
+  List<ClassMasterItem> _classes = [];
+  List<BatchItem> _batches = [];
+  List<DivisionItem> _divisions = [];
+  List<EmployeeItem> _employees = [];
+  List<SubjectItem> _subjects = [];
+  List<SubjectTypeItem> _subjectTypes = [];
 
   final List<String> _weekDays = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
   ];
 
-  final List<Map<String, dynamic>> _subjectTypes = [
-    {'id': 1, 'name': 'Theory'},
-    {'id': 2, 'name': 'Practical'},
-    {'id': 3, 'name': 'Lab'},
-  ];
+  // Remove hardcoded subject types - will be loaded dynamically
 
   @override
   void initState() {
@@ -189,6 +186,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
       setState(() {
         _subjects = subjects;
         _selectedSubject = null;
+        _subjectTypes = []; // Clear subject types when subjects change
       });
       
       print('🎯 === SUBJECTS LOADED SUCCESSFULLY ===');
@@ -198,6 +196,37 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
       print('❌ === ERROR LOADING SUBJECTS ===');
       print('   Error: $e');
       print('   Stack trace: $e');
+    }
+  }
+
+  Future<void> _loadSubjectTypes() async {
+    if (_selectedSubject == null) return;
+    try {
+      print('🎯 === LOADING SUBJECT TYPES ===');
+      print('   📖 Selected Subject: ID=${_selectedSubject!.subjectId}, Name="${_selectedSubject!.subjectName}"');
+      
+      final subjectTypes = await AdminTimetableService.getSubjectTypesBySubject(
+          _selectedSubject!.subjectId);
+      
+      print('✅ Subject Types loaded: ${subjectTypes.length}');
+      for (int i = 0; i < subjectTypes.length; i++) {
+        final subjectType = subjectTypes[i];
+        print('   🏷️ Subject Type $i: ID=${subjectType.subTypeId}, Name="${subjectType.subTypeName}"');
+      }
+      
+      setState(() {
+        _subjectTypes = subjectTypes;
+        if (subjectTypes.isNotEmpty) {
+          _subTypeId = subjectTypes.first.subTypeId;
+        }
+      });
+      
+      print('🎯 === SUBJECT TYPES LOADED SUCCESSFULLY ===');
+      print('   🏷️ Subject Types count: ${_subjectTypes.length}');
+      
+    } catch (e) {
+      print('❌ === ERROR LOADING SUBJECT TYPES ===');
+      print('   Error: $e');
     }
   }
 
@@ -258,6 +287,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
       _batches = [];
       _divisions = [];
       _subjects = [];
+      _subjectTypes = [];
     });
   }
 
@@ -398,7 +428,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
            _buildModernDropdownField<ClassMasterItem>(
              label: 'Class',
              value: _selectedClass,
-             items: _classes.cast<ClassMasterItem>(),
+             items: _classes,
              onChanged: (value) {
                setState(() {
                  _selectedClass = value;
@@ -423,7 +453,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
            _buildModernDropdownField<BatchItem>(
              label: 'Batch',
              value: _selectedBatch,
-             items: _batches.cast<BatchItem>(),
+             items: _batches,
              onChanged: (value) {
                setState(() {
                  _selectedBatch = value;
@@ -440,7 +470,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
            _buildModernDropdownField<DivisionItem>(
              label: 'Division',
              value: _selectedDivision,
-             items: _divisions.cast<DivisionItem>(),
+             items: _divisions,
              onChanged: (value) {
                setState(() {
                  _selectedDivision = value;
@@ -452,7 +482,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
            _buildModernDropdownField<EmployeeItem>(
              label: 'Teacher',
              value: _selectedEmployee,
-             items: _employees.cast<EmployeeItem>(),
+             items: _employees,
              onChanged: (value) {
                setState(() {
                  _selectedEmployee = value;
@@ -470,14 +500,61 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
            _buildModernDropdownField<SubjectItem>(
              label: 'Subject',
              value: _selectedSubject,
-             items: _subjects.cast<SubjectItem>(),
+             items: _subjects,
              onChanged: (value) {
                setState(() {
                  _selectedSubject = value;
+                 _subjectTypes = []; // Clear subject types when subject changes
                });
+               if (value != null) {
+                 _loadSubjectTypes();
+               }
              },
              displayText: (item) => item.subjectName,
            ),
+
+          // Subject Type dropdown with loading state
+          _buildModernDropdownField<SubjectTypeItem>(
+            label: 'Subject Type',
+            value: _subjectTypes.isNotEmpty ? _subjectTypes.firstWhere(
+              (type) => type.subTypeId == _subTypeId,
+              orElse: () => _subjectTypes.first,
+            ) : null,
+            items: _subjectTypes,
+            onChanged: _subjectTypes.isNotEmpty
+                ? (value) {
+                    setState(() {
+                      _subTypeId = value?.subTypeId ?? 1;
+                    });
+                  }
+                : (value) {},
+            displayText: (item) => item.subTypeName,
+            isEnabled: _selectedSubject != null,
+          ),
+          
+          // Show loading indicator when subject types are being fetched
+          if (_selectedSubject != null && _subjectTypes.isEmpty)
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Loading subject types...',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           _buildModernDropdownField<String>(
             label: 'Week Day',
@@ -522,18 +599,6 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
                 ),
               ),
             ],
-          ),
-
-          _buildModernDropdownField<Map<String, dynamic>>(
-            label: 'Subject Type',
-            value: _subjectTypes.firstWhere((type) => type['id'] == _subTypeId),
-            items: _subjectTypes,
-            onChanged: (value) {
-              setState(() {
-                _subTypeId = value?['id'] ?? 1;
-              });
-            },
-            displayText: (item) => item['name'],
           ),
 
           const SizedBox(height: 30),
@@ -581,6 +646,7 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
     required List<T> items,
     required ValueChanged<T?> onChanged,
     required String Function(T) displayText,
+    bool isEnabled = true,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -589,10 +655,10 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF374151),
+              color: isEnabled ? const Color(0xFF374151) : Colors.grey[400],
             ),
           ),
           const SizedBox(height: 8),
@@ -600,22 +666,32 @@ class _AdminTimetableScreenState extends State<AdminTimetableScreen>
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFD1D5DB)),
+              border: Border.all(color: isEnabled ? const Color(0xFFD1D5DB) : Colors.grey[300]!),
               borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[50],
+              color: isEnabled ? Colors.grey[50] : Colors.grey[100],
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<T>(
                 value: value,
                 isExpanded: true,
-                hint: Text('Select $label'),
+                hint: Text(
+                  'Select $label',
+                  style: TextStyle(
+                    color: isEnabled ? Colors.grey[600] : Colors.grey[400],
+                  ),
+                ),
                 items: items.map((T item) {
                   return DropdownMenuItem<T>(
                     value: item,
-                    child: Text(displayText(item)),
+                    child: Text(
+                      displayText(item),
+                      style: TextStyle(
+                        color: isEnabled ? Colors.black : Colors.grey[400],
+                      ),
+                    ),
                   );
                 }).toList(),
-                onChanged: onChanged,
+                onChanged: isEnabled ? onChanged : (value) {},
               ),
             ),
           ),

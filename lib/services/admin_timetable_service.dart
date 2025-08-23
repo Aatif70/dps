@@ -356,6 +356,72 @@ class AdminTimetableService {
     }
   }
 
+  // Get subject types by subject ID
+  static Future<List<SubjectTypeItem>> getSubjectTypesBySubject(int subjectId) async {
+    try {
+      print('🔍 === GETTING SUBJECT TYPES BY SUBJECT ===');
+      print('   📖 SubjectId: $subjectId');
+      
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      
+      if (uid.isEmpty) {
+        print('❌ ERROR: Uid not found in SharedPreferences');
+        return [];
+      }
+
+      print('    Uid: $uid');
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/Subject');
+      
+      print('   🌐 Subject Types API URL: $url');
+      print('   📤 Request body: Uid=$uid, subjectId=$subjectId');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'subjectId': subjectId.toString(),
+        },
+      );
+
+      print('   📥 Subject Types API Response Status: ${response.statusCode}');
+      print('   📄 Subject Types API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        print('   🔍 Response JSON: $jsonData');
+        
+        if (jsonData['success'] == true && jsonData['data'] is List) {
+          final List<dynamic> data = jsonData['data'];
+          print('   📊 Data list length: ${data.length}');
+          
+          final result = data.map((st) => SubjectTypeItem.fromJson(st as Map<String, dynamic>)).toList();
+          print('   ✅ Successfully parsed ${result.length} subject types');
+          
+          for (int i = 0; i < result.length; i++) {
+            final subjectType = result[i];
+            print('     🏷️ Subject Type $i: ID=${subjectType.subTypeId}, Name="${subjectType.subTypeName}"');
+          }
+          
+          return result;
+        } else {
+          print('   ❌ API returned success=false or data is not a list');
+          print('   🔍 Success: ${jsonData['success']}');
+          print('   🔍 Data type: ${jsonData['data']?.runtimeType}');
+        }
+      } else {
+        print('   ❌ HTTP Error: ${response.statusCode}');
+      }
+      return [];
+    } catch (e) {
+      print('❌ === ERROR GETTING SUBJECT TYPES ===');
+      print('   Error: $e');
+      print('   Stack trace: ${StackTrace.current}');
+      return [];
+    }
+  }
+
   // Keep the old method for backward compatibility but mark it as deprecated
   @deprecated
   static Future<List<SubjectItem>> getSubjectsByClassMaster(int classMasterId) async {
@@ -479,6 +545,23 @@ class SubjectItem {
     return SubjectItem(
       subjectId: json['SubjectId'] ?? 0,
       subjectName: json['SubjectName'] ?? '',
+    );
+  }
+}
+
+class SubjectTypeItem {
+  final int subTypeId;
+  final String subTypeName;
+
+  SubjectTypeItem({
+    required this.subTypeId,
+    required this.subTypeName,
+  });
+
+  factory SubjectTypeItem.fromJson(Map<String, dynamic> json) {
+    return SubjectTypeItem(
+      subTypeId: int.tryParse((json['SubTypeId'] ?? '0').toString()) ?? 0,
+      subTypeName: (json['SubTypeName'] ?? '').toString(),
     );
   }
 }
