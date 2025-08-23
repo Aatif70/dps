@@ -428,6 +428,123 @@ class AdminTimetableService {
     print('⚠️ DEPRECATED: Use getSubjectsByClassMasterAndEmployee instead');
     return getSubjectsByClassMasterAndEmployee(classMasterId, 0);
   }
+
+  // Get classes by employee ID
+  static Future<List<ClassMasterItem>> getClassesByEmployee(int empId) async {
+    try {
+      print('🔍 === GETTING CLASSES BY EMPLOYEE ===');
+      print('   👤 EmpId: $empId');
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      if (uid.isEmpty) {
+        print('❌ ERROR: Uid not found in SharedPreferences');
+        return [];
+      }
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/GetClassByEmpId');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'EmpId': empId.toString(),
+        },
+      );
+      print('   📥 ClassesByEmp API Response Status: ${response.statusCode}');
+      print('   📄 ClassesByEmp API Response Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] is List) {
+          final List<dynamic> data = jsonData['data'];
+          return data.map((c) => ClassMasterItem.fromJson(c as Map<String, dynamic>)).toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('❌ === ERROR GETTING CLASSES BY EMPLOYEE ===');
+      print('   Error: $e');
+      return [];
+    }
+  }
+
+  // Get batches by employee ID and class master ID
+  static Future<List<BatchItem>> getBatchesByEmployeeAndClass(int empId, int classMasterId) async {
+    try {
+      print('🔍 === GETTING BATCHES BY EMPLOYEE AND CLASS ===');
+      print('   👤 EmpId: $empId, 🏫 ClassMasterId: $classMasterId');
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      if (uid.isEmpty) {
+        print('❌ ERROR: Uid not found in SharedPreferences');
+        return [];
+      }
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/BatchByEmpId');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'empid': empId.toString(),
+          'classmid': classMasterId.toString(),
+        },
+      );
+      print('   📥 BatchByEmp API Response Status: ${response.statusCode}');
+      print('   📄 BatchByEmp API Response Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] is List) {
+          final List<dynamic> data = jsonData['data'];
+          return data.map((b) => BatchItem.fromJson(b as Map<String, dynamic>)).toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('❌ === ERROR GETTING BATCHES BY EMPLOYEE AND CLASS ===');
+      print('   Error: $e');
+      return [];
+    }
+  }
+
+  // Get divisions by class ID
+  static Future<List<DivisionItem>> getDivisionsByClassId(int classId) async {
+    try {
+      print('🔍 === GETTING DIVISIONS BY CLASS ID ===');
+      print('   🏫 ClassId: $classId');
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      if (uid.isEmpty) {
+        print('❌ ERROR: Uid not found in SharedPreferences');
+        return [];
+      }
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/DivByEmpId');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'Uid': uid,
+          'classId': classId.toString(),
+        },
+      );
+      print('   📥 DivByEmp API Response Status: ${response.statusCode}');
+      print('   📄 DivByEmp API Response Body: ${response.body}');
+      final decoded = json.decode(response.body);
+      if (response.statusCode == 200) {
+        if (decoded is Map<String, dynamic> &&
+            decoded['success'] == true &&
+            decoded['data'] is List) {
+          final List<dynamic> data = decoded['data'];
+          return data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
+        } else if (decoded is List) {
+          // API returned an empty list directly
+          return [];
+        }
+      }
+      return [];
+    } catch (e) {
+      print('❌ === ERROR GETTING DIVISIONS BY CLASS ID ===');
+      print('   Error: $e');
+      return [];
+    }
+  }
 }
 
 // Data models for timetable creation
@@ -472,10 +589,10 @@ class BatchItem {
 
   factory BatchItem.fromJson(Map<String, dynamic> json) {
     return BatchItem(
-      classId: int.tryParse((json['ClassId'] ?? '0').toString()) ?? 0,
+      classId: int.tryParse((json['classid'] ?? json['ClassId'] ?? '0').toString()) ?? 0,
       classMasterId: int.tryParse((json['ClassMasterId'] ?? '0').toString()) ?? 0,
       courseYear: int.tryParse((json['CourseYear'] ?? '0').toString()) ?? 0,
-      batchName: (json['BatchName'] ?? '').toString(),
+      batchName: (json['batch'] ?? json['BatchName'] ?? '').toString(),
     );
   }
 }
@@ -498,9 +615,19 @@ class DivisionItem {
       divisionId: int.tryParse((json['DivisionId'] ?? '0').toString()) ?? 0,
       classId: int.tryParse((json['ClassId'] ?? '0').toString()) ?? 0,
       empId: int.tryParse((json['EmpId'] ?? '0').toString()) ?? 0,
-      divName: (json['DivName'] ?? '').toString(),
+      divName: (json['DivName'] ?? json['Name'] ?? '').toString(),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DivisionItem &&
+          runtimeType == other.runtimeType &&
+          divisionId == other.divisionId;
+
+  @override
+  int get hashCode => divisionId.hashCode;
 }
 
 class EmployeeItem {
@@ -547,6 +674,16 @@ class SubjectItem {
       subjectName: json['SubjectName'] ?? '',
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SubjectItem &&
+          runtimeType == other.runtimeType &&
+          subjectId == other.subjectId;
+
+  @override
+  int get hashCode => subjectId.hashCode;
 }
 
 class SubjectTypeItem {
@@ -564,6 +701,16 @@ class SubjectTypeItem {
       subTypeName: (json['SubTypeName'] ?? '').toString(),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SubjectTypeItem &&
+          runtimeType == other.runtimeType &&
+          subTypeId == other.subTypeId;
+
+  @override
+  int get hashCode => subTypeId.hashCode;
 }
 
 class TeacherTimetableData {
