@@ -17,11 +17,25 @@ class AdminTimetableService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
+      print('🔍 === GET TEACHER TIMETABLES ===');
+      print('   🌐 URL: $url');
+      print('   🔑 UId: $uid');
+      print('   📥 Status: ${response.statusCode}');
+      print('   📄 Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final List<dynamic> data = jsonData['data'];
-          return data.map((json) => TeacherTimetableData.fromJson(json)).toList();
+          final list = data.map((json) => TeacherTimetableData.fromJson(json)).toList();
+          print('   ✅ Parsed teachers: ${list.length}');
+          for (int i = 0; i < list.length; i++) {
+            final t = list[i];
+            print('     👤 [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
+          }
+          return list;
+        } else {
+          print('   ❌ Unexpected JSON shape for teacher timetables');
         }
       }
       return [];

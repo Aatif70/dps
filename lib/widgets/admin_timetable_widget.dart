@@ -38,6 +38,13 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         }
         _isLoading = false;
       });
+      try {
+        print('👥 Header dropdown teachers: ${_teacherTimetables.length}');
+        for (int i = 0; i < _teacherTimetables.length; i++) {
+          final t = _teacherTimetables[i] as TeacherTimetableData;
+          print('   - [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
+        }
+      } catch (_) {}
     } catch (e) {
       setState(() {
         _isLoading = false;
