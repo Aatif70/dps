@@ -18,7 +18,7 @@ class _AdminEmployeeDetailsScreenState extends State<AdminEmployeeDetailsScreen>
   @override
   void initState() {
     super.initState();
-    print('[AdminEmployeeDetails] initState');
+    debugPrint('[AdminEmployeeDetails] initState');
     _fadeController = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
     _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeIn);
   }
@@ -27,20 +27,20 @@ class _AdminEmployeeDetailsScreenState extends State<AdminEmployeeDetailsScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final Object? args = ModalRoute.of(context)?.settings.arguments;
-    print('[AdminEmployeeDetails] didChangeDependencies - route args: ' + (args?.toString() ?? 'null'));
+    debugPrint('[AdminEmployeeDetails] didChangeDependencies - route args: ' + (args?.toString() ?? 'null'));
     if (_empId == 0) {
       if (args is int) {
         _empId = args;
-        print('[AdminEmployeeDetails] Parsed EmpId: ' + _empId.toString());
+        debugPrint('[AdminEmployeeDetails] Parsed EmpId: ' + _empId.toString());
         _load();
       } else {
-        print('[AdminEmployeeDetails] Invalid or missing EmpId argument');
+        debugPrint('[AdminEmployeeDetails] Invalid or missing EmpId argument');
       }
     }
   }
 
   Future<void> _load() async {
-    print('[AdminEmployeeDetails] _load() start for EmpId=' + _empId.toString());
+    debugPrint('[AdminEmployeeDetails] _load() start for EmpId=' + _empId.toString());
     setState(() => _isLoading = true);
     final res = await AdminEmployeeDetailsService.fetchEmployeeDetails(empId: _empId);
     if (!mounted) return;

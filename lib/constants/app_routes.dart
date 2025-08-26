@@ -29,6 +29,7 @@ class AppRoutes {
   // Admin Routes
   static const String adminDashboard = '/admin/dashboard';
   static const String adminStudents = '/admin/students';
+  static const String adminStudentsHub = '/admin/students/hub';
   static const String adminFeesHub = '/admin/fees';
   static const String adminFeesReceipts = '/admin/fees/receipts';
   static const String adminConcessionReceipts = '/admin/fees/concession-receipts';

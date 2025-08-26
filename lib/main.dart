@@ -32,6 +32,7 @@ import 'package:dps/screens/admin/admin_student_personal_screen.dart';
 import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
 import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
 import 'package:dps/screens/admin/admin_timetable_screen.dart';
+import 'package:dps/screens/admin/admin_students_hub_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_search_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_details_screen.dart';
 import 'package:dps/screens/admin/admin_fees_class_summary_screen.dart';
@@ -102,6 +103,7 @@ class MyApp extends StatelessWidget {
         // Admin routes
         AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
         AppRoutes.adminStudents: (context) => const AdminStudentsScreen(),
+        AppRoutes.adminStudentsHub: (context) => const AdminStudentsHubScreen(),
         AppRoutes.adminFeesHub: (context) => const AdminFeesHubScreen(),
         AppRoutes.adminStudentDetails: (context) => const AdminStudentDetailsScreen(),
         AppRoutes.adminClassesHub: (context) => const AdminClassesHubScreen(),

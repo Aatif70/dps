@@ -83,10 +83,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         _isLoading = false;
       });
 
-      print('=== ADMIN DASHBOARD DATA LOADED ===');
+      debugPrint('=== ADMIN DASHBOARD DATA LOADED ===');
     } catch (e) {
-      print('=== ADMIN DASHBOARD DATA ERROR ===');
-      print('Error: $e');
+      debugPrint('=== ADMIN DASHBOARD DATA ERROR ===');
+      debugPrint('Error: $e');
       setState(() {
         _isLoading = false;
       });
@@ -666,7 +666,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         subtitle: 'Manage student information and records',
         icon: Icons.people_alt_rounded,
         color: const Color(0xFF4A90E2),
-        route: AppRoutes.adminStudents,
+        route: AppRoutes.adminStudentsHub,
       ),
 
       _AdminFeature(
