@@ -16,6 +16,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedDate = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -251,46 +252,67 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           // const Spacer(),
                                // Teacher selector
           if (_teacherTimetables.isNotEmpty)
-            Container(
-              constraints: const BoxConstraints(maxWidth: 330),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<TeacherTimetableData>(
-                  value: _selectedTeacher,
-                  hint: const Text(
-                    'Select Teacher',
-                    style: TextStyle(color: Colors.deepPurple, fontSize: 14),
+            Expanded(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 330),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<TeacherTimetableData>(
+                    value: _selectedTeacher,
+                    hint: const Text(
+                      'Select Teacher',
+                      style: TextStyle(color: Colors.deepPurple, fontSize: 14),
+                    ),
+                    dropdownColor: Colors.grey.shade50,
+                    // dropdownColor: const Color(0xFF6366F1),
+
+                    style: const TextStyle(color: Colors.black38, fontSize: 14,),
+
+                    // icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
+                    items: _teacherTimetables.cast<TeacherTimetableData>().map((teacher) {
+                      return DropdownMenuItem<TeacherTimetableData>(
+                        value: teacher,
+                        child: Text(
+                          teacher.teacherName,
+                          style: const TextStyle(color: Colors.black87, fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (TeacherTimetableData? value) {
+                      setState(() {
+                        _selectedTeacher = value;
+                        // Refresh calendar to show new teacher's schedule
+                        _focusedDate = _focusedDate;
+                      });
+                    },
                   ),
-                  dropdownColor: Colors.grey.shade50,
-                  // dropdownColor: const Color(0xFF6366F1),
-
-                  style: const TextStyle(color: Colors.black38, fontSize: 14,),
-
-                  // icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
-                  items: _teacherTimetables.cast<TeacherTimetableData>().map((teacher) {
-                    return DropdownMenuItem<TeacherTimetableData>(
-                      value: teacher,
-                      child: Text(
-                        teacher.teacherName,
-                        style: const TextStyle(color: Colors.black87, fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (TeacherTimetableData? value) {
-                    setState(() {
-                      _selectedTeacher = value;
-                      // Refresh calendar to show new teacher's schedule
-                      _focusedDate = _focusedDate;
-                    });
-                  },
                 ),
               ),
             ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: SizedBox(
+              height: 40,
+              child: ElevatedButton.icon(
+                onPressed: _openAddTimetableSheet,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  backgroundColor: const Color(0xFF6366F1),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                icon: const Icon(Icons.add),
+                label: const FittedBox(child: Text('Add Timetable')),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -596,5 +618,585 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     } catch (e) {
       return time24;
     }
+  }
+
+  void _openAddTimetableSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: _AddTimetableForm(
+            onSubmitted: (result) async {
+              Navigator.of(ctx).pop();
+              // reload and set selected teacher
+              await _loadTeacherTimetables();
+              if (result.empId != null) {
+                TeacherTimetableData? match;
+                try {
+                  match = _teacherTimetables
+                      .cast<TeacherTimetableData>()
+                      .firstWhere((t) => t.empId == result.empId);
+                } catch (_) {
+                  match = null;
+                }
+                if (match != null) {
+                  setState(() {
+                    _selectedTeacher = match;
+                  });
+                }
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AddTimetableResult {
+  final int? empId;
+  _AddTimetableResult({required this.empId});
+}
+
+class _AddTimetableForm extends StatefulWidget {
+  final void Function(_AddTimetableResult) onSubmitted;
+  const _AddTimetableForm({required this.onSubmitted});
+
+  @override
+  State<_AddTimetableForm> createState() => _AddTimetableFormState();
+}
+
+class _AddTimetableFormState extends State<_AddTimetableForm> {
+  EmployeeItem? _selectedEmployee;
+  ClassMasterItem? _selectedClass;
+  BatchItem? _selectedBatch;
+  DivisionItem? _selectedDivision;
+  String? _selectedWeekday;
+  SubjectItem? _selectedSubject;
+  SubjectTypeItem? _selectedSubjectType;
+  String? _fromTime;
+  String? _toTime;
+
+  bool _loadingEmployees = false;
+  bool _loadingClasses = false;
+  bool _loadingBatches = false;
+  bool _loadingDivisions = false;
+  bool _loadingSubjects = false;
+  bool _loadingSubjectTypes = false;
+  bool _submitting = false;
+
+  List<EmployeeItem> _employees = [];
+  List<ClassMasterItem> _classes = [];
+  List<BatchItem> _batches = [];
+  List<DivisionItem> _divisions = [];
+  List<SubjectItem> _subjects = [];
+  List<SubjectTypeItem> _subjectTypes = [];
+
+  final List<String> _weekdays = const ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  // Time selection is now via native picker
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEmployees();
+  }
+
+  Future<void> _loadEmployees() async {
+    setState(() => _loadingEmployees = true);
+    final data = await AdminTimetableService.getEmployees();
+    setState(() {
+      _employees = data;
+      _loadingEmployees = false;
+    });
+  }
+
+  Future<void> _onEmployeeChanged(EmployeeItem? emp) async {
+    setState(() {
+      _selectedEmployee = emp;
+      _selectedClass = null;
+      _selectedBatch = null;
+      _selectedDivision = null;
+      _selectedSubject = null;
+      _selectedSubjectType = null;
+      _classes = [];
+      _batches = [];
+      _divisions = [];
+      _subjects = [];
+      _subjectTypes = [];
+    });
+    if (emp == null) return;
+    setState(() => _loadingClasses = true);
+    final cls = await AdminTimetableService.getClassesByEmployee(emp.empId);
+    setState(() {
+      _classes = cls;
+      _loadingClasses = false;
+    });
+  }
+
+  Future<void> _onClassChanged(ClassMasterItem? cls) async {
+    setState(() {
+      _selectedClass = cls;
+      _selectedBatch = null;
+      _selectedDivision = null;
+      _selectedSubject = null;
+      _selectedSubjectType = null;
+      _batches = [];
+      _divisions = [];
+      _subjects = [];
+      _subjectTypes = [];
+    });
+    if (cls == null || _selectedEmployee == null) return;
+    setState(() { _loadingBatches = true; _loadingSubjects = true; });
+    final batchesF = AdminTimetableService.getBatchesByEmployeeAndClass(_selectedEmployee!.empId, cls.classMasterId);
+    final subsF = AdminTimetableService.getSubjectsByClassMasterAndEmployee(cls.classMasterId, _selectedEmployee!.empId);
+    final results = await Future.wait([batchesF, subsF]);
+    setState(() {
+      _batches = (results[0] as List<BatchItem>);
+      _subjects = (results[1] as List<SubjectItem>);
+      _loadingBatches = false;
+      _loadingSubjects = false;
+    });
+  }
+
+  Future<void> _onBatchChanged(BatchItem? batch) async {
+    setState(() {
+      _selectedBatch = batch;
+      _selectedDivision = null;
+      _divisions = [];
+    });
+    if (batch == null) return;
+    setState(() { _loadingDivisions = true; });
+    final divs = await AdminTimetableService.getDivisionsByClassId(batch.classId);
+    setState(() {
+      _divisions = divs;
+      _loadingDivisions = false;
+      print('Divisions loaded: ${_divisions.map((d) => d.divName).toList()}');
+    });
+  }
+
+  Future<void> _onSubjectChanged(SubjectItem? sub) async {
+    setState(() {
+      _selectedSubject = sub;
+      _selectedSubjectType = null;
+      _subjectTypes = [];
+    });
+    if (sub == null) return;
+    setState(() => _loadingSubjectTypes = true);
+    final types = await AdminTimetableService.getSubjectTypesBySubject(sub.subjectId);
+    setState(() {
+      _subjectTypes = types;
+      _loadingSubjectTypes = false;
+    });
+  }
+
+  Future<void> _submit() async {
+    if (_selectedEmployee == null ||
+        _selectedClass == null ||
+        _selectedBatch == null ||
+        _selectedDivision == null ||
+        _selectedWeekday == null ||
+        _selectedSubject == null ||
+        _selectedSubjectType == null ||
+        _fromTime == null ||
+        _toTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields.')),
+      );
+      return;
+    }
+    // Ensure From < To
+    if (_fromTime == _toTime || (_fromTime ?? '')!.compareTo(_toTime ?? '') >= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a valid time range.')),
+      );
+      return;
+    }
+    setState(() => _submitting = true);
+    final res = await AdminTimetableService.addTimetable(
+      classId: _selectedClass!.classMasterId,
+      batchId: _selectedBatch!.classId,
+      divisionId: _selectedDivision!.divisionId,
+      empId: _selectedEmployee!.empId,
+      weekDay: _selectedWeekday!,
+      subId: _selectedSubject!.subjectId,
+      fromTime: _fromTime!,
+      toTime: _toTime!,
+      subTypeId: _selectedSubjectType!.subTypeId,
+    );
+    setState(() => _submitting = false);
+    if (res['success'] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Timetable added successfully.')),
+      );
+      widget.onSubmitted(_AddTimetableResult(empId: _selectedEmployee!.empId));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res['message']?.toString() ?? 'Failed to add timetable.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: const [
+              Icon(Icons.schedule, color: Color(0xFF6366F1)),
+              SizedBox(width: 8),
+              Text('Add Timetable', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                _buildEmployeeDropdown(),
+                const SizedBox(height: 12),
+                _buildClassDropdown(),
+                const SizedBox(height: 12),
+                _buildBatchDivisionRow(),
+                const SizedBox(height: 12),
+                _buildWeekdayDropdown(),
+                const SizedBox(height: 12),
+                _buildSubjectDropdown(),
+                const SizedBox(height: 12),
+                _buildSubjectTypeDropdown(),
+                const SizedBox(height: 12),
+                _buildTimePickers(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _submitting ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6366F1),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: _submitting
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.save),
+              label: const Text('Save Timetable'),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmployeeDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Teacher'),
+      child: _loadingEmployees
+          ? const SizedBox(height: 24, child: Center(child: CircularProgressIndicator(strokeWidth: 2)))
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<EmployeeItem>(
+                value: _selectedEmployee,
+                hint: const Text('Select Teacher'),
+                isExpanded: true,
+                items: _employees
+                    .where((e) => (e.designationName.toLowerCase().contains('teacher')))
+                    .map((e) => DropdownMenuItem<EmployeeItem>(
+                          value: e,
+                          child: Text(e.name),
+                        ))
+                    .toList(),
+                onChanged: _onEmployeeChanged,
+              ),
+            ),
+    );
+  }
+
+  Widget _buildClassDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Class', icon: Icons.school),
+      child: _loadingClasses
+          ? SizedBox(
+              height: 40,
+              child: Row(
+                children: const [
+                  SizedBox(width: 4),
+                  SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Loading classes...')),
+                ],
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<ClassMasterItem>(
+                value: _selectedClass,
+                hint: const Text('Select Class'),
+                isExpanded: true,
+                items: _classes
+                    .map((c) => DropdownMenuItem<ClassMasterItem>(
+                          value: c,
+                          child: Text(c.className),
+                        ))
+                    .toList(),
+                onChanged: _onClassChanged,
+              ),
+            ),
+    );
+  }
+
+  Widget _buildBatchDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Batch', icon: Icons.calendar_month),
+      child: _loadingBatches
+          ? SizedBox(
+              height: 40,
+              child: Row(
+                children: const [
+                  SizedBox(width: 4),
+                  SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Loading batches...')),
+                ],
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<BatchItem>(
+                value: _selectedBatch,
+                hint: const Text('Select Batch'),
+                isExpanded: true,
+                items: _batches
+                    .map((b) => DropdownMenuItem<BatchItem>(
+                          value: b,
+                          child: Text(b.batchName.isNotEmpty ? b.batchName : 'Batch ${b.courseYear}'),
+                        ))
+                    .toList(),
+                onChanged: _onBatchChanged,
+              ),
+            ),
+    );
+  }
+
+  Widget _buildDivisionDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Division', icon: Icons.group),
+      child: _loadingDivisions
+          ? SizedBox(
+              height: 40,
+              child: Row(
+                children: const [
+                  SizedBox(width: 4),
+                  SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Loading divisions...')),
+                ],
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<DivisionItem>(
+                value: _selectedDivision,
+                hint: const Text('Select Division'),
+                isExpanded: true,
+                items: _divisions
+                    .map((d) => DropdownMenuItem<DivisionItem>(
+                          value: d,
+                          child: Text(d.divName),
+                        ))
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedDivision = val),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildWeekdayDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Weekday', icon: Icons.event),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedWeekday,
+          hint: const Text('Select Weekday'),
+          isExpanded: true,
+          items: _weekdays.map((d) => DropdownMenuItem<String>(value: d, child: Text(d))).toList(),
+          onChanged: (val) => setState(() => _selectedWeekday = val),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubjectDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Subject', icon: Icons.menu_book),
+      child: _loadingSubjects
+          ? SizedBox(
+              height: 40,
+              child: Row(
+                children: const [
+                  SizedBox(width: 4),
+                  SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Loading subjects...')),
+                ],
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<SubjectItem>(
+                value: _selectedSubject,
+                hint: const Text('Select Subject'),
+                isExpanded: true,
+                items: _subjects
+                    .map((s) => DropdownMenuItem<SubjectItem>(
+                          value: s,
+                          child: Text(s.subjectName),
+                        ))
+                    .toList(),
+                onChanged: _onSubjectChanged,
+              ),
+            ),
+    );
+  }
+
+  Widget _buildSubjectTypeDropdown() {
+    return InputDecorator(
+      decoration: _fieldDecoration('Subject Type', icon: Icons.category),
+      child: _loadingSubjectTypes
+          ? SizedBox(
+              height: 40,
+              child: Row(
+                children: const [
+                  SizedBox(width: 4),
+                  SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Loading subject types...')),
+                ],
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<SubjectTypeItem>(
+                value: _selectedSubjectType,
+                hint: const Text('Select Subject Type'),
+                isExpanded: true,
+                items: _subjectTypes
+                    .map((st) => DropdownMenuItem<SubjectTypeItem>(
+                          value: st,
+                          child: Text(st.subTypeName),
+                        ))
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedSubjectType = val),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildTimePickers() {
+    return Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              final picked = await _pickTime(context, initial: _fromTime);
+              if (picked != null) setState(() => _fromTime = picked);
+            },
+            child: InputDecorator(
+              decoration: _fieldDecoration('From Time', icon: Icons.access_time),
+              child: Text(_fromTime ?? 'Select From', style: TextStyle(color: _fromTime == null ? Colors.grey.shade600 : Colors.black)),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              final picked = await _pickTime(context, initial: _toTime);
+              if (picked != null) setState(() => _toTime = picked);
+            },
+            child: InputDecorator(
+              decoration: _fieldDecoration('To Time', icon: Icons.access_time_filled),
+              child: Text(_toTime ?? 'Select To', style: TextStyle(color: _toTime == null ? Colors.grey.shade600 : Colors.black)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<String?> _pickTime(BuildContext context, {String? initial}) async {
+    TimeOfDay initialTime;
+    try {
+      if (initial != null && initial.contains(':')) {
+        final parts = initial.split(':');
+        initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+      } else {
+        initialTime = const TimeOfDay(hour: 9, minute: 0);
+      }
+    } catch (_) {
+      initialTime = const TimeOfDay(hour: 9, minute: 0);
+    }
+    final picked = await showTimePicker(context: context, initialTime: initialTime, builder: (ctx, child) {
+      return MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+        child: child ?? const SizedBox.shrink(),
+      );
+    });
+    if (picked == null) return null;
+    final hh = picked.hour.toString().padLeft(2, '0');
+    final mm = picked.minute.toString().padLeft(2, '0');
+    return '$hh:$mm';
+  }
+
+  InputDecoration _fieldDecoration(String label, {IconData? icon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF6366F1)) : null,
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFF6366F1)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      fillColor: Colors.white,
+      filled: true,
+    );
+  }
+
+  Widget _buildBatchDivisionRow() {
+    return Row(
+      children: [
+        Expanded(child: _buildBatchDropdown()),
+        const SizedBox(width: 12),
+        Expanded(child: _buildDivisionDropdown()),
+      ],
+    );
   }
 }

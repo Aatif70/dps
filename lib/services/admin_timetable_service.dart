@@ -532,10 +532,16 @@ class AdminTimetableService {
             decoded['success'] == true &&
             decoded['data'] is List) {
           final List<dynamic> data = decoded['data'];
-          return data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
+          final allDivisions = data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
+          // Do not filter by classId, just return all divisions
+          print('Found ${allDivisions.length} divisions');
+          return allDivisions;
         } else if (decoded is List) {
-          // API returned an empty list directly
-          return [];
+          // API returned a raw list
+          final List<dynamic> data = decoded;
+          final allDivisions = data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
+          print('Found ${allDivisions.length} divisions (raw list)');
+          return allDivisions;
         }
       }
       return [];
@@ -611,6 +617,7 @@ class DivisionItem {
   });
 
   factory DivisionItem.fromJson(Map<String, dynamic> json) {
+    // Map both 'DivName' and 'Name' from API to divName for dropdown display
     return DivisionItem(
       divisionId: int.tryParse((json['DivisionId'] ?? '0').toString()) ?? 0,
       classId: int.tryParse((json['ClassId'] ?? '0').toString()) ?? 0,
