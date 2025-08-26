@@ -8,6 +8,13 @@ class AdminFeesHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<_FeesItem> items = [
       _FeesItem(
+        title: 'Search by Student',
+        subtitle: 'Find a student and view fees',
+        icon: Icons.person_search_rounded,
+        color: const Color(0xFFFF7043),
+        route: AppRoutes.adminFeesStudentSearch,
+      ),
+      _FeesItem(
         title: 'Fees Receipts',
         subtitle: 'View latest student fees receipts',
         icon: Icons.receipt_long_rounded,
@@ -27,6 +34,13 @@ class AdminFeesHubScreen extends StatelessWidget {
         icon: Icons.payment_rounded,
         color: const Color(0xFFE65100), // orange
         route: AppRoutes.adminPaymentVouchers,
+      ),
+      _FeesItem(
+        title: 'Class-wise Summary',
+        subtitle: 'Paid vs pending per class',
+        icon: Icons.analytics_outlined,
+        color: const Color(0xFFFF6E6E),
+        route: AppRoutes.adminFeesClassSummary,
       ),
     ];
 

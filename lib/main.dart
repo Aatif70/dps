@@ -32,6 +32,9 @@ import 'package:dps/screens/admin/admin_student_personal_screen.dart';
 import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
 import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
 import 'package:dps/screens/admin/admin_timetable_screen.dart';
+import 'package:dps/screens/admin/admin_fees_student_search_screen.dart';
+import 'package:dps/screens/admin/admin_fees_student_details_screen.dart';
+import 'package:dps/screens/admin/admin_fees_class_summary_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
@@ -117,6 +120,9 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminFeesReceipts: (context) => const AdminFeesReceiptsScreen(),
         AppRoutes.adminConcessionReceipts: (context) => const AdminConcessionReceiptsScreen(),
         AppRoutes.adminPaymentVouchers: (context) => const AdminPaymentVouchersScreen(),
+        AppRoutes.adminFeesStudentSearch: (context) => const AdminFeesStudentSearchScreen(),
+        AppRoutes.adminFeesStudentDetails: (context) => const AdminFeesStudentDetailsScreen(),
+        AppRoutes.adminFeesClassSummary: (context) => const AdminFeesClassSummaryScreen(),
         AppRoutes.adminTimetable: (context) => const AdminTimetableScreen(),
         AppRoutes.adminEmployees: (context) => const AdminEmployeeListScreen(),
         AppRoutes.adminEmployeesHub: (context) => const AdminEmployeesHubScreen(),

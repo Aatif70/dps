@@ -689,7 +689,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         title: 'Attendance',
         subtitle: 'Track student and employee attendance',
         icon: Icons.document_scanner_rounded,
-        color: const Color(0xFFE17055),
+        color: const Color(0xFF6C5CE7),
         route: AppRoutes.adminAttendanceHub,
       ),
 
@@ -705,7 +705,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         title: 'Fees',
         subtitle: 'Handle fee collection and payments',
         icon: Icons.account_balance_wallet_rounded,
-        color: const Color(0xFF6C5CE7),
+        color: const Color(0xFFE17055),
         route: AppRoutes.adminFeesHub,
       ),
 

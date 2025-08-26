@@ -33,6 +33,9 @@ class AppRoutes {
   static const String adminFeesReceipts = '/admin/fees/receipts';
   static const String adminConcessionReceipts = '/admin/fees/concession-receipts';
   static const String adminPaymentVouchers = '/admin/fees/payment-vouchers';
+  static const String adminFeesStudentSearch = '/admin/fees/search-student';
+  static const String adminFeesStudentDetails = '/admin/fees/student-details';
+  static const String adminFeesClassSummary = '/admin/fees/class-summary';
   static const String adminStudentDetails = '/admin/students/details';
   static const String adminStudentCaste = '/admin/students/caste';
   static const String adminStudentIncome = '/admin/students/income';
