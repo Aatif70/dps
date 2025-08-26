@@ -19,11 +19,33 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
   final _outCtrl = TextEditingController();
   bool _isPresent = true;
   AttendanceEmployee? _selected;
+  TimeOfDay? _inTime;
+  TimeOfDay? _outTime;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  TimeOfDay? _parseTimeString(String? timeString) {
+    if (timeString == null || timeString.isEmpty) return null;
+    try {
+      final parts = timeString.split(':');
+      if (parts.length == 2) {
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        return TimeOfDay(hour: hour, minute: minute);
+      }
+    } catch (e) {
+      // Return null if parsing fails
+    }
+    return null;
+  }
+
+  String _formatTimeOfDay(TimeOfDay? time) {
+    if (time == null) return '';
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   Future<void> _load() async {
@@ -57,6 +79,11 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
     _inCtrl.text = emp.inTime ?? '';
     _outCtrl.text = emp.outTime ?? '';
     _isPresent = emp.isPresent;
+    
+    // Parse time strings to TimeOfDay objects
+    _inTime = _parseTimeString(emp.inTime);
+    _outTime = _parseTimeString(emp.outTime);
+    
     setState(() {});
     showModalBottomSheet(
       context: context,
@@ -68,18 +95,20 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
           child: _EditSheet(
             name: emp.employeeName,
             date: date,
-            inCtrl: _inCtrl,
-            outCtrl: _outCtrl,
+            inTime: _inTime,
+            outTime: _outTime,
             isPresent: _isPresent,
             onPresentChanged: (v) => setState(() => _isPresent = v),
+            onInTimeChanged: (time) => setState(() => _inTime = time),
+            onOutTimeChanged: (time) => setState(() => _outTime = time),
             onSave: () async {
               final ok = await AdminEmployeeAttendanceService.updateAttendance(
                 attId: emp.attId,
                 empId: emp.empId ?? 0,
                 attDate: date,
                 isPresent: _isPresent,
-                inTime: _inCtrl.text.trim(),
-                outTime: _outCtrl.text.trim(),
+                inTime: _formatTimeOfDay(_inTime),
+                outTime: _formatTimeOfDay(_outTime),
               );
               if (!mounted) return;
               Navigator.pop(context);
@@ -175,19 +204,23 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
 class _EditSheet extends StatelessWidget {
   final String name;
   final DateTime date;
-  final TextEditingController inCtrl;
-  final TextEditingController outCtrl;
+  final TimeOfDay? inTime;
+  final TimeOfDay? outTime;
   final bool isPresent;
   final ValueChanged<bool> onPresentChanged;
+  final ValueChanged<TimeOfDay?> onInTimeChanged;
+  final ValueChanged<TimeOfDay?> onOutTimeChanged;
   final VoidCallback onSave;
 
   const _EditSheet({
     required this.name,
     required this.date,
-    required this.inCtrl,
-    required this.outCtrl,
+    required this.inTime,
+    required this.outTime,
     required this.isPresent,
     required this.onPresentChanged,
+    required this.onInTimeChanged,
+    required this.onOutTimeChanged,
     required this.onSave,
   });
 
@@ -213,9 +246,75 @@ class _EditSheet extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Row(children: [
-            Expanded(child: TextField(controller: inCtrl, decoration: const InputDecoration(labelText: 'In Time', hintText: 'HH:MM'))),
+            Expanded(
+              child: InkWell(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: inTime ?? TimeOfDay.now(),
+                  );
+                  if (time != null) {
+                    onInTimeChanged(time);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.access_time, color: Color(0xFF6C5CE7)),
+                      const SizedBox(width: 8),
+                      Text(
+                        inTime != null 
+                          ? '${inTime!.hour.toString().padLeft(2, '0')}:${inTime!.minute.toString().padLeft(2, '0')}'
+                          : 'Select In Time',
+                        style: TextStyle(
+                          color: inTime != null ? Colors.black : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(width: 12),
-            Expanded(child: TextField(controller: outCtrl, decoration: const InputDecoration(labelText: 'Out Time', hintText: 'HH:MM'))),
+            Expanded(
+              child: InkWell(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: outTime ?? TimeOfDay.now(),
+                  );
+                  if (time != null) {
+                    onOutTimeChanged(time);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.access_time, color: Color(0xFF6C5CE7)),
+                      const SizedBox(width: 8),
+                      Text(
+                        outTime != null 
+                          ? '${outTime!.hour.toString().padLeft(2, '0')}:${outTime!.minute.toString().padLeft(2, '0')}'
+                          : 'Select Out Time',
+                        style: TextStyle(
+                          color: outTime != null ? Colors.black : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ]),
           const SizedBox(height: 16),
           SizedBox(

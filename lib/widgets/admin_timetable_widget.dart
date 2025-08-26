@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:dps/services/admin_timetable_service.dart';
 
 class AdminTimetableWidget extends StatefulWidget {
@@ -12,12 +13,9 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
   List _teacherTimetables = [];
   bool _isLoading = true;
   TeacherTimetableData? _selectedTeacher;
-  String _selectedDay = 'Monday';
-  DateTime _baseDate = DateTime.now();
-
-  final List<String> _weekDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-  ];
+  DateTime _selectedDate = DateTime.now();
+  DateTime _focusedDate = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.month;
 
   @override
   void initState() {
@@ -33,6 +31,10 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
       final timetables = await AdminTimetableService.getTeacherTimetables();
       setState(() {
         _teacherTimetables = timetables;
+        // Automatically select the first teacher if available
+        if (timetables.isNotEmpty) {
+          _selectedTeacher = timetables.first;
+        }
         _isLoading = false;
       });
     } catch (e) {
@@ -42,9 +44,47 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     }
   }
 
-  int _getDateForDay(String day) {
-    int dayIndex = _weekDays.indexOf(day);
-    return _baseDate.day + dayIndex;
+  String _getDayName(DateTime date) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days[date.weekday - 1];
+  }
+
+  List<DateTime> _getEventDays() {
+    if (_selectedTeacher == null) return [];
+    final teacher = _selectedTeacher!;
+    final eventDays = <DateTime>[];
+    
+    // Get the current week's dates
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    
+    for (int i = 0; i < 7; i++) {
+      final date = startOfWeek.add(Duration(days: i));
+      final dayName = _getDayName(date);
+      final hasClasses = teacher.timetables.any((entry) => entry.weekDay == dayName);
+      if (hasClasses) {
+        eventDays.add(date);
+      }
+    }
+    
+    return eventDays;
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1];
+  }
+
+  List<TimetableEntry> _getClassesForDay(DateTime date) {
+    if (_selectedTeacher == null) return [];
+    final dayName = _getDayName(date);
+    return _selectedTeacher!.timetables
+        .where((entry) => entry.weekDay == dayName)
+        .toList()
+      ..sort((a, b) => a.fromTime.compareTo(b.fromTime));
   }
 
   @override
@@ -66,8 +106,69 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         children: [
           // Header with back button and Add Task button
           _buildHeader(),
-          // Day selector
-          _buildDaySelector(),
+          // Calendar
+          _buildCalendar(),
+          // Selected date info
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6366F1).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.calendar_today,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getDayName(_selectedDate),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${_selectedDate.day} ${_getMonthName(_selectedDate.month)} ${_selectedDate.year}',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                      ),
+                      if (_selectedTeacher != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_getClassesForDay(_selectedDate).length} classes scheduled',
+                          style: const TextStyle(
+                            color: Color(0xFF6366F1),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Teacher info
           if (_selectedTeacher != null)
             Container(
@@ -183,6 +284,8 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                   onChanged: (TeacherTimetableData? value) {
                     setState(() {
                       _selectedTeacher = value;
+                      // Refresh calendar to show new teacher's schedule
+                      _focusedDate = _focusedDate;
                     });
                   },
                 ),
@@ -193,64 +296,128 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     );
   }
 
-  Widget _buildDaySelector() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: _weekDays.map((day) {
-          final isSelected = day == _selectedDay;
-          final dayDate = _getDateForDay(day);
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedDay = day;
-              });
-            },
-            child: Column(
-              children: [
-                Text(
-                  day.substring(0, 3),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isSelected ? Colors.black87 : Colors.black54,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
+  Widget _buildCalendar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white38),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TableCalendar(
+        firstDay: DateTime.utc(2020, 1, 1),
+        lastDay: DateTime.utc(2030, 12, 31),
+        focusedDay: _focusedDate,
+        calendarFormat: _calendarFormat,
+        availableGestures: AvailableGestures.horizontalSwipe,
+        availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+        rowHeight: 45,
+        selectedDayPredicate: (day) => isSameDay(_selectedDate, day),
+        onDaySelected: (selectedDay, focusedDay) {
+          setState(() {
+            _selectedDate = selectedDay;
+            _focusedDate = focusedDay;
+          });
+        },
+        onFormatChanged: (format) {
+          setState(() {
+            _calendarFormat = format;
+          });
+        },
+        onPageChanged: (focusedDay) {
+          setState(() {
+            _focusedDate = focusedDay;
+          });
+        },
+        eventLoader: (day) {
+          final dayName = _getDayName(day);
+          if (_selectedTeacher != null) {
+            final hasClasses = _selectedTeacher!.timetables.any((entry) => entry.weekDay == dayName);
+            if (hasClasses) {
+              print('Calendar: Found classes for $dayName (${day.day}/${day.month})');
+            }
+            return hasClasses ? [day] : [];
+          }
+          return [];
+        },
+        calendarStyle: const CalendarStyle(
+          outsideDaysVisible: false,
+          weekendTextStyle: TextStyle(color: Color(0xFF718096)),
+          selectedDecoration: BoxDecoration(
+            color: Color(0xFF6366F1),
+            shape: BoxShape.circle,
+          ),
+          todayDecoration: BoxDecoration(
+            color: Color(0xFF58CC02),
+            shape: BoxShape.circle,
+          ),
+          defaultDecoration: BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          markerDecoration: BoxDecoration(
+            color: Color(0xFF6366F1),
+            shape: BoxShape.circle,
+          ),
+          cellMargin: EdgeInsets.all(2),
+        ),
+        headerStyle: const HeaderStyle(
+          formatButtonVisible: false,
+          titleCentered: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
+          ),
+          leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFF6366F1)),
+          rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFF6366F1)),
+        ),
+        calendarBuilders: CalendarBuilders(
+          markerBuilder: (context, day, events) {
+            if (events.isNotEmpty) {
+              return Positioned(
+                bottom: 2,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF6366F1),
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Text(
-                      '$dayDate',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : Colors.black87,
-                      ),
-                    ),
+                ),
+              );
+            }
+            return null;
+          },
+          defaultBuilder: (context, day, focusedDay) {
+            final dayName = _getDayName(day);
+            final hasClasses = _selectedTeacher != null && 
+                _selectedTeacher!.timetables.any((entry) => entry.weekDay == dayName);
+            
+            return Container(
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: hasClasses ? const Color(0xFF6366F1).withOpacity(0.1) : Colors.transparent,
+              ),
+              child: Center(
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle(
+                    color: hasClasses ? const Color(0xFF6366F1) : null,
+                    fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
-                const SizedBox(height: 4),
-                if (isSelected)
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF6366F1),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }).toList(),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -288,21 +455,12 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
   }
 
   Widget _buildTimelineView() {
-    if (_selectedTeacher == null && _teacherTimetables.isNotEmpty) {
-      setState(() {
-        _selectedTeacher = _teacherTimetables.first;
-      });
-    }
-
     if (_selectedTeacher == null) {
       return _buildEmptyState();
     }
 
     final teacher = _selectedTeacher!;
-    final dayTimetables = teacher.timetables
-        .where((entry) => entry.weekDay == _selectedDay)
-        .toList()
-      ..sort((a, b) => a.fromTime.compareTo(b.fromTime));
+    final dayTimetables = _getClassesForDay(_selectedDate);
 
     if (dayTimetables.isEmpty) {
       return _buildEmptyState();
