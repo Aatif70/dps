@@ -90,108 +90,37 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Header with back button and Add Task button
-          _buildHeader(),
-          // Calendar
-          _buildCalendar(),
-          // Selected date info
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6366F1).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.calendar_today,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getDayName(_selectedDate),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color(0xFF2D3748),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_selectedDate.day} ${_getMonthName(_selectedDate.month)} ${_selectedDate.year}',
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 12,
-                        ),
-                      ),
-                      if (_selectedTeacher != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          '${_getClassesForDay(_selectedDate).length} classes scheduled',
-                          style: const TextStyle(
-                            color: Color(0xFF6366F1),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Teacher info
-          if (_selectedTeacher != null)
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header with back button and Add Task button
+            _buildHeader(),
+            // Calendar
+            _buildCalendar(),
+            // Selected date info
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: const Color(0xFF6366F1).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFF6366F1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      Icons.person,
-                      color: Color(0xFF6366F1),
-                      size: 20,
+                      Icons.calendar_today,
+                      color: Colors.white,
+                      size: 16,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -200,40 +129,101 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _selectedTeacher!.teacherName,
+                          _getDayName(_selectedDate),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: Color(0xFF1E293B),
+                            color: Color(0xFF2D3748),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
-                          '${_selectedTeacher!.timetables.length} classes scheduled',
+                          '${_selectedDate.day} ${_getMonthName(_selectedDate.month)} ${_selectedDate.year}',
                           style: const TextStyle(
                             color: Color(0xFF64748B),
                             fontSize: 12,
                           ),
                         ),
+                        if (_selectedTeacher != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '${_getClassesForDay(_selectedDate).length} classes scheduled',
+                            style: const TextStyle(
+                              color: Color(0xFF6366F1),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-          // Content
-          Expanded(
-            child: _isLoading
-                ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xFF6366F1)),
+            // Teacher info
+            if (_selectedTeacher != null)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Color(0xFF6366F1),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _selectedTeacher!.teacherName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${_selectedTeacher!.timetables.length} classes scheduled',
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )
+            // Content (no Expanded so the whole page can scroll)
+            _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Color(0xFF6366F1)),
+                    ),
+                  )
                 : _teacherTimetables.isEmpty
-                ? _buildEmptyState()
-                : _buildTimelineView(),
-          ),
-        ],
+                    ? _buildEmptyState()
+                    : _buildTimelineView(),
+          ],
+        ),
       ),
     );
   }
@@ -267,6 +257,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
                       'Select Teacher',
                       style: TextStyle(color: Colors.deepPurple, fontSize: 14),
                     ),
+                    isExpanded: true,
                     dropdownColor: Colors.grey.shade50,
                     // dropdownColor: const Color(0xFF6366F1),
 
@@ -491,6 +482,8 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: dayTimetables.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         final entry = dayTimetables[index];
         final isLast = index == dayTimetables.length - 1;
