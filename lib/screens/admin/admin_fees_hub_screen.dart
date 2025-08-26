@@ -11,72 +11,224 @@ class AdminFeesHubScreen extends StatelessWidget {
         title: 'Fees Receipts',
         subtitle: 'View latest student fees receipts',
         icon: Icons.receipt_long_rounded,
-        color: const Color(0xFF6C5CE7),
+        color: const Color(0xFFEF6C00), // deep orange
         route: AppRoutes.adminFeesReceipts,
       ),
       _FeesItem(
         title: 'Concession Receipts',
         subtitle: 'View latest concession receipts',
         icon: Icons.discount_rounded,
-        color: const Color(0xFFFD79A8),
+        color: const Color(0xFFD81B60), // pink
         route: AppRoutes.adminConcessionReceipts,
       ),
       _FeesItem(
         title: 'Payment Vouchers',
         subtitle: 'View latest outgoing payments',
         icon: Icons.payment_rounded,
-        color: const Color(0xFFE17055),
+        color: const Color(0xFFE65100), // orange
         route: AppRoutes.adminPaymentVouchers,
       ),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Fees')),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemBuilder: (context, index) {
-          final _FeesItem item = items[index];
-          return InkWell(
-            onTap: () => Navigator.pushNamed(context, item.route),
+      appBar: AppBar(
+        title: const Text(
+          'Fees',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
+      ),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFF8A65), // warm orange
+                        Color(0xFFFF6E6E), // warm coral
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF8A65).withOpacity(0.25),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.account_balance_wallet_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Fees Management',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Manage receipts, concessions and vouchers',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                _buildSectionTitle('Quick Actions', Icons.local_atm_rounded, const Color(0xFFEF6C00)),
+                const SizedBox(height: 16),
+                _buildItemsGrid(items),
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
-              ),
-              child: Row(
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItemsGrid(List<_FeesItem> items) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return GestureDetector(
+          onTap: () => Navigator.pushNamed(context, item.route),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: item.color.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: item.color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          item.color.withOpacity(0.12),
+                          item.color.withOpacity(0.06),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Icon(item.icon, color: item.color),
+                    child: Icon(item.icon, color: item.color, size: 28),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(height: 20),
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3748),
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item.title, style: const TextStyle(fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 4),
-                        Text(item.subtitle, style: const TextStyle(color: Color(0xFF64748B))),
-                      ],
+                    child: Text(
+                      item.subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
                 ],
               ),
             ),
-          );
-        },
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemCount: items.length,
-      ),
+          ),
+        );
+      },
     );
   }
 }
