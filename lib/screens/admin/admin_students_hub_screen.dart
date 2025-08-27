@@ -64,6 +64,14 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
         route: AppRoutes.adminRegisteredStudents,
       ),
 
+      _HubItem(
+        title: 'Admitted Students',
+        subtitle: 'View admitted students by class',
+        icon: Icons.verified_rounded,
+        color: const Color(0xFF16A34A),
+        route: AppRoutes.adminAdmittedStudents,
+      ),
+
 
     ];
 

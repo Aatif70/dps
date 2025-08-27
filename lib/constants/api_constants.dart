@@ -69,6 +69,11 @@ class ApiConstants {
 
   // ------------- ADMIN ADMISSIONS -------------
   static const String registeredStudents = '/api/Register/GetRegisteredStd';
+  static const String divisionsByClass = '/api/Students/DivByClass';
+  static const String classwiseSubjects = '/api/Register/GetclasswiseSubject';
+  static const String practicalBatchesByDivision = '/api/Register/GetPracticalBatchCP';
+  static const String createAdmission = '/api/Register/CreateAdmission';
+  static const String admittedStudentsByClass = '/api/Register/GetAdmittedStudent';
 
   // ------------- ADMIN CLASSES -------------
   static const String classMasters = '/api/User/ClassMasters';
