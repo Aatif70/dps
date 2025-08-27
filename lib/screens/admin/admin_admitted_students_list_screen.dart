@@ -183,28 +183,68 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
           ],
           border: Border.all(color: const Color(0xFFF1F5F9)),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4A90E2).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(s.name, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
+                    const SizedBox(height: 6),
+                    Wrap(spacing: 10, runSpacing: 6, children: [
+                      _chip('${s.className} • ${s.batch}')
+                    ]),
+                  ]),
+                ),
+                _statusPill(s.status),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(s.name, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
-                const SizedBox(height: 4),
-                Wrap(spacing: 10, runSpacing: 6, children: [
-                  _chip('${s.className} • ${s.batch}'),
-                  _chip('Roll ${s.rollNo}'),
-                  _chip('Year ${s.admissionYear}')
-                ]),
-              ]),
+            const SizedBox(height: 12),
+            Divider(height: 1, color: Colors.grey.shade200),
+            const SizedBox(height: 12),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 520;
+                final children = <Widget>[
+                  _kv('Admission ID', s.admissionId.toString()),
+                  _kv('Student ID', s.studentId.toString()),
+                  _kv('Class ID', s.classId.toString()),
+                  _kv('Roll No', s.rollNo.toString()),
+                  _kv('Admission Year', s.admissionYear.toString()),
+                  _kv('Admission Date', s.admissionDate != null ? _fmtDate(s.admissionDate!) : '-'),
+                  _kv('Active', s.isActive ? 'Yes' : 'No'),
+                  _kv('Current', s.isCurrent ? 'Yes' : 'No'),
+                ];
+                if (isWide) {
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 10,
+                    children: children
+                        .map((w) => SizedBox(width: (constraints.maxWidth - 16) / 2, child: w))
+                        .toList(),
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      for (final w in children) ...[
+                        w,
+                        if (w != children.last) const SizedBox(height: 8),
+                      ]
+                    ],
+                  );
+                }
+              },
             ),
           ],
         ),
@@ -230,6 +270,40 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
       child: Center(child: Text(t)),
     );
   }
+
+  Widget _kv(String k, String v) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 140,
+          child: Text(k, style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: Text(v, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E293B)))),
+      ],
+    );
+  }
+
+  Widget _statusPill(String status) {
+    final normalized = status.toUpperCase();
+    Color bg = const Color(0xFFF1F5F9);
+    Color fg = const Color(0xFF64748B);
+    if (normalized == 'APPEAR') {
+      bg = const Color(0xFFDCFCE7);
+      fg = const Color(0xFF166534);
+    } else if (normalized == 'LEFT' || normalized == 'INACTIVE') {
+      bg = const Color(0xFFFEE2E2);
+      fg = const Color(0xFF991B1B);
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(normalized, style: TextStyle(color: fg, fontWeight: FontWeight.w700)),
+    );
+  }
+
+  String _fmtDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year.toString()}';
 }
 
 
