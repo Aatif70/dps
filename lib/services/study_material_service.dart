@@ -131,10 +131,7 @@ class StudyMaterialService {
       case 'mov':
       case 'mkv':
         return 'video';
-      case 'mp3':
-      case 'wav':
-      case 'aac':
-        return 'audio';
+
       case 'jpg':
       case 'jpeg':
       case 'png':
@@ -343,9 +340,6 @@ class ApiStudyMaterialRecord {
       case 'avi':
       case 'mov':
         return MaterialType.video;
-      case 'mp3':
-      case 'wav':
-        return MaterialType.audio;
       default:
         return MaterialType.pdf;
     }
@@ -368,7 +362,7 @@ class ApiStudyMaterialRecord {
 }
 
 // Keep existing enums and classes for backward compatibility
-enum MaterialType { pdf, video, audio }
+enum MaterialType { pdf, video }
 enum DifficultyLevel { beginner, intermediate, advanced }
 
 class StudyMaterial {

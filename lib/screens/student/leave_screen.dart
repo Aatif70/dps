@@ -28,6 +28,12 @@ class _LeaveScreenState extends State<LeaveScreen>
   int _consecutiveApprovals = 5;
   int _totalLeaveDays = 15;
 
+  // Persist leave application form state
+  final TextEditingController _descriptionController = TextEditingController();
+  DateTime _fromDate = DateTime.now().add(const Duration(days: 1));
+  DateTime _toDate = DateTime.now().add(const Duration(days: 1));
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
@@ -115,6 +121,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     _tabController.dispose();
     _headerAnimationController.dispose();
     _streakAnimationController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -997,19 +1004,9 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Widget _buildLeaveApplicationForm(BuildContext context, ScrollController scrollController) {
-    final TextEditingController _descriptionController = TextEditingController();
-    DateTime _fromDate = DateTime.now().add(const Duration(days: 1));
-    DateTime _toDate = DateTime.now().add(const Duration(days: 1));
-    bool _isSubmitting = false;
-
     return StatefulBuilder(
       builder: (context, setModalState) {
-        return GestureDetector(
-          onTap: () {
-            // Dismiss keyboard when tapping anywhere on the screen
-            FocusScope.of(context).unfocus();
-          },
-          child: Container(
+                return Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -1017,51 +1014,72 @@ class _LeaveScreenState extends State<LeaveScreen>
             ),
             child: Column(
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 24),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
+                GestureDetector(
+                  onTap: () {
+                    // Dismiss keyboard when tapping on the header area
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.event_available_rounded,
-                      color: Color(0xFF8E44AD),
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Apply for Leave',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF2D3748),
+                GestureDetector(
+                  onTap: () {
+                    // Dismiss keyboard when tapping on the title area
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.event_available_rounded,
+                        color: Color(0xFF8E44AD),
+                        size: 24,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Text(
+                        'Apply for Leave',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF2D3748),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: SingleChildScrollView(
                     controller: scrollController,
+                    physics: const ClampingScrollPhysics(), // Better scroll physics
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                       // From Date
-                      const Text(
-                        'From Date',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2D3748),
+                      GestureDetector(
+                        onTap: () {
+                          // Dismiss keyboard when tapping on the label
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: const Text(
+                          'From Date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2D3748),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () async {
+                          // Dismiss keyboard before showing date picker
+                          FocusScope.of(context).unfocus();
                           final date = await showDatePicker(
                             context: context,
                             initialDate: _fromDate,
@@ -1099,17 +1117,25 @@ class _LeaveScreenState extends State<LeaveScreen>
                       const SizedBox(height: 20),
 
                       // To Date
-                      const Text(
-                        'To Date',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2D3748),
+                      GestureDetector(
+                        onTap: () {
+                          // Dismiss keyboard when tapping on the label
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: const Text(
+                          'To Date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2D3748),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () async {
+                          // Dismiss keyboard before showing date picker
+                          FocusScope.of(context).unfocus();
                           final date = await showDatePicker(
                             context: context,
                             initialDate: _toDate,
@@ -1144,18 +1170,29 @@ class _LeaveScreenState extends State<LeaveScreen>
                       const SizedBox(height: 20),
 
                       // Description
-                      const Text(
-                        'Description',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2D3748),
+                      GestureDetector(
+                        onTap: () {
+                          // Dismiss keyboard when tapping on the label
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: const Text(
+                          'Description',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2D3748),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _descriptionController,
                         maxLines: 4,
+                        textInputAction: TextInputAction.done, // Shows "Done" button on keyboard
+                        onSubmitted: (_) {
+                          // Dismiss keyboard when user taps "Done"
+                          FocusScope.of(context).unfocus();
+                        },
                         decoration: InputDecoration(
                           hintText: 'Enter reason for leave...',
                           border: OutlineInputBorder(
@@ -1165,15 +1202,37 @@ class _LeaveScreenState extends State<LeaveScreen>
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(color: Color(0xFF8E44AD)),
                           ),
+                          // Add suffix icon to dismiss keyboard
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.keyboard_hide),
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 32),
+
+                      // Add some empty space that can be tapped to dismiss keyboard
+                      GestureDetector(
+                        onTap: () {
+                          // Dismiss keyboard when tapping on empty space
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Container(
+                          height: 20,
+                          color: Colors.transparent,
+                        ),
+                      ),
 
                       // Submit Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : () async {
+                            // Dismiss keyboard before submitting
+                            FocusScope.of(context).unfocus();
+                            
                             if (_descriptionController.text.trim().isEmpty) {
                               CustomSnackbar.showError(
                                 context,
@@ -1239,12 +1298,11 @@ class _LeaveScreenState extends State<LeaveScreen>
                         ),
                       ),
                     ],
-                  ),
+                  ), // Close SingleChildScrollView
                 ),
               ),
             ],
           ),
-          )
         );
       },
     );

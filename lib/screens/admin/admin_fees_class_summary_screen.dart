@@ -87,10 +87,10 @@ class _AdminFeesClassSummaryScreenState extends State<AdminFeesClassSummaryScree
               ),
             ),
             const SizedBox(height: 16),
-
-            // Year filter (simple for now)
+            const SizedBox(height: 16),
             Row(
               children: [
+
                 Expanded(
                   child: TextField(
                     controller: TextEditingController(text: _academicYear),

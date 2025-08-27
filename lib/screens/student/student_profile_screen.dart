@@ -303,9 +303,11 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                     backgroundImage: _studentDetail?.photo.isNotEmpty == true
                         ? NetworkImage(_studentDetail!.photoUrl)
                         : null,
-                    onBackgroundImageError: (exception, stackTrace) {
-                      print('Image loading failed for student profile: ${_studentDetail?.photoUrl}');
-                    },
+                    onBackgroundImageError: _studentDetail?.photo.isNotEmpty == true
+                        ? (exception, stackTrace) {
+                            print('Image loading failed for student profile: ${_studentDetail?.photoUrl}');
+                          }
+                        : null,
                     child: _studentDetail?.photo.isEmpty == true
                         ? const Icon(
                       Icons.person_rounded,

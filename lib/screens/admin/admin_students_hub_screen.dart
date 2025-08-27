@@ -55,6 +55,16 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
         color: const Color(0xFFFF7043),
         route: AppRoutes.adminFeesStudentSearch,
       ),
+
+      _HubItem(
+        title: 'New Admission',
+        subtitle: 'Add a new student into the school',
+        icon: Icons.add_outlined,
+        color: const Color(0xFFE4004B),
+        route: AppRoutes.adminStudents,
+      ),
+
+
     ];
 
     return Scaffold(

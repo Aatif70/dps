@@ -242,8 +242,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(12),
@@ -252,7 +252,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
         controller: _tabController,
         indicator: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -261,14 +261,16 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
             ),
           ],
         ),
-        indicatorPadding: const EdgeInsets.symmetric(horizontal: -12, vertical: 0),
+        indicatorPadding: const EdgeInsets.symmetric(horizontal: -18, vertical: 12),
         dividerColor: Colors.transparent,
-        labelColor: const Color(0xFF4A90E2),
+        // labelColor: const Color(0xFF4A90E2),
+        labelColor: Colors.blue,
         unselectedLabelColor: const Color(0xFF64748B),
+
         labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         overlayColor: MaterialStatePropertyAll(Colors.transparent),
-        labelPadding: const EdgeInsets.symmetric(vertical: 8),
+        labelPadding: const EdgeInsets.symmetric(vertical: 5),
         tabs: const [
           Tab(text: 'Events'),
           Tab(text: 'Annual'),
@@ -351,8 +353,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                               : const Color(0xFF4A90E2);
                       return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 1),
-                        width: 6,
-                        height: 6,
+                        width: 12,
+                        height: 4,
                         decoration: BoxDecoration(
                           color: color,
                           shape: BoxShape.circle,

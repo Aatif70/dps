@@ -38,7 +38,6 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     'All',
     'PDF',
     'Video',
-    'Audio',
   ];
 
   int _studyStreak = 9;
@@ -790,9 +789,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       case study_service.MaterialType.video:
         icon = Icons.play_circle_fill_rounded;
         break;
-      case study_service.MaterialType.audio:
-        icon = Icons.headphones_rounded;
-        break;
+
       default:
         icon = Icons.insert_drive_file_rounded; // Default fallback
         break;
@@ -944,8 +941,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         return Icons.picture_as_pdf_rounded;
       case 'video':
         return Icons.play_circle_outline_rounded;
-      case 'audio':
-        return Icons.headphones_rounded;
+
       default:
         return Icons.filter_list_rounded;
     }

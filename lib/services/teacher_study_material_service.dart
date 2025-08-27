@@ -283,10 +283,6 @@ class StudyMaterial {
       case 'mov':
       case 'wmv':
         return StudyMaterialType.video;
-      case 'mp3':
-      case 'wav':
-      case 'aac':
-        return StudyMaterialType.audio;
       case 'ppt':
       case 'pptx':
         return StudyMaterialType.presentation;
@@ -345,4 +341,4 @@ class SubjectData {
   }
 }
 
-enum StudyMaterialType { pdf, video, audio, presentation, image, document, file }
+enum StudyMaterialType { pdf, video, presentation, image, document, file }

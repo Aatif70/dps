@@ -1313,8 +1313,6 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         return const Color(0xFFE74C3C);
       case StudyMaterialType.video:
         return const Color(0xFF4A90E2);
-      case StudyMaterialType.audio:
-        return const Color(0xFF58CC02);
       case StudyMaterialType.presentation:
         return const Color(0xFFFF9500);
       case StudyMaterialType.image:
@@ -1332,8 +1330,6 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         return Icons.picture_as_pdf;
       case StudyMaterialType.video:
         return Icons.videocam;
-      case StudyMaterialType.audio:
-        return Icons.audiotrack;
       case StudyMaterialType.presentation:
         return Icons.slideshow;
       case StudyMaterialType.image:
@@ -1664,8 +1660,6 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
         return const Color(0xFFE74C3C);
       case StudyMaterialType.video:
         return const Color(0xFF4A90E2);
-      case StudyMaterialType.audio:
-        return const Color(0xFF58CC02);
       case StudyMaterialType.presentation:
         return const Color(0xFFFF9500);
       case StudyMaterialType.image:
@@ -1683,8 +1677,6 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
         return Icons.picture_as_pdf;
       case StudyMaterialType.video:
         return Icons.videocam;
-      case StudyMaterialType.audio:
-        return Icons.audiotrack;
       case StudyMaterialType.presentation:
         return Icons.slideshow;
       case StudyMaterialType.image:
