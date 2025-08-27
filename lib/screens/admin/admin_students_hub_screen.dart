@@ -61,7 +61,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
         subtitle: 'Add a new student into the school',
         icon: Icons.add_outlined,
         color: const Color(0xFFE4004B),
-        route: AppRoutes.adminStudents,
+        route: AppRoutes.adminRegisteredStudents,
       ),
 
 

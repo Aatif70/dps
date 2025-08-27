@@ -66,4 +66,9 @@ class AppRoutes {
   static const String adminEmployeeAttendanceReport = '/admin/employees/attendance/report';
   static const String adminEmployeeDetails = '/admin/employees/details';
 
+  // Admissions
+  static const String adminRegisteredStudents = '/admin/admissions/registered';
+  static const String adminRegisteredStudentDetails = '/admin/admissions/registered/details';
+  static const String adminAdmissionAllotment = '/admin/admissions/allotment';
+
 } 

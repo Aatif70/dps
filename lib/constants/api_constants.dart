@@ -67,6 +67,9 @@ class ApiConstants {
   static const String studentCount = '/api/Students/StudentCount';
   static const String classWiseFeeSummary = '/api/Fees/classwisefeesummary';
 
+  // ------------- ADMIN ADMISSIONS -------------
+  static const String registeredStudents = '/api/Register/GetRegisteredStd';
+
   // ------------- ADMIN CLASSES -------------
   static const String classMasters = '/api/User/ClassMasters';
   static const String adminBatches = '/api/User/Batches';

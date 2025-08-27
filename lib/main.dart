@@ -33,6 +33,9 @@ import 'package:dps/screens/admin/admin_student_previous_school_screen.dart';
 import 'package:dps/screens/admin/admin_student_sms_details_screen.dart';
 import 'package:dps/screens/admin/admin_timetable_screen.dart';
 import 'package:dps/screens/admin/admin_students_hub_screen.dart';
+import 'package:dps/screens/admin/admin_registered_students_list_screen.dart';
+import 'package:dps/screens/admin/admin_registered_student_details_screen.dart';
+import 'package:dps/screens/admin/admin_admission_allotment_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_search_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_details_screen.dart';
 import 'package:dps/screens/admin/admin_fees_class_summary_screen.dart';
@@ -137,6 +140,11 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminAttendanceHub: (context) => const AdminAttendanceHubScreen(),
         AppRoutes.adminStudentAttendance: (context) => const AdminStudentAttendanceScreen(),
         AppRoutes.adminStudentAttendanceByDate: (context) => const AdminStudentAttendanceByDateScreen(),
+
+        // Admissions
+        AppRoutes.adminRegisteredStudents: (context) => const AdminRegisteredStudentsListScreen(),
+        AppRoutes.adminRegisteredStudentDetails: (context) => const AdminRegisteredStudentDetailsScreen(),
+        AppRoutes.adminAdmissionAllotment: (context) => const AdminAdmissionAllotmentScreen(),
 
       },
       onGenerateRoute: (settings) {
