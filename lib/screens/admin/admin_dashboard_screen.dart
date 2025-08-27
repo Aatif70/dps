@@ -709,6 +709,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         route: AppRoutes.adminFeesHub,
       ),
 
+      _AdminFeature(
+        title: 'Exams',
+        subtitle: 'Manage exam and results',
+        icon: Icons.task_alt_rounded,
+        color: Colors.pink,
+        route: AppRoutes.adminExams,
+      ),
+
+
     ];
 
     return Padding(

@@ -75,6 +75,10 @@ class ApiConstants {
   static const String createAdmission = '/api/Register/CreateAdmission';
   static const String admittedStudentsByClass = '/api/Register/GetAdmittedStudent';
 
+  // ------------- ADMIN INTERNAL EXAMS -------------
+  static const String internalExams = '/api/InternalExam/GetExams';
+  static const String internalExamMarks = '/api/InternalExam/ExamMarks';
+
   // ------------- ADMIN CLASSES -------------
   static const String classMasters = '/api/User/ClassMasters';
   static const String adminBatches = '/api/User/Batches';
