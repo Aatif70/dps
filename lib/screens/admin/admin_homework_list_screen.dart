@@ -3,6 +3,8 @@ import 'package:dps/services/admin_homework_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:http/http.dart' as http;
 
 class AdminHomeworkListScreen extends StatefulWidget {
   const AdminHomeworkListScreen({super.key});
@@ -112,7 +114,13 @@ class _AdminHomeworkListScreenState extends State<AdminHomeworkListScreen> {
           children: [
             const Icon(Icons.event_rounded, color: Color(0xFF64748B)),
             const SizedBox(width: 8),
-            Text('$label: ${_fmt(value)}', style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
+            Expanded(
+              child: Text(
+                '$label: ${_fmt(value)}',
+                style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),
@@ -176,71 +184,178 @@ class _AdminHomeworkListScreenState extends State<AdminHomeworkListScreen> {
   void _showDocViewer(String url, String subject) {
     final extension = url.toLowerCase().split('.').last;
     if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].contains(extension)) {
-      showDialog(
+      showModalBottomSheet(
         context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.all(10),
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return DraggableScrollableSheet(
+            initialChildSize: 0.9,
+            minChildSize: 0.4,
+            maxChildSize: 0.95,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 48,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2E8F0),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '$subject - Attachment',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new_rounded),
+                            onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        color: Colors.black,
+                        child: PhotoView(
+                          imageProvider: NetworkImage(url),
+                          backgroundDecoration: const BoxDecoration(color: Colors.black),
+                          minScale: PhotoViewComputedScale.contained,
+                          maxScale: PhotoViewComputedScale.covered * 2.5,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(Icons.broken_image, color: Colors.white, size: 48),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    } else if (extension == 'txt') {
+      _showTextAttachment(url, subject);
+    } else {
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _showTextAttachment(String url, String subject) async {
+    String content = '';
+    try {
+      final res = await http.get(Uri.parse(url));
+      if (res.statusCode == 200) {
+        content = res.body;
+      } else {
+        content = 'Failed to load file (HTTP ${res.statusCode}).';
+      }
+    } catch (e) {
+      content = 'Error loading file: $e';
+    }
+
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
               child: Column(
                 children: [
+                  const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                    width: 48,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE2E8F0),
+                      borderRadius: BorderRadius.circular(4),
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(
-                            '$subject - Attachment',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+                            '$subject - Attachment (txt)',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
                         ),
                       ],
                     ),
                   ),
                   Expanded(
-                    child: Container(
-                      color: Colors.black,
-                      child: Image.network(url, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image, color: Colors.white))),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12)),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                        },
-                        icon: const Icon(Icons.open_in_new_rounded),
-                        label: const Text('Open in Browser'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Scrollbar(
+                          controller: scrollController,
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            padding: const EdgeInsets.all(12),
+                            child: SelectableText(
+                              content,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 14,
+                                color: Color(0xFF1E293B),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      );
-    } else {
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    }
+            );
+          },
+        );
+      },
+    );
   }
 }
 
