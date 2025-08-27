@@ -138,8 +138,7 @@ class AdminAdmissionsService {
       'AdmissionDate': admissionDateIso,
       'PracticalId': practicalId,
       'StudSubjects': subjects.map((e) => e.toJson()).toList(),
-      // pass UId if backend expects auth via form fields elsewhere; including for parity
-      'UId': uid,
+      'UserId': uid,
     };
     print('[Service] POST CreateAdmission -> ${ApiConstants.baseUrl + ApiConstants.createAdmission}');
     print('[Service] CreateAdmission body=${json.encode(body)}');
