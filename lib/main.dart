@@ -39,6 +39,7 @@ import 'package:dps/screens/admin/admin_admission_allotment_screen.dart';
 import 'package:dps/screens/admin/admin_admitted_students_list_screen.dart';
 import 'package:dps/screens/admin/admin_exams_list_screen.dart';
 import 'package:dps/screens/admin/admin_exam_marks_screen.dart';
+import 'package:dps/screens/admin/admin_homework_list_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_search_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_details_screen.dart';
 import 'package:dps/screens/admin/admin_fees_class_summary_screen.dart';
@@ -105,7 +106,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.teacherAllocatedSubjects: (context) => const TeacherAllocatedSubjectsScreen(),
         AppRoutes.teacherprofile: (context) => const TeacherProfileScreen(),
 
-
         // Admin routes
         AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
         AppRoutes.adminStudents: (context) => const AdminStudentsScreen(),
@@ -151,6 +151,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminAdmittedStudents: (context) => const AdminAdmittedStudentsListScreen(),
         AppRoutes.adminExams: (context) => const AdminExamsListScreen(),
         AppRoutes.adminExamMarks: (context) => const AdminExamMarksScreen(),
+        AppRoutes.adminHomeworkList: (context) => const AdminHomeworkListScreen(),
 
       },
       onGenerateRoute: (settings) {

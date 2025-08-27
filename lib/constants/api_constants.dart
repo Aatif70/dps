@@ -84,5 +84,10 @@ class ApiConstants {
   static const String adminBatches = '/api/User/Batches';
   static const String adminDivisions = '/api/User/Divisions';
 
+  // ------------- ADMIN HOMEWORK -------------
+  static const String adminHomeworkList = '/api/HomeWork/HomeWorkList';
+  // Base to access homework files (resolved relative to baseUrl)
+  static const String homeworkFilesBase = baseUrl + '/StudyMaterial/HomeWork';
+
 
 }

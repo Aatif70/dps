@@ -73,5 +73,6 @@ class AppRoutes {
   static const String adminAdmittedStudents = '/admin/admissions/admitted';
   static const String adminExams = '/admin/exams';
   static const String adminExamMarks = '/admin/exams/marks';
+  static const String adminHomeworkList = '/admin/homework/list';
 
 } 

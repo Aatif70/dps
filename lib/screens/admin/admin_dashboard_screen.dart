@@ -718,6 +718,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       ),
 
 
+      _AdminFeature(
+        title: 'Homework',
+        subtitle: 'View homework across classes',
+        icon: Icons.assignment_turned_in_rounded,
+        color: const Color(0xFF4A90E2),
+        route: AppRoutes.adminHomeworkList,
+      ),
+
     ];
 
     return Padding(
