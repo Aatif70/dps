@@ -1,7 +1,7 @@
 class ApiConstants {
   // static const String baseUrl = 'https://as.mokshasolutions.com/';
   // static const String baseUrl = 'http://192.168.1.15:8025';
-  static const String baseUrl = 'http://192.168.1.14:8025';
+  static const String baseUrl = 'http://192.168.1.7:8025';
   static const String login = '/api/User/Login';
 
   // ------------- STUDENT -------------
@@ -83,6 +83,8 @@ class ApiConstants {
   static const String classMasters = '/api/User/ClassMasters';
   static const String adminBatches = '/api/User/Batches';
   static const String adminDivisions = '/api/User/Divisions';
+  static const String createClass = '/api/Master/CreateClass';
+  static const String updateClass = '/api/Master/UpdateClass';
 
   // ------------- ADMIN HOMEWORK -------------
   static const String adminHomeworkList = '/api/HomeWork/HomeWorkList';

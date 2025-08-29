@@ -43,6 +43,8 @@ import 'package:dps/screens/admin/admin_homework_list_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_search_screen.dart';
 import 'package:dps/screens/admin/admin_fees_student_details_screen.dart';
 import 'package:dps/screens/admin/admin_fees_class_summary_screen.dart';
+import 'package:dps/screens/admin/admin_class_create_screen.dart';
+import 'package:dps/screens/admin/admin_class_edit_screen.dart';
 import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
@@ -114,6 +116,16 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminStudentDetails: (context) => const AdminStudentDetailsScreen(),
         AppRoutes.adminClassesHub: (context) => const AdminClassesHubScreen(),
         AppRoutes.adminClassMasters: (context) => const AdminClassMastersScreen(),
+        AppRoutes.adminAddClass: (context) => const AdminClassCreateScreen(),
+        AppRoutes.adminEditClass: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return AdminClassEditScreen(
+            classMasterId: args['ClassMasterId'] as int,
+            className: args['ClassName'] as String,
+            rollNoPrefix: args['RollNoPreFix'] as String,
+            courseYear: args['CourseYear'] as int,
+          );
+        },
         AppRoutes.adminBatches: (context) => const AdminBatchesScreen(),
         AppRoutes.adminDivisions: (context) => const AdminDivisionsScreen(),
         AppRoutes.adminStudentCaste: (context) => const AdminStudentCasteScreen(),

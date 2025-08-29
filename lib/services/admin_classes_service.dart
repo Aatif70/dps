@@ -26,6 +26,60 @@ class AdminClassesService {
     }
   }
 
+  static Future<bool> createClass({
+    required String className,
+    required String rollNoPrefix,
+    required int courseYear,
+  }) async {
+    try {
+      final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.createClass}');
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'ClassName': className,
+          'RollNoPreFix': rollNoPrefix,
+          'CourseYear': courseYear,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        return (jsonData['success'] == true);
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> updateClass({
+    required int classMasterId,
+    required String className,
+    required String rollNoPrefix,
+    required int courseYear,
+  }) async {
+    try {
+      final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.updateClass}');
+      final response = await http.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'ClassMasterId': classMasterId,
+          'ClassName': className,
+          'RollNoPreFix': rollNoPrefix,
+          'CourseYear': courseYear,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        return (jsonData['success'] == true);
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<List<BatchItem>> fetchBatches() async {
     try {
       final prefs = await SharedPreferences.getInstance();

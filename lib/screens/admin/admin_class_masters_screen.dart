@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:dps/constants/app_routes.dart';
 import 'package:dps/services/admin_classes_service.dart';
 
 class AdminClassMastersScreen extends StatefulWidget {
@@ -87,6 +88,16 @@ class _AdminClassMastersScreenState extends State<AdminClassMastersScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF2D3748)),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, AppRoutes.adminAddClass);
+          if (result == true) {
+            _load();
+          }
+        },
+        backgroundColor: const Color(0xFF10B981),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -125,39 +136,56 @@ class _AdminClassMastersScreenState extends State<AdminClassMastersScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             itemBuilder: (context, index) {
                               final item = _filtered[index];
-                              return Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
-                                  ],
-                                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
+                              return InkWell(
+                                onTap: () async {
+                                  final result = await Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.adminEditClass,
+                                    arguments: {
+                                      'ClassMasterId': item.classMasterId,
+                                      'ClassName': item.className,
+                                      'RollNoPreFix': item.rollNoPrefix,
+                                      'CourseYear': item.courseYear,
+                                    },
+                                  );
+                                  if (result == true) {
+                                    _load();
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                                    ],
+                                    border: Border.all(color: const Color(0xFFF1F5F9)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(Icons.class_, color: Color(0xFF4A90E2)),
                                       ),
-                                      child: const Icon(Icons.class_, color: Color(0xFF4A90E2)),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(item.className, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B))),
-                                          const SizedBox(height: 6),
-                                          Text('Year: ${item.courseYear} • Prefix: ${item.rollNoPrefix}', style: const TextStyle(color: Color(0xFF64748B))),
-                                        ],
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.className, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B))),
+                                            const SizedBox(height: 6),
+                                            Text('Year: ${item.courseYear} • Prefix: ${item.rollNoPrefix}', style: const TextStyle(color: Color(0xFF64748B))),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             },
