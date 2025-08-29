@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:intl/intl.dart';
 import '../../services/teacher_leave_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class TeacherLeaveScreen extends StatefulWidget {
   const TeacherLeaveScreen({super.key});
@@ -807,29 +808,14 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
       Navigator.pop(context); // Close loading dialog
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Leave request approved successfully'),
-            backgroundColor: Color(0xFF8E44AD),
-          ),
-        );
+        CustomSnackbar.showSuccess(context, message: 'Leave request approved successfully');
         _loadLeaveData(); // Refresh data
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to approve leave request'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        CustomSnackbar.showError(context, message: 'Failed to approve leave request');
       }
     } catch (e) {
       Navigator.pop(context); // Close loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomSnackbar.showError(context, message: 'Error: $e');
     }
   }
 
@@ -852,29 +838,14 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
       Navigator.pop(context); // Close loading dialog
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Leave request rejected'),
-            backgroundColor: Color(0xFFE74C3C),
-          ),
-        );
+        CustomSnackbar.showSuccess(context, message: 'Leave request rejected');
         _loadLeaveData(); // Refresh data
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to reject leave request'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        CustomSnackbar.showError(context, message: 'Failed to reject leave request');
       }
     } catch (e) {
       Navigator.pop(context); // Close loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomSnackbar.showError(context, message: 'Error: $e');
     }
   }
 

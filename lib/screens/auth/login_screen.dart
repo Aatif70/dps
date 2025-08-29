@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen>
         }
       } else {
         print('Login failed, show error');
+        
         CustomSnackbar.showError(
           context,
           message: 'Login failed. Please check your credentials.',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dps/services/admin_employee_attendance_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class AdminUpdateEmployeeAttendanceScreen extends StatefulWidget {
   const AdminUpdateEmployeeAttendanceScreen({super.key});
@@ -112,8 +113,12 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
               );
               if (!mounted) return;
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? 'Attendance updated' : 'Update failed'), backgroundColor: ok ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C)));
-              if (ok) _load();
+              if (ok) {
+                CustomSnackbar.showSuccess(context, message: 'Attendance updated');
+                _load();
+              } else {
+                CustomSnackbar.showError(context, message: 'Update failed');
+              }
             },
           ),
         );

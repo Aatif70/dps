@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:dps/services/admin_timetable_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class AdminTimetableWidget extends StatefulWidget {
   const AdminTimetableWidget({super.key});
@@ -809,16 +810,12 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
         _selectedSubjectType == null ||
         _fromTime == null ||
         _toTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields.')),
-      );
+      CustomSnackbar.showWarning(context, message: 'Please fill all fields.');
       return;
     }
     // Ensure From < To
     if (_fromTime == _toTime || (_fromTime ?? '')!.compareTo(_toTime ?? '') >= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a valid time range.')),
-      );
+      CustomSnackbar.showError(context, message: 'Please select a valid time range.');
       return;
     }
     setState(() => _submitting = true);
@@ -835,14 +832,10 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
     );
     setState(() => _submitting = false);
     if (res['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Timetable added successfully.')),
-      );
+      CustomSnackbar.showSuccess(context, message: 'Timetable added successfully.');
       widget.onSubmitted(_AddTimetableResult(empId: _selectedEmployee!.empId));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res['message']?.toString() ?? 'Failed to add timetable.')),
-      );
+      CustomSnackbar.showError(context, message: res['message']?.toString() ?? 'Failed to add timetable.');
     }
   }
 

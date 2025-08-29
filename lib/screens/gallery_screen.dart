@@ -7,6 +7,7 @@ import 'package:video_player/video_player.dart';
 import '../services/gallery_service.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({Key? key}) : super(key: key);
@@ -606,12 +607,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unable to open YouTube video'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        CustomSnackbar.showError(context, message: 'Unable to open YouTube video');
       }
     }
   }
@@ -682,13 +678,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                     if (media.isYoutube) {
                       _launchYouTube(media.fullUrl);
                     } else {
-                      // For videos, you could implement video player here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Video playback not implemented yet'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
+                      CustomSnackbar.showInfo(context, message: 'Video playback not implemented yet');
                     }
                   },
                   child: Container(

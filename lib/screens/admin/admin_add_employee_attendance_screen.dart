@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dps/services/admin_employee_attendance_service.dart';
 import 'package:dps/services/admin_employee_list_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class AdminAddEmployeeAttendanceScreen extends StatefulWidget {
   const AdminAddEmployeeAttendanceScreen({super.key});
@@ -102,10 +103,14 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
     );
     if (!mounted) return;
     setState(() => _submitting = false);
-    final color = ok ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
     final msg = ok ? 'Attendance added' : 'Failed to add attendance';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: color));
-    if (ok) Navigator.pop(context);
+    final color = ok ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
+    if (ok) {
+      CustomSnackbar.showSuccess(context, message: msg);
+      Navigator.pop(context);
+    } else {
+      CustomSnackbar.showError(context, message: msg);
+    }
   }
 
   @override

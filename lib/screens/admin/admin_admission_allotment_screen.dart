@@ -1,6 +1,7 @@
 import 'package:dps/services/admin_admissions_service.dart';
 import 'package:dps/services/admin_classes_service.dart';
 import 'package:flutter/material.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class AdminAdmissionAllotmentScreen extends StatefulWidget {
   const AdminAdmissionAllotmentScreen({super.key});
@@ -262,16 +263,16 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
                   ? null
                   : () async {
                       if (_selectedBatch == null || _selectedDivision == null || _selectedSubjectIds.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select class, division and at least one subject')));
+                        CustomSnackbar.showError(context, message: 'Please select class, division and at least one subject');
                         return;
                       }
                       if (_selectedPractical == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a practical batch')));
+                        CustomSnackbar.showWarning(context, message: 'Please select a practical batch');
                         return;
                       }
                       final int? year = int.tryParse(_yearCtl.text.trim());
                       if (year == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid admission year')));
+                        CustomSnackbar.showError(context, message: 'Please enter a valid admission year');
                         return;
                       }
                       setState(() => _submitting = true);
@@ -291,9 +292,9 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
                       setState(() => _submitting = false);
                       if (success) {
                         Navigator.of(context).popUntil((route) => route.isFirst);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Admission approved successfully')));
+                        CustomSnackbar.showSuccess(context, message: 'Admission approved successfully');
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to approve admission')));
+                        CustomSnackbar.showError(context, message: 'Failed to approve admission');
                       }
                     },
               icon: const Icon(Icons.check_circle_rounded),

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../services/teacher_study_material_service.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class TeacherStudyMaterialScreen extends StatefulWidget {
   const TeacherStudyMaterialScreen({super.key});
@@ -1276,12 +1277,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       if (success) {
         print('=== UPLOAD SUCCESSFUL ===');
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Study material uploaded successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        CustomSnackbar.showSuccess(context, message: 'Study material uploaded successfully!');
         // Reload the materials list
         _loadStudyMaterials();
       } else {
@@ -1299,12 +1295,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   }
 
   void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    CustomSnackbar.showError(context, message: message);
   }
 
   Color _getTypeColor(StudyMaterialType type) {

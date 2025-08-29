@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dps/constants/app_strings.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 import '../../services/allocated_subjects_service.dart';
 
 
@@ -69,12 +70,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
       print('Error loading allocated subjects: $e');
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to load allocated subjects'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomSnackbar.showError(context, message: 'Failed to load allocated subjects');
     }
   }
 

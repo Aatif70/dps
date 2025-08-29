@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../../services/teacher_homework_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({super.key});
@@ -37,9 +39,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   void _showHomeworkPreview(TeacherHomework homework) {
     final String url = homework.docUrl;
     if (url.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No attachment available')),
-      );
+      CustomSnackbar.showWarning(context, message: 'No attachment available');
       return;
     }
 
@@ -872,9 +872,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking file: $e')),
-      );
+      CustomSnackbar.showError(context, message: 'Error picking file: $e');
     }
   }
 
@@ -895,9 +893,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   Future<void> _submitHomework() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedSubject == null || _selectedBatch == null || _selectedDivision == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
-      );
+      CustomSnackbar.showError(context, message: 'Please fill all required fields');
       return;
     }
 
@@ -914,24 +910,12 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       );
       if (success) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Homework created successfully!'),
-            backgroundColor: Color(0xFF58CC02),
-          ),
-        );
+        CustomSnackbar.showSuccess(context, message: 'Homework created successfully!');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to create homework'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        CustomSnackbar.showError(context, message: 'Failed to create homework');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      CustomSnackbar.showError(context, message: 'Error: $e');
     }
     setState(() => _isSubmitting = false);
   }

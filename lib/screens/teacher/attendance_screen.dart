@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dps/constants/app_strings.dart';
 import 'package:dps/services/teacher_attendance_service.dart';
 import 'package:intl/intl.dart';
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class TeacherAttendanceScreen extends StatefulWidget {
   const TeacherAttendanceScreen({super.key});
@@ -111,7 +112,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       print('Loaded ${_students.length} students successfully');
     } catch (e) {
       print('Error loading students: $e');
-      _showErrorSnackBar('Failed to load students');
+      CustomSnackbar.showError(context, message: 'Failed to load students');
     } finally {
       setState(() => _isLoadingStudents = false);
     }
@@ -138,7 +139,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       print('Loaded ${_attendanceRecords.length} attendance records successfully');
     } catch (e) {
       print('Error loading attendance records: $e');
-      _showErrorSnackBar('Failed to load attendance records');
+      CustomSnackbar.showError(context, message: 'Failed to load attendance records');
     } finally {
       setState(() => _isLoadingRecords = false);
     }
@@ -438,25 +439,11 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red.shade600,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+    CustomSnackbar.showError(context, message: message);
   }
 
   void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+    CustomSnackbar.showSuccess(context, message: message);
   }
 
   bool _canShowStudentList() {
@@ -1777,21 +1764,14 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
       print('Loaded ${_studentDetails.length} student details successfully');
     } catch (e) {
       print('Error loading student details: $e');
-      _showErrorSnackBar('Failed to load student details');
+      CustomSnackbar.showError(context, message: 'Failed to load student details');
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red.shade600,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+    CustomSnackbar.showError(context, message: message);
   }
 
   @override

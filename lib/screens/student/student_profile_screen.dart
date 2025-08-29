@@ -5,6 +5,7 @@ import 'package:dps/constants/app_routes.dart';
 import 'package:dps/services/student_profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:dps/widgets/custom_snackbar.dart';
 
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({Key? key}) : super(key: key);
@@ -1313,20 +1314,10 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not open document in browser'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          CustomSnackbar.showError(context, message: 'Could not open document in browser');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error opening document: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        CustomSnackbar.showError(context, message: 'Error opening document: $e');
       }
     }
   }
