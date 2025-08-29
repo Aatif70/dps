@@ -108,7 +108,7 @@ class _AdminClassCreateScreenState extends State<AdminClassCreateScreen> {
                   child: ElevatedButton(
                     onPressed: _submitting ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

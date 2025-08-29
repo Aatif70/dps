@@ -95,7 +95,7 @@ class _AdminClassMastersScreenState extends State<AdminClassMastersScreen> {
             _load();
           }
         },
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: _loading
