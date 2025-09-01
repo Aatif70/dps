@@ -683,8 +683,8 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                   icon: const Icon(Icons.visibility),
                   label: const Text('Preview Attachment'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade50,
-                    foregroundColor: Colors.black87,
+                    backgroundColor: const Color(0xFF58CC02),
+                    foregroundColor: Colors.white
                   ),
                 ),
               ),

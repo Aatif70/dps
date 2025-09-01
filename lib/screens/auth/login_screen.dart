@@ -64,9 +64,9 @@ class _LoginScreenState extends State<LoginScreen>
       });
 
       HapticFeedback.lightImpact();
-      print('Login button pressed');
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
+      debugPrint('Login button pressed');
+      debugPrint('Email: ${_emailController.text}');
+      debugPrint('Password: ${_passwordController.text}');
 
       // Call API
       bool success = await ApiService.login(
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen>
       });
 
       if (success) {
-        print('Login successful, checking role for navigation');
+        debugPrint('Login successful, checking role for navigation');
 
         // Get role from SharedPreferences
         final prefs = await SharedPreferences.getInstance();
@@ -88,35 +88,35 @@ class _LoginScreenState extends State<LoginScreen>
         if (!_rememberMe) {
           // Mark this session as temporary (will be cleared on next app start)
           await prefs.setBool('SessionTemporary', true);
-          print('Remember Me: OFF (temporary session)');
+          debugPrint('Remember Me: OFF (temporary session)');
         } else {
           await prefs.remove('SessionTemporary');
-          print('Remember Me: ON (persistent session)');
+          debugPrint('Remember Me: ON (persistent session)');
         }
         final role = prefs.getString('Role') ?? '';
-        print('Full Name: ${prefs.getString('FullName')}');
+        debugPrint('Full Name: ${prefs.getString('FullName')}');
 
-        print('User role: $role');
+        debugPrint('User role: $role');
 
         // Navigate based on role
         if (role.toLowerCase() == 'admin') {
-          print('Navigating to admin dashboard');
+          debugPrint('Navigating to admin dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
 
         } else if (role.toLowerCase() == 'teacher') {
-          print('Navigating to teacher dashboard');
+          debugPrint('Navigating to teacher dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
         }
           else if (role.toLowerCase() == 'student') {
-          print('Navigating to student dashboard');
+          debugPrint('Navigating to student dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
         }
           else {
-          print('Unknown role, defaulting to student dashboard');
+          debugPrint('Unknown role, defaulting to student dashboard');
           Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
         }
       } else {
-        print('Login failed, show error');
+        debugPrint('Login failed, show error');
         
         CustomSnackbar.showError(
           context,

@@ -26,7 +26,7 @@ class _FeesScreenState extends State<FeesScreen> {
   }
 
   Future<void> _loadPaidFees() async {
-    print('=== FEES SCREEN DEBUG START ===');
+    debugPrint('=== FEES SCREEN DEBUG START ===');
     setState(() {
       isLoading = true;
     });
@@ -41,25 +41,25 @@ class _FeesScreenState extends State<FeesScreen> {
       final fees = results[0] as List<PaidFeeRecord>;
       final remaining = results[1] as List<RemainingFeeRecord>;
 
-      print('Fees Screen - Received ${fees.length} paid fee records');
-      print('Fees Screen - Received ${remaining.length} remaining fee records');
+      debugPrint('Fees Screen - Received ${fees.length} paid fee records');
+      debugPrint('Fees Screen - Received ${remaining.length} remaining fee records');
 
       // Calculate category totals
       final totals = <String, double>{};
       final counts = <String, int>{};
 
-      print('Fees Screen - Processing categories:');
+      debugPrint('Fees Screen - Processing categories:');
       for (int i = 0; i < fees.length; i++) {
         final fee = fees[i];
-        print('Processing fee $i: ${fee.toString()}');
+        debugPrint('Processing fee $i: ${fee.toString()}');
 
         final category = FeeCategory.getCategoryFromParticular(fee.particular);
         totals[category] = (totals[category] ?? 0) + fee.amount;
         counts[category] = (counts[category] ?? 0) + 1;
       }
 
-      print('Final category totals: $totals');
-      print('Final category counts: $counts');
+      debugPrint('Final category totals: $totals');
+      debugPrint('Final category counts: $counts');
 
       setState(() {
         paidFees = fees;
@@ -69,11 +69,11 @@ class _FeesScreenState extends State<FeesScreen> {
         isLoading = false;
       });
 
-      print('Fees Screen - State updated successfully');
-      print('=== FEES SCREEN DEBUG END ===');
+      debugPrint('Fees Screen - State updated successfully');
+      debugPrint('=== FEES SCREEN DEBUG END ===');
     } catch (e, stackTrace) {
-      print('Fees Screen - Error occurred: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Fees Screen - Error occurred: $e');
+      debugPrint('Stack trace: $stackTrace');
 
       setState(() {
         isLoading = false;

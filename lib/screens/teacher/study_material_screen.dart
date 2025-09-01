@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -17,7 +16,7 @@ class TeacherStudyMaterialScreen extends StatefulWidget {
 
 class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen> {
   String _selectedSubject = 'All';
-  String _selectedClass = 'All';
+  String _selectedClassFilter = 'All';
 
   List<StudyMaterial> _allStudyMaterials = [];
   List<StudyMaterial> _filteredStudyMaterials = [];
@@ -28,11 +27,11 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   List<String> _classes = ['All'];
 
   // Upload form variables
-  List<BatchData> _batches = [];
+  List<ClassData> _uploadClasses = [];
   List<SubjectData> _subjectsForUpload = [];
-  BatchData? _selectedBatch;
+  ClassData? _selectedUploadClass;
   SubjectData? _selectedUploadSubject;
-  bool _isLoadingBatches = false;
+  bool _isLoadingUploadClasses = false;
   bool _isLoadingSubjects = false;
   bool _isUploading = false;
 
@@ -88,7 +87,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
     setState(() {
       _filteredStudyMaterials = _allStudyMaterials.where((material) {
         final subjectMatch = _selectedSubject == 'All' || material.subject == _selectedSubject;
-        final classMatch = _selectedClass == 'All' || material.className == _selectedClass;
+        final classMatch = _selectedClassFilter == 'All' || material.className == _selectedClassFilter;
         return subjectMatch && classMatch;
       }).toList();
     });
@@ -335,11 +334,11 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
               Expanded(
                 child: _buildFilterDropdown(
                   'Class',
-                  _selectedClass,
+                  _selectedClassFilter,
                   _classes,
                       (value) {
                     setState(() {
-                      _selectedClass = value!;
+                      _selectedClassFilter = value!;
                     });
                     _applyFilters();
                   },
@@ -686,8 +685,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                       icon: Icon(material.uploadType == 'YTLink' ? Icons.play_arrow : Icons.visibility),
                       label: Text(material.uploadType == 'YTLink' ? 'Open' : 'Preview'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade50,
-                        foregroundColor: Colors.black87,
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ),
@@ -730,9 +729,9 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   void _showUploadDialog(BuildContext context) {
     print('=== SHOWING UPLOAD DIALOG ===');
     // Reset form data
-    _selectedBatch = null;
+    _selectedUploadClass = null;
     _selectedUploadSubject = null;
-    _batches.clear();
+    _uploadClasses.clear();
     _subjectsForUpload.clear();
     _chapterController.clear();
     _descriptionController.clear();
@@ -790,7 +789,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                 TextFormField(
                   controller: _chapterController,
                   decoration: const InputDecoration(
-                    labelText: 'Chapter *',
+                    labelText: 'Chapter',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.book),
                   ),
@@ -801,7 +800,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                 TextFormField(
                   controller: _descriptionController,
                   decoration: const InputDecoration(
-                    labelText: 'Description *',
+                    labelText: 'Description',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.description),
                   ),
@@ -825,14 +824,14 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                             const Icon(Icons.class_, color: Colors.grey),
                             const SizedBox(width: 8),
                             Text(
-                              'Class *',
+                              'Class',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade700,
                               ),
                             ),
                             const Spacer(),
-                            if (_isLoadingBatches)
+                            if (_isLoadingUploadClasses)
                               const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -841,11 +840,11 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                           ],
                         ),
                       ),
-                      if (_batches.isEmpty && !_isLoadingBatches)
+                      if (_uploadClasses.isEmpty && !_isLoadingUploadClasses)
                         Padding(
                           padding: const EdgeInsets.all(12),
                           child: ElevatedButton.icon(
-                            onPressed: () => _loadBatches(setModalState),
+                            onPressed: () => _loadUploadClasses(setModalState),
                             icon: const Icon(Icons.refresh),
                             label: const Text('Load Classes'),
                             style: ElevatedButton.styleFrom(
@@ -854,28 +853,28 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                             ),
                           ),
                         )
-                      else if (_batches.isNotEmpty)
+                      else if (_classes.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.all(12),
-                          child: DropdownButtonFormField<BatchData>(
-                            value: _selectedBatch,
+                          child: DropdownButtonFormField<ClassData>(
+                            value: _selectedUploadClass,
                             decoration: const InputDecoration(
                               hintText: 'Select Class',
                               border: OutlineInputBorder(),
                             ),
-                            items: _batches.map((batch) {
-                              return DropdownMenuItem<BatchData>(
-                                value: batch,
-                                child: Text(batch.batchName),
+                            items: _uploadClasses.map((classData) {
+                              return DropdownMenuItem<ClassData>(
+                                value: classData,
+                                child: Text(classData.className),
                               );
                             }).toList(),
-                            onChanged: (BatchData? newValue) {
+                            onChanged: (ClassData? newValue) {
                               print('=== CLASS SELECTION CHANGED ===');
-                              print('Selected Class: ${newValue?.batchName}');
+                              print('Selected Class: ${newValue?.className}');
                               print('ClassMasterId: ${newValue?.classMasterId}');
 
                               setModalState(() {
-                                _selectedBatch = newValue;
+                                _selectedUploadClass = newValue;
                                _selectedUploadSubject = null;
                                 _subjectsForUpload.clear();
                               });
@@ -906,7 +905,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                             const Icon(Icons.subject, color: Colors.grey),
                             const SizedBox(width: 8),
                             Text(
-                              'Subject *',
+                              'Subject',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade700,
@@ -922,7 +921,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                           ],
                         ),
                       ),
-                      if (_selectedBatch == null)
+                      if (_selectedUploadClass == null)
                         Padding(
                           padding: const EdgeInsets.all(12),
                           child: Text(
@@ -975,7 +974,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Upload Type *',
+                        'Upload Type',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -1148,26 +1147,26 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
     );
   }
 
-  Future<void> _loadBatches(StateSetter setModalState) async {
-    print('=== LOADING BATCHES ===');
+  Future<void> _loadUploadClasses(StateSetter setModalState) async {
+    print('=== LOADING UPLOAD CLASSES ===');
     setModalState(() {
-      _isLoadingBatches = true;
+      _isLoadingUploadClasses = true;
     });
 
     try {
-      final batches = await TeacherStudyMaterialService.getBatches();
-      print('=== BATCHES LOADED ===');
-      print('Number of batches: ${batches.length}');
+      final classes = await TeacherStudyMaterialService.getClasses();
+      print('=== UPLOAD CLASSES LOADED ===');
+      print('Number of classes: ${classes.length}');
 
       setModalState(() {
-        _batches = batches;
-        _isLoadingBatches = false;
+        _uploadClasses = classes;
+        _isLoadingUploadClasses = false;
       });
     } catch (e) {
-      print('=== LOAD BATCHES ERROR ===');
+      print('=== LOAD UPLOAD CLASSES ERROR ===');
       print('Error: $e');
       setModalState(() {
-        _isLoadingBatches = false;
+        _isLoadingUploadClasses = false;
       });
     }
   }
@@ -1236,7 +1235,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       _showErrorMessage('Description is required');
       return;
     }
-    if (_selectedBatch == null) {
+    if (_selectedUploadClass == null) {
       _showErrorMessage('Please select a class');
       return;
     }
@@ -1261,7 +1260,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
     try {
       final success = await TeacherStudyMaterialService.addStudyMaterial(
-        classMasterId: _selectedBatch!.classMasterId,
+        classMasterId: _selectedUploadClass!.classMasterId,
         subjectId: _selectedUploadSubject!.subjectId,
         chapter: _chapterController.text.trim(),
         description: _descriptionController.text.trim(),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -8,10 +9,10 @@ class TeacherStudyMaterialService {
   // Fetch study materials for teacher
   static Future<List<StudyMaterial>> getStudyMaterials() async {
     try {
-      print('=== STUDY MATERIAL LIST API CALL ===');
+      debugPrint('=== STUDY MATERIAL LIST API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.teacherStudyMaterial}');
       final request = http.MultipartRequest('POST', url);
@@ -20,9 +21,9 @@ class TeacherStudyMaterialService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== STUDY MATERIAL LIST API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== STUDY MATERIAL LIST API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -33,23 +34,65 @@ class TeacherStudyMaterialService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== STUDY MATERIAL LIST ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== STUDY MATERIAL LIST ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
 
-  // Fetch batches for class dropdown
-  static Future<List<BatchData>> getBatches() async {
+  // Fetch classes for class dropdown using GetClassByEmpId API
+  static Future<List<ClassData>> getClasses() async {
     try {
-      print('=== BATCHES API CALL ===');
+      debugPrint('=== GET CLASSES API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('UID: $uid');
-      print('EmpId: $empId');
+      debugPrint('UID: $uid');
+      debugPrint('EmpId: $empId');
+
+      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.getClassByEmpId}');
+      final request = http.MultipartRequest('POST', url);
+      request.fields['Uid'] = uid;
+      request.fields['EmpId'] = empId.toString();
+
+      debugPrint('=== GET CLASSES REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('=== GET CLASSES API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> data = jsonData['data'];
+          return data.map((item) => ClassData.fromJson(item)).toList();
+        }
+      }
+      return [];
+    } catch (e, stackTrace) {
+      debugPrint('=== GET CLASSES API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      return [];
+    }
+  }
+
+  // Fetch batches for class dropdown (keeping for backward compatibility)
+  static Future<List<BatchData>> getBatches() async {
+    try {
+      debugPrint('=== BATCHES API CALL ===');
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('Uid') ?? '';
+      final empId = prefs.getInt('Id') ?? 0;
+
+      debugPrint('UID: $uid');
+      debugPrint('EmpId: $empId');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.batches}');
       final request = http.MultipartRequest('POST', url);
@@ -57,15 +100,15 @@ class TeacherStudyMaterialService {
       request.fields['EmpId'] = empId.toString();
       request.fields['CourseMasterId'] = '1'; // Default as mentioned
 
-      print('=== BATCHES REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== BATCHES REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== BATCHES API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== BATCHES API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -76,9 +119,9 @@ class TeacherStudyMaterialService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== BATCHES API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== BATCHES API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -86,30 +129,30 @@ class TeacherStudyMaterialService {
   // Fetch subjects based on selected class
   static Future<List<SubjectData>> getSubjects(int classMasterId) async {
     try {
-      print('=== SUBJECTS API CALL ===');
+      debugPrint('=== SUBJECTS API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('UID: $uid');
-      print('EmpId: $empId');
-      print('ClassMasterId: $classMasterId');
+      debugPrint('UID: $uid');
+      debugPrint('EmpId: $empId');
+      debugPrint('ClassMasterId: $classMasterId');
 
-      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.subjectList}');
+      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.subByEmpId}');
       final request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
-      request.fields['EmpId'] = empId.toString();
-      request.fields['ClassMasterId'] = classMasterId.toString();
+      request.fields['classMasterId'] = classMasterId.toString();
+      request.fields['empId'] = empId.toString();
 
-      print('=== SUBJECTS REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== SUBJECTS REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== SUBJECTS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== SUBJECTS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -120,9 +163,9 @@ class TeacherStudyMaterialService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== SUBJECTS API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== SUBJECTS API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -138,22 +181,22 @@ class TeacherStudyMaterialService {
     File? file,
   }) async {
     try {
-      print('=== ADD STUDY MATERIAL API CALL ===');
+      debugPrint('=== ADD STUDY MATERIAL API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('UID: $uid');
-      print('EmpId: $empId');
-      print('ClassMasterId: $classMasterId');
-      print('SubjectId: $subjectId');
-      print('Chapter: $chapter');
-      print('Description: $description');
-      print('UploadType: $uploadType');
-      print('YoutubeLink: $youtubeLink');
-      print('File: ${file?.path ?? 'No file'}');
+      debugPrint('UID: $uid');
+      debugPrint('EmpId: $empId');
+      debugPrint('ClassMasterId: $classMasterId');
+      debugPrint('SubjectId: $subjectId');
+      debugPrint('Chapter: $chapter');
+      debugPrint('Description: $description');
+      debugPrint('UploadType: $uploadType');
+      debugPrint('YoutubeLink: $youtubeLink');
+      debugPrint('File: ${file?.path ?? 'No file'}');
 
-      final url = Uri.parse('${ApiConstants.baseUrl}/api/OnlineExam/AddStudyMaterial');
+      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studyMaterialAdd}');
       final request = http.MultipartRequest('POST', url);
 
       // Add required fields
@@ -168,7 +211,7 @@ class TeacherStudyMaterialService {
       // Add optional fields
       if (youtubeLink != null && youtubeLink.isNotEmpty) {
         request.fields['YoutubeLink'] = youtubeLink;
-        print('Added YoutubeLink: $youtubeLink');
+        debugPrint('Added YoutubeLink: $youtubeLink');
       }
 
       if (file != null) {
@@ -181,35 +224,35 @@ class TeacherStudyMaterialService {
           filename: file.path.split('/').last,
         );
         request.files.add(multipartFile);
-        print('Added File: ${file.path.split('/').last}');
+        debugPrint('Added File: ${file.path.split('/').last}');
       }
 
-      print('=== ADD STUDY MATERIAL REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
-      print('Request Files: ${request.files.map((f) => f.filename).toList()}');
+      debugPrint('=== ADD STUDY MATERIAL REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
+      debugPrint('Request Files: ${request.files.map((f) => f.filename).toList()}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== ADD STUDY MATERIAL API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== ADD STUDY MATERIAL API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          print('=== STUDY MATERIAL ADDED SUCCESSFULLY ===');
+          debugPrint('=== STUDY MATERIAL ADDED SUCCESSFULLY ===');
           return true;
         } else {
-          print('=== ADD STUDY MATERIAL FAILED ===');
-          print('Error: ${jsonData['message'] ?? 'Unknown error'}');
+          debugPrint('=== ADD STUDY MATERIAL FAILED ===');
+          debugPrint('Error: ${jsonData['message'] ?? 'Unknown error'}');
         }
       }
       return false;
     } catch (e, stackTrace) {
-      print('=== ADD STUDY MATERIAL ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== ADD STUDY MATERIAL ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return false;
     }
   }
@@ -298,6 +341,23 @@ class StudyMaterial {
       default:
         return StudyMaterialType.file;
     }
+  }
+}
+
+class ClassData {
+  final int classMasterId;
+  final String className;
+
+  ClassData({
+    required this.classMasterId,
+    required this.className,
+  });
+
+  factory ClassData.fromJson(Map<String, dynamic> json) {
+    return ClassData(
+      classMasterId: json['ClassMasterId'] ?? 0,
+      className: json['ClassName'] ?? '',
+    );
   }
 }
 

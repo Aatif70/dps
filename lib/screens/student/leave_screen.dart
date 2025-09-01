@@ -77,19 +77,19 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Future<void> _loadLeaveData() async {
-    print('=== LEAVE SCREEN DEBUG START ===');
+    debugPrint('=== LEAVE SCREEN DEBUG START ===');
     setState(() {
       _isLoading = true;
     });
 
     try {
-      print('Leave Screen - Calling LeaveService.getStudentLeaves()');
+      debugPrint('Leave Screen - Calling LeaveService.getStudentLeaves()');
       final studentLeaves = await LeaveService.getStudentLeaves();
-      print('Leave Screen - Received ${studentLeaves.length} student leave records');
+      debugPrint('Leave Screen - Received ${studentLeaves.length} student leave records');
 
       // Convert to legacy format for compatibility with existing UI
       final leaveRequests = studentLeaves.map((leave) => leave.toLegacyLeaveRequest()).toList();
-      print('Leave Screen - Converted to ${leaveRequests.length} legacy leave requests');
+      debugPrint('Leave Screen - Converted to ${leaveRequests.length} legacy leave requests');
 
       setState(() {
         _studentLeaves = studentLeaves;
@@ -97,11 +97,11 @@ class _LeaveScreenState extends State<LeaveScreen>
         _isLoading = false;
       });
 
-      print('Leave Screen - State updated successfully');
-      print('=== LEAVE SCREEN DEBUG END ===');
+      debugPrint('Leave Screen - State updated successfully');
+      debugPrint('=== LEAVE SCREEN DEBUG END ===');
     } catch (e, stackTrace) {
-      print('Leave Screen - Error occurred: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Leave Screen - Error occurred: $e');
+      debugPrint('Stack trace: $stackTrace');
 
       setState(() {
         _isLoading = false;
@@ -1246,7 +1246,7 @@ class _LeaveScreenState extends State<LeaveScreen>
                             });
 
                             try {
-                              print('=== SUBMITTING LEAVE APPLICATION ===');
+                              debugPrint('=== SUBMITTING LEAVE APPLICATION ===');
                               final success = await LeaveService.addLeave(
                                 fromDate: DateFormat('dd-MM-yyyy').format(_fromDate),
                                 toDate: DateFormat('dd-MM-yyyy').format(_toDate),
@@ -1267,7 +1267,7 @@ class _LeaveScreenState extends State<LeaveScreen>
                                 );
                               }
                             } catch (e) {
-                              print('Error submitting leave: $e');
+                              debugPrint('Error submitting leave: $e');
                               CustomSnackbar.showError(
                                 context,
                                 message: 'An error occurred. Please try again.',

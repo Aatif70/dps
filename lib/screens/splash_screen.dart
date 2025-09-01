@@ -114,21 +114,21 @@ class _SplashScreenState extends State<SplashScreen>
       final rememberMe = prefs.getBool('RememberMe') ?? false;
       final sessionTemporary = prefs.getBool('SessionTemporary') ?? false;
 
-      print('=== SPLASH SESSION CHECK ===');
-      print('Stored Uid: ' + (uid.isEmpty ? 'EMPTY' : 'PRESENT'));
-      print('Stored Role: ' + (role.isEmpty ? 'EMPTY' : role));
+      debugPrint('=== SPLASH SESSION CHECK ===');
+      debugPrint('Stored Uid: ' + (uid.isEmpty ? 'EMPTY' : 'PRESENT'));
+      debugPrint('Stored Role: ' + (role.isEmpty ? 'EMPTY' : role));
 
       if (!mounted) return;
 
       if (uid.isEmpty || role.isEmpty) {
-        print('No active session found. Navigating to login.');
+        debugPrint('No active session found. Navigating to login.');
         Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
       }
 
       // If Remember Me is off and session marked temporary, clear on app start
       if (!rememberMe && sessionTemporary) {
-        print('Temporary session detected and Remember Me OFF. Clearing session.');
+        debugPrint('Temporary session detected and Remember Me OFF. Clearing session.');
         await prefs.clear();
         Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
@@ -137,24 +137,24 @@ class _SplashScreenState extends State<SplashScreen>
       // Active session: route by role
       switch (role.toLowerCase()) {
         case 'admin':
-          print('Active session for ADMIN. Navigating to admin dashboard.');
+          debugPrint('Active session for ADMIN. Navigating to admin dashboard.');
           Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
           break;
         case 'teacher':
-          print('Active session for TEACHER. Navigating to teacher dashboard.');
+          debugPrint('Active session for TEACHER. Navigating to teacher dashboard.');
           Navigator.pushReplacementNamed(context, AppRoutes.teacherDashboard);
           break;
         case 'student':
-          print('Active session for STUDENT. Navigating to student dashboard.');
+          debugPrint('Active session for STUDENT. Navigating to student dashboard.');
           Navigator.pushReplacementNamed(context, AppRoutes.studentDashboard);
           break;
         default:
-          print('Unknown role. Defaulting to login.');
+          debugPrint('Unknown role. Defaulting to login.');
           Navigator.pushReplacementNamed(context, AppRoutes.login);
           break;
       }
     } catch (e) {
-      print('Error during session check: $e');
+      debugPrint('Error during session check: $e');
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
