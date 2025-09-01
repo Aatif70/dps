@@ -756,13 +756,13 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   final _homeworkController = TextEditingController();
 
   // Dropdown data
-  List<Course> _courses = [];
+  List<Class> _classes = [];
   List<Batch> _batches = [];
   List<Division> _divisions = [];
   List<Subject> _subjects = [];
 
   // Selected values
-  Course? _selectedCourse;
+  Class? _selectedClass;
   Batch? _selectedBatch;
   Division? _selectedDivision;
   Subject? _selectedSubject;
@@ -774,7 +774,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   @override
   void initState() {
     super.initState();
-    _loadCourses();
+    _loadClasses();
   }
 
   @override
@@ -783,12 +783,12 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
     super.dispose();
   }
 
-  Future<void> _loadCourses() async {
+  Future<void> _loadClasses() async {
     setState(() => _isLoading = true);
     try {
-      final courses = await TeacherHomeworkService.getCourses();
+      final classes = await TeacherHomeworkService.getClasses();
       setState(() {
-        _courses = courses;
+        _classes = classes;
         _isLoading = false;
       });
     } catch (e) {
@@ -797,17 +797,15 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   }
 
   Future<void> _loadBatches() async {
-    if (_selectedCourse == null) return;
+    if (_selectedClass == null) return;
     setState(() => _isLoading = true);
     try {
-      final batches = await TeacherHomeworkService.getBatches(_selectedCourse!.courseMasterId);
+      final batches = await TeacherHomeworkService.getBatchList(_selectedClass!.classMasterId);
       setState(() {
         _batches = batches;
         _selectedBatch = null;
         _divisions.clear();
-        _subjects.clear();
         _selectedDivision = null;
-        _selectedSubject = null;
         _isLoading = false;
       });
     } catch (e) {
@@ -816,45 +814,31 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   }
 
   Future<void> _loadDivisions() async {
-    if (_selectedBatch == null) {
-      debugPrint('[DEBUG] _loadDivisions: No batch selected');
-      return;
-    }
-
-    debugPrint('[DEBUG] _loadDivisions: Fetching divisions for ClassId: ${_selectedBatch!.classId}');
+    if (_selectedBatch == null) return;
     setState(() => _isLoading = true);
     try {
       final divisions = await TeacherHomeworkService.getDivisions(_selectedBatch!.classId);
-      debugPrint('[DEBUG] _loadDivisions: Divisions fetched: ${divisions.map((d) => d.name).toList()}');
       setState(() {
         _divisions = divisions;
         _selectedDivision = null;
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('[DEBUG] _loadDivisions: Error: $e');
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadSubjects() async {
-    if (_selectedBatch == null) {
-      debugPrint('[DEBUG] _loadSubjects: No batch selected');
-      return;
-    }
-
-    debugPrint('[DEBUG] _loadSubjects: Fetching subjects for ClassMasterId: ${_selectedBatch!.classMasterId}');
+    if (_selectedClass == null) return;
     setState(() => _isLoading = true);
     try {
-      final subjects = await TeacherHomeworkService.getSubjects(_selectedBatch!.classMasterId);
-      debugPrint('[DEBUG] _loadSubjects: Subjects fetched: ${subjects.map((s) => s.subjectName).toList()}');
+      final subjects = await TeacherHomeworkService.getSubjects(_selectedClass!.classMasterId);
       setState(() {
         _subjects = subjects;
         _selectedSubject = null;
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('[DEBUG] _loadSubjects: Error: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -891,17 +875,15 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
 
   Future<void> _submitHomework() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedSubject == null || _selectedBatch == null || _selectedDivision == null) {
+    if (_selectedClass == null || _selectedBatch == null || _selectedDivision == null || _selectedSubject == null) {
       CustomSnackbar.showError(context, message: 'Please fill all required fields');
       return;
     }
-
     setState(() => _isSubmitting = true);
     try {
       final success = await TeacherHomeworkService.addHomework(
         subjectId: _selectedSubject!.subjectId,
         date: _selectedDate,
-        classMasterId: _selectedBatch!.classMasterId,
         classId: _selectedBatch!.classId,
         divisionId: _selectedDivision!.divisionId,
         homework: _homeworkController.text,
@@ -964,55 +946,59 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // Course Dropdown
-                    DropdownButtonFormField<Course>(
-                      decoration: const InputDecoration(
-                        labelText: 'Course',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.school_outlined),
-                      ),
-                      value: _selectedCourse,
-                      items: _courses.map((course) {
-                        return DropdownMenuItem<Course>(
-                          value: course,
-                          child: Text(course.courseName),
-                        );
-                      }).toList(),
-                      onChanged: (course) {
-                        setState(() {
-                          _selectedCourse = course;
-                          debugPrint('[DEBUG] Selected Course: ${course?.courseName}, id: ${course?.courseMasterId}');
-                        });
-                        _loadBatches();
-                      },
-                      validator: (value) => value == null ? 'Please select a course' : null,
-                    ),
-                    const SizedBox(height: 16),
-                    // Batch Dropdown
-                    DropdownButtonFormField<Batch>(
+                    // Class Dropdown
+                    DropdownButtonFormField<Class>(
                       decoration: const InputDecoration(
                         labelText: 'Class',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.class_outlined),
                       ),
+                      value: _selectedClass,
+                      items: _classes.map((classItem) {
+                        return DropdownMenuItem<Class>(
+                          value: classItem,
+                          child: Text(classItem.className),
+                        );
+                      }).toList(),
+                      onChanged: (classItem) {
+                        setState(() {
+                          _selectedClass = classItem;
+                          _selectedBatch = null;
+                          _batches.clear();
+                          _selectedDivision = null;
+                          _divisions.clear();
+                          _selectedSubject = null;
+                          _subjects.clear();
+                        });
+                        _loadBatches();
+                        _loadSubjects();
+                      },
+                      validator: (value) => value == null ? 'Please select a class' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    // Batch Dropdown
+                    DropdownButtonFormField<Batch>(
+                      decoration: const InputDecoration(
+                        labelText: 'Batch',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.layers_outlined),
+                      ),
                       value: _selectedBatch,
                       items: _batches.map((batch) {
                         return DropdownMenuItem<Batch>(
                           value: batch,
-                          child: Text(batch.batchName),
+                          child: Text(batch.className),
                         );
                       }).toList(),
                       onChanged: (batch) {
                         setState(() {
                           _selectedBatch = batch;
-                          debugPrint('[DEBUG] Selected Batch: ${batch?.batchName}, ClassId: ${batch?.classId}, ClassMasterId: ${batch?.classMasterId}');
                           _selectedDivision = null;
-                          _divisions = [];
+                          _divisions.clear();
                         });
                         _loadDivisions();
-                        _loadSubjects();
                       },
-                      validator: (value) => value == null ? 'Please select a class' : null,
+                      validator: (value) => value == null ? 'Please select a batch' : null,
                     ),
                     const SizedBox(height: 16),
                     // Division Dropdown
@@ -1032,7 +1018,6 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       onChanged: (division) {
                         setState(() {
                           _selectedDivision = division;
-                          debugPrint('[DEBUG] Selected Division: ${division?.name}, id: ${division?.divisionId}');
                         });
                       },
                       validator: (value) => value == null ? 'Please select a division' : null,
@@ -1046,18 +1031,18 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                         prefixIcon: Icon(Icons.subject_outlined),
                       ),
                       value: _selectedSubject,
-                      items: _subjects.map<DropdownMenuItem<Subject>>((Subject subject) {
+                      items: _subjects.map((subject) {
                         return DropdownMenuItem<Subject>(
                           value: subject,
                           child: Text(subject.subjectName),
                         );
                       }).toList(),
-                      onChanged: (Subject? subject) {
+                      onChanged: (subject) {
                         setState(() {
                           _selectedSubject = subject;
                         });
                       },
-                      validator: (Subject? value) => value == null ? 'Please select a subject' : null,
+                      validator: (value) => value == null ? 'Please select a subject' : null,
                     ),
                     const SizedBox(height: 16),
                     // Date Picker

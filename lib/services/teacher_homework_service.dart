@@ -58,24 +58,30 @@ class TeacherHomeworkService {
     }
   }
 
-  // Fetch courses dropdown
-  static Future<List<Course>> getCourses() async {
+
+
+  // Fetch classes dropdown for teacher
+  static Future<List<Class>> getClasses() async {
     try {
-      debugPrint('=== COURSES API CALL ===');
+      debugPrint('=== CLASSES API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
+      final empId = prefs.getInt('Id') ?? 0;
 
-      debugPrint('Fetching courses for UID: $uid');
+      debugPrint('Fetching classes for UID: $uid, EmpId: $empId');
 
-      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.courseList}');
+      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.getClassByEmpId}');
       final request = http.MultipartRequest('POST', url);
-      request.fields['Uid'] = uid;
+      request.fields.addAll({
+        'Uid': uid,
+        'EmpId': empId.toString(),
+      });
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('=== COURSES API RESPONSE ===');
+      debugPrint('=== CLASSES API RESPONSE ===');
       debugPrint('Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
 
@@ -83,44 +89,38 @@ class TeacherHomeworkService {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           final List<dynamic> data = jsonData['data'];
-          return data.map((item) => Course.fromJson(item)).toList();
+          return data.map((item) => Class.fromJson(item)).toList();
         }
       }
 
       return [];
     } catch (e) {
-      debugPrint('=== COURSES ERROR ===');
+      debugPrint('=== CLASSES ERROR ===');
       debugPrint('Error: $e');
       return [];
     }
   }
 
-  // Fetch batches dropdown
-  static Future<List<Batch>> getBatches(int courseMasterId) async {
+  // Fetch batch list for a class
+  static Future<List<Batch>> getBatchList(int classMasterId) async {
     try {
-      debugPrint('=== BATCHES API CALL ===');
-
+      debugPrint('=== BATCH LIST API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
-
-      debugPrint('Fetching batches for UID: $uid, EmpId: $empId, CourseMasterId: $courseMasterId');
-
-      final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.batches}');
+      debugPrint('Fetching batches for UID: $uid, EmpId: $empId, ClassMasterId: $classMasterId');
+      final url = Uri.parse('${ApiConstants.baseUrl}/api/User/BatchList');
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
         'Uid': uid,
         'EmpId': empId.toString(),
-        'CourseMasterId': courseMasterId.toString(),
+        'ClassMasterId': classMasterId.toString(),
       });
-
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
-      debugPrint('=== BATCHES API RESPONSE ===');
+      debugPrint('=== BATCH LIST API RESPONSE ===');
       debugPrint('Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
@@ -128,26 +128,22 @@ class TeacherHomeworkService {
           return data.map((item) => Batch.fromJson(item)).toList();
         }
       }
-
       return [];
     } catch (e) {
-      debugPrint('=== BATCHES ERROR ===');
+      debugPrint('=== BATCH LIST ERROR ===');
       debugPrint('Error: $e');
       return [];
     }
   }
 
-  // Fetch divisions dropdown
+  // Update getDivisions to use ClassId (from batch)
   static Future<List<Division>> getDivisions(int classId) async {
     try {
       debugPrint('=== DIVISIONS API CALL ===');
-
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
-
       debugPrint('Fetching divisions for UID: $uid, EmpId: $empId, ClassId: $classId');
-
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.divisionList}');
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
@@ -155,14 +151,11 @@ class TeacherHomeworkService {
         'EmpId': empId.toString(),
         'ClassId': classId.toString(),
       });
-
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
       debugPrint('=== DIVISIONS API RESPONSE ===');
       debugPrint('Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
@@ -170,7 +163,6 @@ class TeacherHomeworkService {
           return data.map((item) => Division.fromJson(item)).toList();
         }
       }
-
       return [];
     } catch (e) {
       debugPrint('=== DIVISIONS ERROR ===');
@@ -225,7 +217,6 @@ class TeacherHomeworkService {
   static Future<bool> addHomework({
     required int subjectId,
     required DateTime date,
-    required int classMasterId,
     required int classId,
     required int divisionId,
     required String homework,
@@ -239,15 +230,23 @@ class TeacherHomeworkService {
 
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
-      debugPrint('Adding homework with:');
+      // Organized print statements for all fields
+      debugPrint('--- HOMEWORK ADD: FIELD SUMMARY ---');
       debugPrint('CreatedBy: $uid');
+      if (uid.isEmpty) debugPrint('[WARNING] CreatedBy (uid) is missing!');
       debugPrint('SubjectId: $subjectId');
+      if (subjectId == 0) debugPrint('[WARNING] SubjectId is missing or zero!');
       debugPrint('Date: $dateString');
-      debugPrint('ClassMasterId: $classMasterId');
+      if (dateString.isEmpty) debugPrint('[WARNING] Date is missing!');
       debugPrint('ClassId: $classId');
+      if (classId == 0) debugPrint('[WARNING] ClassId is missing or zero!');
       debugPrint('DivisionId: $divisionId');
+      if (divisionId == 0) debugPrint('[WARNING] DivisionId is missing or zero!');
       debugPrint('HomeWork: $homework');
-      debugPrint('File: ${file?.path ?? 'No file'}');
+      if (homework.isEmpty) debugPrint('[WARNING] HomeWork is missing!');
+      debugPrint('file: ${file?.path ?? 'No file'}');
+      if (file == null) debugPrint('[INFO] No file attached.');
+      debugPrint('--- END FIELD SUMMARY ---');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.homeworkAdd}');
       final request = http.MultipartRequest('POST', url);
@@ -256,7 +255,6 @@ class TeacherHomeworkService {
         'CreatedBy': uid,
         'SubjectId': subjectId.toString(),
         'Date': dateString,
-        'ClassMasterId': classMasterId.toString(),
         'ClassId': classId.toString(),
         'DivisionId': divisionId.toString(),
         'HomeWork': homework,
@@ -332,42 +330,31 @@ class TeacherHomework {
 }
 
 
-class Course {
-  final int courseMasterId;
-  final String courseName;
+class Class {
+  final int classMasterId;
+  final String className;
 
-  Course({
-    required this.courseMasterId,
-    required this.courseName,
+  Class({
+    required this.classMasterId,
+    required this.className,
   });
 
-  factory Course.fromJson(Map<String, dynamic> json) {
-    return Course(
-      courseMasterId: json['CourseMasterId'] ?? 0,
-      courseName: json['CourseName'] ?? '',
+  factory Class.fromJson(Map<String, dynamic> json) {
+    return Class(
+      classMasterId: json['ClassMasterId'] ?? 0,
+      className: json['ClassName'] ?? '',
     );
   }
 }
 
 class Batch {
   final int classId;
-  final int classMasterId;
-  final int courseYear;
-  final String batchName;
-
-  Batch({
-    required this.classId,
-    required this.classMasterId,
-    required this.courseYear,
-    required this.batchName,
-  });
-
+  final String className;
+  Batch({required this.classId, required this.className});
   factory Batch.fromJson(Map<String, dynamic> json) {
     return Batch(
       classId: json['ClassId'] ?? 0,
-      classMasterId: json['ClassMasterId'] ?? 0,
-      courseYear: json['CourseYear'] ?? 0,
-      batchName: json['BatchName'] ?? '',
+      className: json['ClassName'] ?? '',
     );
   }
 }
