@@ -368,25 +368,31 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           }
           return [];
         },
-        calendarStyle: const CalendarStyle(
+        calendarStyle: CalendarStyle(
           outsideDaysVisible: false,
-          weekendTextStyle: TextStyle(color: Color(0xFF718096)),
+          weekendTextStyle: const TextStyle(color: Color(0xFF718096)),
+          // Minimal ring for selected and today (no solid fill)
           selectedDecoration: BoxDecoration(
-            color: Color(0xFF6366F1),
             shape: BoxShape.circle,
+            // color: Colors.transparent,
+                        color: Color(0xFF6366F1),
+
+            border: Border.all(color: const Color(0xFF6366F1), width: 1.5),
           ),
           todayDecoration: BoxDecoration(
-            color: Color(0xFF58CC02),
+            shape: BoxShape.circle,
+                        color: Color(0xFF58CC02),
+
+            border: Border.all(color: const Color(0xFF58CC02), width: 1.5),
+          ),
+          defaultDecoration: const BoxDecoration(
             shape: BoxShape.circle,
           ),
-          defaultDecoration: BoxDecoration(
-            shape: BoxShape.circle,
-          ),
-          markerDecoration: BoxDecoration(
+          markerDecoration: const BoxDecoration(
             color: Color(0xFF6366F1),
             shape: BoxShape.circle,
           ),
-          cellMargin: EdgeInsets.all(2),
+          cellMargin: const EdgeInsets.all(2),
         ),
         headerStyle: const HeaderStyle(
           formatButtonVisible: false,
@@ -403,10 +409,10 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           markerBuilder: (context, day, events) {
             if (events.isNotEmpty) {
               return Positioned(
-                bottom: 2,
+                bottom: 6,
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  width: 4,
+                  height: 4,
                   decoration: const BoxDecoration(
                     color: Color(0xFF6366F1),
                     shape: BoxShape.circle,
@@ -423,16 +429,16 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
             
             return Container(
               margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: hasClasses ? const Color(0xFF6366F1).withOpacity(0.1) : Colors.transparent,
+                color: Colors.transparent,
               ),
               child: Center(
                 child: Text(
                   '${day.day}',
                   style: TextStyle(
-                    color: hasClasses ? const Color(0xFF6366F1) : null,
-                    fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
+                    color: hasClasses ? const Color(0xFF2D3748) : null,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -510,20 +516,19 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         Column(
           children: [
             Container(
-              width: 16,
-              height: 16,
+              width: 10,
+              height: 10,
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
               ),
             ),
             if (!isLast)
               Container(
-                width: 2,
-                height: 80,
+                width: 1,
+                height: 60,
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                color: color.withValues(alpha: 0.3),
+                color: color.withValues(alpha: 0.25),
               ),
           ],
         ),
@@ -678,6 +683,9 @@ class _AddTimetableForm extends StatefulWidget {
 }
 
 class _AddTimetableFormState extends State<_AddTimetableForm> {
+  // Spacing constants to keep the layout rhythm consistent
+  static const double _fieldGap = 16;
+  static const double _sectionGap = 20;
   EmployeeItem? _selectedEmployee;
   ClassMasterItem? _selectedClass;
   BatchItem? _selectedBatch;
@@ -856,45 +864,50 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
           const SizedBox(height: 12),
           Row(
             children: const [
-              Icon(Icons.schedule, color: Color(0xFF6366F1)),
+              Icon(Icons.schedule, color: Color(0xFF2D3748)),
               SizedBox(width: 8),
-              Text('Add Timetable', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Add Timetable', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: _sectionGap),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+              ],
+              border: Border.all(color: const Color(0xFFF1F5F9)),
             ),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 _buildEmployeeDropdown(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildClassDropdown(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildBatchDivisionRow(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildWeekdayDropdown(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildSubjectDropdown(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildSubjectTypeDropdown(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _fieldGap),
                 _buildTimePickers(),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: _sectionGap),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _submitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
+                backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
+                elevation: 0,
+                minimumSize: const Size(double.infinity, 48),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -904,7 +917,7 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
               label: const Text('Save Timetable'),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -1167,18 +1180,19 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
   InputDecoration _fieldDecoration(String label, {IconData? icon}) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF6366F1)) : null,
+      labelStyle: const TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
+      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF718096), size: 20) : null,
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         borderRadius: BorderRadius.circular(12),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Color(0xFF6366F1)),
+        borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
         borderRadius: BorderRadius.circular(12),
       ),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: const Color(0xFFF8F9FA),
       filled: true,
     );
   }

@@ -283,217 +283,221 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
   }
 
   Widget _buildEventsTab() {
-    return Column(
-      children: [
-        _buildFilterChips(),
-        TableCalendar<EventData>(
-          firstDay: DateTime.utc(2020, 1, 1),
-          lastDay: DateTime.utc(2030, 12, 31),
-          focusedDay: _focusedDay,
-          calendarFormat: _calendarFormat,
-          availableGestures: AvailableGestures.horizontalSwipe,
-          availableCalendarFormats: const {CalendarFormat.month: 'Month'},
-          rowHeight: 36,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-            });
-          },
-          onFormatChanged: (_) {
-            // Force month view
-            setState(() => _calendarFormat = CalendarFormat.month);
-          },
-          onPageChanged: (focusedDay) {
-            _focusedDay = focusedDay;
-          },
-          eventLoader: _getEventsForDay,
-          calendarStyle: const CalendarStyle(
-            outsideDaysVisible: false,
-            weekendTextStyle: TextStyle(color: Color(0xFF718096)),
-            holidayTextStyle: TextStyle(color: Color(0xFFE74C3C)),
-            selectedDecoration: BoxDecoration(
-              color: Color(0xFF4A90E2),
-              shape: BoxShape.circle,
-            ),
-            todayDecoration: BoxDecoration(
-              color: Color(0xFF58CC02),
-              shape: BoxShape.circle,
-            ),
-            markerDecoration: BoxDecoration(
-              color: Color(0xFF4A90E2),
-              shape: BoxShape.circle,
-            ),
-          ),
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-            leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFF4A90E2)),
-            rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFF4A90E2)),
-          ),
-          calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, day, events) {
-              if (events.isNotEmpty) {
-                return Positioned(
-                  bottom: 1,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: events.take(3).map((event) {
-                      final type = _eventType(event as EventData);
-                      final color = type == 'holiday'
-                          ? const Color(0xFFE74C3C)
-                          : type == 'exam'
-                              ? const Color(0xFFFF9500)
-                              : const Color(0xFF4A90E2);
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        width: 12,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              }
-              return null;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildFilterChips(),
+          TableCalendar<EventData>(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            availableGestures: AvailableGestures.horizontalSwipe,
+            availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+            rowHeight: 36,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
             },
+            onFormatChanged: (_) {
+              // Force month view
+              setState(() => _calendarFormat = CalendarFormat.month);
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            eventLoader: _getEventsForDay,
+            calendarStyle: const CalendarStyle(
+              outsideDaysVisible: false,
+              weekendTextStyle: TextStyle(color: Color(0xFF718096)),
+              holidayTextStyle: TextStyle(color: Color(0xFFE74C3C)),
+              selectedDecoration: BoxDecoration(
+                color: Color(0xFF4A90E2),
+                shape: BoxShape.circle,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Color(0xFF58CC02),
+                shape: BoxShape.circle,
+              ),
+              markerDecoration: BoxDecoration(
+                color: Color(0xFF4A90E2),
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
+              ),
+              leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFF4A90E2)),
+              rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFF4A90E2)),
+            ),
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, day, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    bottom: 1,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: events.take(3).map((event) {
+                        final type = _eventType(event as EventData);
+                        final color = type == 'holiday'
+                            ? const Color(0xFFE74C3C)
+                            : type == 'exam'
+                                ? const Color(0xFFFF9500)
+                                : const Color(0xFF4A90E2);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          width: 12,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(child: _buildEventList(_getEventsForDay(_selectedDay ?? DateTime.now()))),
-        if (_filteredEvents.isNotEmpty) _buildUpcomingEvents(),
-      ],
+          const SizedBox(height: 10),
+          _buildEventList(_getEventsForDay(_selectedDay ?? DateTime.now())),
+          if (_filteredEvents.isNotEmpty) _buildUpcomingEvents(),
+        ],
+      ),
     );
   }
 
   Widget _buildAnnualTab() {
-    return Column(
-      children: [
-        _buildAnnualFilterChips(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
-                setState(() {
-                  _selectedYear--;
-                  _annualFocusedDay = DateTime(_selectedYear, 1, 1);
-                  _annualSelectedDay = DateTime(_selectedYear, 1, 1);
-                });
-                _loadData();
-              },
-            ),
-            Text(
-              _selectedYear.toString(),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () {
-                setState(() {
-                  _selectedYear++;
-                  _annualFocusedDay = DateTime(_selectedYear, 1, 1);
-                  _annualSelectedDay = DateTime(_selectedYear, 1, 1);
-                });
-                _loadData();
-              },
-            ),
-          ],
-        ),
-        TableCalendar<CalendarItem>(
-          firstDay: DateTime.utc(_selectedYear, 1, 1),
-          lastDay: DateTime.utc(_selectedYear, 12, 31),
-          focusedDay: _annualFocusedDay,
-          calendarFormat: _annualCalendarFormat,
-          availableGestures: AvailableGestures.horizontalSwipe,
-          availableCalendarFormats: const {CalendarFormat.month: 'Month'},
-          rowHeight: 36,
-          selectedDayPredicate: (day) => isSameDay(_annualSelectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _annualSelectedDay = selectedDay;
-              _annualFocusedDay = focusedDay;
-            });
-          },
-          onFormatChanged: (_) {
-            setState(() => _annualCalendarFormat = CalendarFormat.month);
-          },
-          onPageChanged: (focusedDay) {
-            _annualFocusedDay = focusedDay;
-          },
-          eventLoader: _getAnnualEventsForDay,
-          calendarStyle: const CalendarStyle(
-            outsideDaysVisible: false,
-            weekendTextStyle: TextStyle(color: Color(0xFF718096)),
-            holidayTextStyle: TextStyle(color: Color(0xFFE74C3C)),
-            selectedDecoration: BoxDecoration(
-              color: Color(0xFF4A90E2),
-              shape: BoxShape.circle,
-            ),
-            todayDecoration: BoxDecoration(
-              color: Color(0xFF58CC02),
-              shape: BoxShape.circle,
-            ),
-            markerDecoration: BoxDecoration(
-              color: Color(0xFF4A90E2),
-              shape: BoxShape.circle,
-            ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildAnnualFilterChips(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () {
+                  setState(() {
+                    _selectedYear--;
+                    _annualFocusedDay = DateTime(_selectedYear, 1, 1);
+                    _annualSelectedDay = DateTime(_selectedYear, 1, 1);
+                  });
+                  _loadData();
+                },
+              ),
+              Text(
+                _selectedYear.toString(),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  setState(() {
+                    _selectedYear++;
+                    _annualFocusedDay = DateTime(_selectedYear, 1, 1);
+                    _annualSelectedDay = DateTime(_selectedYear, 1, 1);
+                  });
+                  _loadData();
+                },
+              ),
+            ],
           ),
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-            leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFF4A90E2)),
-            rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFF4A90E2)),
-          ),
-          calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, day, events) {
-              if (events.isNotEmpty) {
-                return Positioned(
-                  bottom: 1,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: events.take(3).map((event) {
-                      final type = _calendarItemType(event as CalendarItem);
-                      final color = type == 'holiday'
-                          ? const Color(0xFFE74C3C)
-                          : type == 'exam'
-                              ? const Color(0xFFFF9500)
-                              : const Color(0xFF4A90E2);
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              }
-              return null;
+          TableCalendar<CalendarItem>(
+            firstDay: DateTime.utc(_selectedYear, 1, 1),
+            lastDay: DateTime.utc(_selectedYear, 12, 31),
+            focusedDay: _annualFocusedDay,
+            calendarFormat: _annualCalendarFormat,
+            availableGestures: AvailableGestures.horizontalSwipe,
+            availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+            rowHeight: 36,
+            selectedDayPredicate: (day) => isSameDay(_annualSelectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _annualSelectedDay = selectedDay;
+                _annualFocusedDay = focusedDay;
+              });
             },
+            onFormatChanged: (_) {
+              setState(() => _annualCalendarFormat = CalendarFormat.month);
+            },
+            onPageChanged: (focusedDay) {
+              _annualFocusedDay = focusedDay;
+            },
+            eventLoader: _getAnnualEventsForDay,
+            calendarStyle: const CalendarStyle(
+              outsideDaysVisible: false,
+              weekendTextStyle: TextStyle(color: Color(0xFF718096)),
+              holidayTextStyle: TextStyle(color: Color(0xFFE74C3C)),
+              selectedDecoration: BoxDecoration(
+                color: Color(0xFF4A90E2),
+                shape: BoxShape.circle,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Color(0xFF58CC02),
+                shape: BoxShape.circle,
+              ),
+              markerDecoration: BoxDecoration(
+                color: Color(0xFF4A90E2),
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
+              ),
+              leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFF4A90E2)),
+              rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFF4A90E2)),
+            ),
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, day, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    bottom: 1,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: events.take(3).map((event) {
+                        final type = _calendarItemType(event as CalendarItem);
+                        final color = type == 'holiday'
+                            ? const Color(0xFFE74C3C)
+                            : type == 'exam'
+                                ? const Color(0xFFFF9500)
+                                : const Color(0xFF4A90E2);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(child: _buildAnnualEventList(_getAnnualEventsForDay(_annualSelectedDay ?? DateTime.now()))),
-      ],
+          const SizedBox(height: 10),
+          _buildAnnualEventList(_getAnnualEventsForDay(_annualSelectedDay ?? DateTime.now())),
+        ],
+      ),
     );
   }
 
@@ -613,10 +617,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
     if (events.isEmpty) {
       return const Center(child: Text('No events for selected date'));
     }
-    return ListView.builder(
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
+    return Column(
+      children: events.map((event) {
         final type = _eventType(event);
         final color = type == 'holiday'
             ? const Color(0xFFE74C3C)
@@ -686,7 +688,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
             ],
           ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -694,10 +696,8 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
     if (events.isEmpty) {
       return const Center(child: Text('No events for selected date'));
     }
-    return ListView.builder(
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
+    return Column(
+      children: events.map((event) {
         final type = _calendarItemType(event);
         final color = type == 'holiday'
             ? const Color(0xFFE74C3C)
@@ -769,7 +769,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
             ],
           ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -796,7 +796,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           ),
         ),
         const SizedBox(height: 12),
-        ...upcomingEvents.map((event) => _buildEventList([event])),
+        _buildEventList(upcomingEvents),
         const SizedBox(height: 20),
       ],
     );
