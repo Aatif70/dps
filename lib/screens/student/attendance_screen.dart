@@ -206,6 +206,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             const SizedBox(height: 25),
             _buildTodayAttendanceCard(context),
             const SizedBox(height: 30),
+
           ],
         ),
       ),
@@ -520,13 +521,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         icon: Icons.cancel_rounded,
         subtitle: 'Days missed',
       ),
-      StatData(
-        title: 'Late',
-        value: lateDays.toString(),
-        color: const Color(0xFFFF9500),
-        icon: Icons.schedule_rounded,
-        subtitle: 'Late arrivals',
-      ),
+
       StatData(
         title: 'Classes',
         value: _todayAttendance.length.toString(),
@@ -537,15 +532,16 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 1.2,
+          crossAxisCount: 3,
+          mainAxisSpacing: 18,
+          crossAxisSpacing: 18,
+          // Give tiles a fixed height to avoid vertical overflow inside each card
+          mainAxisExtent: 138,
         ),
         itemCount: stats.length,
         itemBuilder: (context, index) {
@@ -557,7 +553,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
   Widget _buildEnhancedStatCard(StatData stat) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -576,7 +572,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -589,24 +585,24 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 child: Icon(
                   stat.icon,
                   color: stat.color,
-                  size: 24,
+                  size: 20,
                 ),
               ),
               Text(
                 stat.value,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: stat.color,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             stat.title,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2D3748),
             ),
@@ -614,7 +610,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           Text(
             stat.subtitle,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: Color(0xFF718096),
             ),
           ),
