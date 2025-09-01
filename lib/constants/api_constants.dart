@@ -1,6 +1,6 @@
 class ApiConstants {
-  // static const String baseUrl = 'https://as.mokshasolutions.com/';
-  static const String baseUrl = 'http://192.168.1.11:8025';
+  static const String baseUrl = 'https://as.mokshasolutions.com/';
+  // static const String baseUrl = 'http://192.168.1.11:8025';
   static const String login = '/api/User/Login';
 
   // ------------- STUDENT -------------

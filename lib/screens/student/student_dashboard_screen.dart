@@ -297,7 +297,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
       FeatureData(
         title: AppStrings.studentmarks,
-        icon: Icons.note_add_outlined,
+        icon: Icons.assessment_rounded,
         color: Colors.amberAccent,
         // value: '85%',
         // subtitle: 'This month',

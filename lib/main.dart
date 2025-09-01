@@ -65,7 +65,10 @@ import 'package:dps/screens/student/student_dashboard_screen.dart';
 import 'package:dps/screens/student/student_profile_screen.dart';
 import 'package:dps/screens/student/study_material_screen.dart';
 import 'package:dps/screens/student/marks_screen.dart';
+import 'package:dps/screens/student/student_results_hub_screen.dart';
+import 'package:dps/screens/student/student_exam_results_screen.dart';
 import 'package:dps/screens/teacher/teacher_dashboard_screen.dart';
+import 'package:dps/services/student_exam_service.dart';
 import 'package:dps/theme/app_theme.dart';
 
 void main() {
@@ -94,7 +97,11 @@ class MyApp extends StatelessWidget {
         AppRoutes.studentHomework: (context) => const HomeworkScreen(),
         AppRoutes.studentLeave: (context) => const LeaveScreen(),
         AppRoutes.studentStudyMaterial: (context) => const StudyMaterialScreen(),
-        AppRoutes.studentmarks: (context) => const MarksScreen(),
+        AppRoutes.studentmarks: (context) => const StudentResultsHubScreen(),
+        AppRoutes.studentExamResults: (context) {
+          final exam = ModalRoute.of(context)!.settings.arguments as StudentExamItem;
+          return StudentExamResultsScreen(exam: exam);
+        },
         AppRoutes.studentExamination: (context) => const ExaminationScreen(),
         AppRoutes.studentProfile: (context) => const StudentProfileScreen(),
         AppRoutes.studenttimetable: (context) => const TimetableScreen(),
