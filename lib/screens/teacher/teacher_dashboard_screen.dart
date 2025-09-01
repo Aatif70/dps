@@ -361,13 +361,29 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   Widget _buildEnhancedFeatureGrid(BuildContext context) {
     final features = [
       TeacherFeatureData(
-        title: AppStrings.attendance,
+        title: 'Attendance Hub',
+        icon: Icons.dashboard_rounded,
+        color: const  Color(0xFF58CC02),
+        subtitle: 'Overview',
+        route: AppRoutes.teacherAttendanceHub,
+        description: 'View your attendance & manage classes',
+      ),
+      TeacherFeatureData(
+        title: 'Mark Attendance',
         icon: Icons.calendar_today_rounded,
         color: const Color(0xFF4A90E2),
-
-        subtitle: 'Average',
+        subtitle: 'Classes',
         route: AppRoutes.teacherAttendance,
         description: 'Mark & view class attendance',
+      ),
+
+      TeacherFeatureData(
+        title: AppStrings.leave,
+        icon: Icons.event_busy_rounded,
+        color: const Color(0xFF8E44AD),
+        subtitle: 'Requests',
+        route: AppRoutes.teacherLeave,
+        description: 'Manage leave requests',
       ),
       TeacherFeatureData(
         title: AppStrings.homework,
@@ -376,14 +392,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         subtitle: 'Active',
         route: AppRoutes.teacherHomework,
         description: 'Create & grade assignments',
-      ),
-      TeacherFeatureData(
-        title: AppStrings.leave,
-        icon: Icons.event_busy_rounded,
-        color: const Color(0xFF8E44AD),
-        subtitle: 'Requests',
-        route: AppRoutes.teacherLeave,
-        description: 'Manage leave requests',
       ),
       TeacherFeatureData(
         title: AppStrings.studyMaterial,
@@ -528,6 +536,12 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
 
   Widget _buildEnhancedQuickActionsSheet(BuildContext context) {
     final quickActions = [
+      QuickActionData(
+        icon: Icons.dashboard_rounded,
+        label: 'Attendance Hub',
+        color: const Color(0xFF4A90E2),
+        route: AppRoutes.teacherAttendanceHub,
+      ),
       QuickActionData(
         icon: Icons.calendar_today_rounded,
         label: 'Mark Attendance',

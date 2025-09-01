@@ -53,6 +53,7 @@ class ApiConstants {
   // ------------- TEACHER ATTENDANCE -------------
   static const String attendanceEmpIndex = '/api/user/AttendanceEmpIndex';
   static const String studentDetails = '/api/user/StudentDetails';
+  static const String employeeAttendance = '/api/Employee/EmployeeAttendance';
 
 
 

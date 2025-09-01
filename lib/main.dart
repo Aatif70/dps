@@ -49,6 +49,7 @@ import 'package:dps/screens/teacher/homework_screen.dart';
 import 'package:dps/screens/teacher/leave_screen.dart';
 import 'package:dps/screens/teacher/study_material_screen.dart';
 import 'package:dps/screens/teacher/teacher_profile_screen.dart';
+import 'package:dps/screens/teacher/attendance_hub_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dps/constants/app_routes.dart';
 import 'package:dps/constants/app_strings.dart';
@@ -109,6 +110,7 @@ class MyApp extends StatelessWidget {
         // Teacher routes
         AppRoutes.teacherDashboard: (context) => const TeacherDashboardScreen(),
         AppRoutes.teacherAttendance: (context) => const TeacherAttendanceScreen(),
+        AppRoutes.teacherAttendanceHub: (context) => const TeacherAttendanceHubScreen(),
         AppRoutes.teacherHomework: (context) => const TeacherHomeworkScreen(),
         AppRoutes.teacherLeave: (context) => const TeacherLeaveScreen(),
         AppRoutes.teacherStudyMaterial: (context) => const TeacherStudyMaterialScreen(),

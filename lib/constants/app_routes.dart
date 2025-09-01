@@ -21,6 +21,7 @@ class AppRoutes {
   // Teacher Routes
   static const String teacherDashboard = '/teacher/dashboard';
   static const String teacherAttendance = '/teacher/attendance';
+  static const String teacherAttendanceHub = '/teacher/attendance-hub';
   static const String teacherHomework = '/teacher/homework';
   static const String teacherLeave = '/teacher/leave';
   static const String teacherStudyMaterial = '/teacher/study-material';
