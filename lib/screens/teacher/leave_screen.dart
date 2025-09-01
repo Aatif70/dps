@@ -175,7 +175,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
 
   Widget _buildEnhancedTabSection(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -209,9 +209,9 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.hourglass_empty_rounded, size: 14),
+                const Icon(Icons.hourglass_empty_rounded, size: 13, color: Colors.orange,),
                 const SizedBox(width: 2),
-                Text('Pending (${_leaveRequests.where((leave) => leave.status == LeaveStatus.pending).length})'),
+                Text('Pending (${_leaveRequests.where((leave) => leave.status == LeaveStatus.pending).length})', style: const TextStyle(color: Colors.orange,))
               ],
             ),
           ),
@@ -220,9 +220,9 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle_outline_rounded, size: 14),
+                const Icon(Icons.check_circle_outline_rounded, size: 13, color: Colors.green,),
                 const SizedBox(width: 2),
-                Text('Approved (${_leaveRequests.where((leave) => leave.status == LeaveStatus.approved).length})'),
+                Text('Approved (${_leaveRequests.where((leave) => leave.status == LeaveStatus.approved).length})', style: const TextStyle(color: Colors.green,)),
               ],
             ),
           ),
@@ -231,9 +231,9 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.cancel_outlined, size: 14),
+                const Icon(Icons.cancel_outlined, size: 13, color: Colors.red,),
                 const SizedBox(width: 2),
-                Text('Rejected (${_leaveRequests.where((leave) => leave.status == LeaveStatus.rejected).length})'),
+                Text('Rejected (${_leaveRequests.where((leave) => leave.status == LeaveStatus.rejected).length})', style: const TextStyle(color: Colors.red,)),
               ],
             ),
           ),
