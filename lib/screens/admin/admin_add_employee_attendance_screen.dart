@@ -233,7 +233,7 @@ class _AdminAddEmployeeAttendanceScreenState extends State<AdminAddEmployeeAtten
                         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFF1F5F9))),
                         child: Row(
                           children: [
-                            CircleAvatar(backgroundColor: const Color(0xFF6C5CE7).withOpacity(0.1), child: const Icon(Icons.person, color: Color(0xFF6C5CE7))),
+                            CircleAvatar(backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.1), child: const Icon(Icons.person, color: Color(0xFF6C5CE7))),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

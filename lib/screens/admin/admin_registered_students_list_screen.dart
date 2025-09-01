@@ -135,7 +135,7 @@ class _AdminRegisteredStudentsListScreenState extends State<AdminRegisteredStude
                     child: const Center(child: Text('No registered students')),
                   )
                 else
-                  ...filtered.map((s) => _studentCard(context, s)).toList(),
+                  ...filtered.map((s) => _studentCard(context, s)),
               ],
             ),
           );

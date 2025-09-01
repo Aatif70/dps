@@ -46,7 +46,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
   }
 
   Future<void> _onClassChanged(BatchItem? batch) async {
-    print('[Allotment] Class changed -> ${batch?.batchName} (ClassId: ${batch?.classId})');
+    debugPrint('[Allotment] Class changed -> ${batch?.batchName} (ClassId: ${batch?.classId})');
     setState(() {
       _selectedBatch = batch;
       _selectedDivision = null;
@@ -63,8 +63,8 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
     final divisions = await AdminAdmissionsService.fetchDivisionsByClass(classId: batch.classId);
     final subjects = await AdminAdmissionsService.fetchClasswiseSubjects(classId: batch.classId);
     if (!mounted) return;
-    print('[Allotment] Divisions fetched for ClassId=${batch.classId} -> count=${divisions.length}');
-    print('[Allotment] Subjects fetched for ClassId=${batch.classId} -> count=${subjects.length}');
+    debugPrint('[Allotment] Divisions fetched for ClassId=${batch.classId} -> count=${divisions.length}');
+    debugPrint('[Allotment] Subjects fetched for ClassId=${batch.classId} -> count=${subjects.length}');
     setState(() {
       _divisions = divisions;
       _subjects = subjects;
@@ -77,7 +77,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
   }
 
   Future<void> _onDivisionChanged(DivisionLite? div) async {
-    print('[Allotment] Division changed -> ${div?.name} (DivisionId: ${div?.divisionId})');
+    debugPrint('[Allotment] Division changed -> ${div?.name} (DivisionId: ${div?.divisionId})');
     setState(() {
       _selectedDivision = div;
       _selectedPractical = null;
@@ -90,7 +90,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
     }
     final practicals = await AdminAdmissionsService.fetchPracticalBatches(divisionId: div.divisionId);
     if (!mounted) return;
-    print('[Allotment] Practicals fetched for DivisionId=${div.divisionId} -> count=${practicals.length}');
+    debugPrint('[Allotment] Practicals fetched for DivisionId=${div.divisionId} -> count=${practicals.length}');
     setState(() {
       _practicals = practicals;
       _loadingPracticals = false;

@@ -361,7 +361,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
   }
 
   Future<void> _loadAttendanceData() async {
-    print('=== LOADING ATTENDANCE DATA BY DATE ===');
+    debugPrint('=== LOADING ATTENDANCE DATA BY DATE ===');
     setState(() {
       _isLoading = true;
       _attendanceData = null;
@@ -375,7 +375,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
         year: _selectedFilterOption == 'monthYear' ? _selectedYear : null,
       );
 
-      print('Attendance data loaded: $data');
+      debugPrint('Attendance data loaded: $data');
       
       if (mounted) {
         setState(() {
@@ -384,7 +384,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
         });
       }
     } catch (e) {
-      print('Error loading attendance data: $e');
+      debugPrint('Error loading attendance data: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

@@ -346,7 +346,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: events.take(3).map((event) {
-                        final type = _eventType(event as EventData);
+                        final type = _eventType(event);
                         final color = type == 'holiday'
                             ? const Color(0xFFE74C3C)
                             : type == 'exam'
@@ -471,7 +471,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: events.take(3).map((event) {
-                        final type = _calendarItemType(event as CalendarItem);
+                        final type = _calendarItemType(event);
                         final color = type == 'holiday'
                             ? const Color(0xFFE74C3C)
                             : type == 'exam'

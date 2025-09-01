@@ -30,14 +30,14 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
   }
 
   Future<void> _loadBatches() async {
-    print('=== LOADING BATCHES ===');
+    debugPrint('=== LOADING BATCHES ===');
     setState(() {
       _isLoadingBatches = true;
     });
 
     try {
       final batches = await AdminStudentAttendanceService.getBatches();
-      print('Loaded ${batches.length} batches');
+      debugPrint('Loaded ${batches.length} batches');
       
       if (mounted) {
         setState(() {
@@ -50,7 +50,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
         });
       }
     } catch (e) {
-      print('Error loading batches: $e');
+      debugPrint('Error loading batches: $e');
       if (mounted) {
         setState(() {
           _isLoadingBatches = false;
@@ -66,7 +66,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
   Future<void> _loadDivisions() async {
     if (_selectedBatch == null) return;
 
-    print('=== LOADING DIVISIONS ===');
+    debugPrint('=== LOADING DIVISIONS ===');
     setState(() {
       _isLoadingDivisions = true;
       _selectedDivision = null;
@@ -74,7 +74,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
 
     try {
       final divisions = await AdminStudentAttendanceService.getDivisionsByClass(_selectedBatch!.classId);
-      print('Loaded ${divisions.length} divisions for class ${_selectedBatch!.classId}');
+      debugPrint('Loaded ${divisions.length} divisions for class ${_selectedBatch!.classId}');
       
       if (mounted) {
         setState(() {
@@ -86,7 +86,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
         });
       }
     } catch (e) {
-      print('Error loading divisions: $e');
+      debugPrint('Error loading divisions: $e');
       if (mounted) {
         setState(() {
           _isLoadingDivisions = false;
@@ -108,7 +108,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
       return;
     }
 
-    print('=== LOADING ATTENDANCE DATA ===');
+    debugPrint('=== LOADING ATTENDANCE DATA ===');
     setState(() {
       _isLoading = true;
       _attendanceData = null;
@@ -122,7 +122,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
         divisionId: _selectedDivision!.divisionId,
       );
 
-      print('Attendance data loaded: $data');
+      debugPrint('Attendance data loaded: $data');
       
       if (mounted) {
         setState(() {
@@ -131,7 +131,7 @@ class _AdminStudentAttendanceScreenState extends State<AdminStudentAttendanceScr
         });
       }
     } catch (e) {
-      print('Error loading attendance data: $e');
+      debugPrint('Error loading attendance data: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

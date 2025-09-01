@@ -157,7 +157,7 @@ class _AdminUpdateEmployeeAttendanceScreenState extends State<AdminUpdateEmploye
                       maintainState: true,
                       leading: Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: const Color(0xFFE17055).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(color: const Color(0xFFE17055).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
                         child: const Icon(Icons.event_note_rounded, color: Color(0xFFE17055)),
                       ),
                       title: Text(

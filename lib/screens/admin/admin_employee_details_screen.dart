@@ -48,12 +48,12 @@ class _AdminEmployeeDetailsScreenState extends State<AdminEmployeeDetailsScreen>
       _details = res;
       _isLoading = false;
     });
-    print('[AdminEmployeeDetails] _load() complete. hasData=' + (_details != null).toString());
+    debugPrint('[AdminEmployeeDetails] _load() complete. hasData=' + (_details != null).toString());
     if (_details != null) {
-      print('[AdminEmployeeDetails] personalDetails=' + _details!.personalDetails.length.toString());
-      print('[AdminEmployeeDetails] classAndSubject=' + _details!.classAndSubject.length.toString());
+      debugPrint('[AdminEmployeeDetails] personalDetails=' + _details!.personalDetails.length.toString());
+      debugPrint('[AdminEmployeeDetails] classAndSubject=' + _details!.classAndSubject.length.toString());
       final int tt = _details!.empTimeTable.isNotEmpty ? _details!.empTimeTable.first.timeTables.length : 0;
-      print('[AdminEmployeeDetails] timeTables=' + tt.toString());
+      debugPrint('[AdminEmployeeDetails] timeTables=' + tt.toString());
       Future.delayed(const Duration(milliseconds: 150), () => _fadeController.forward());
     }
   }
@@ -177,7 +177,7 @@ Widget _buildHeroHeader(BuildContext context, EmployeeDetailsResponse details) {
 
 Widget _buildPersonalSection(BuildContext context, EmployeeDetailsResponse details) {
   final PersonalDetail? p = details.personalDetails.isNotEmpty ? details.personalDetails.first : null;
-  print('[AdminEmployeeDetails] Render personal section - hasPersonal=' + (p != null).toString());
+  debugPrint('[AdminEmployeeDetails] Render personal section - hasPersonal=' + (p != null).toString());
   if (p == null) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -221,7 +221,7 @@ Widget _buildPersonalSection(BuildContext context, EmployeeDetailsResponse detai
 }
 
 Widget _buildClassesSection(BuildContext context, EmployeeDetailsResponse details) {
-  print('[AdminEmployeeDetails] Render classes section - count=' + details.classAndSubject.length.toString());
+  debugPrint('[AdminEmployeeDetails] Render classes section - count=' + details.classAndSubject.length.toString());
   if (details.classAndSubject.isEmpty) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -291,7 +291,7 @@ Widget _buildClassesSection(BuildContext context, EmployeeDetailsResponse detail
 
 Widget _buildTimetableSection(BuildContext context, EmployeeDetailsResponse details) {
   final List<TimeTableItem> raw = details.empTimeTable.isNotEmpty ? details.empTimeTable.first.timeTables : <TimeTableItem>[];
-  print('[AdminEmployeeDetails] Render timetable section - count=' + raw.length.toString());
+  debugPrint('[AdminEmployeeDetails] Render timetable section - count=' + raw.length.toString());
   if (raw.isEmpty) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

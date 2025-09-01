@@ -63,22 +63,22 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
     });
 
     try {
-      print('=== LOADING STUDENT PROFILE DATA ===');
+      debugPrint('=== LOADING STUDENT PROFILE DATA ===');
 
       // Load student details
       final studentDetailResponse = await StudentProfileService.getStudentDetails();
       if (studentDetailResponse != null) {
         _studentDetail = studentDetailResponse.data;
-        print('=== STUDENT DETAILS LOADED ===');
-        print('Student: ${_studentDetail!.studentName}');
+        debugPrint('=== STUDENT DETAILS LOADED ===');
+        debugPrint('Student: ${_studentDetail!.studentName}');
       }
 
       // Load student documents
       final documentsResponse = await StudentProfileService.getStudentDocuments();
       if (documentsResponse != null) {
         _documentCategories = documentsResponse.data;
-        print('=== STUDENT DOCUMENTS LOADED ===');
-        print('Categories: ${_documentCategories.length}');
+        debugPrint('=== STUDENT DOCUMENTS LOADED ===');
+        debugPrint('Categories: ${_documentCategories.length}');
       }
 
       setState(() {
@@ -87,8 +87,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
       });
 
     } catch (e) {
-      print('=== ERROR LOADING STUDENT DATA ===');
-      print('Error: $e');
+      debugPrint('=== ERROR LOADING STUDENT DATA ===');
+      debugPrint('Error: $e');
 
       setState(() {
         _isLoading = false;
@@ -306,7 +306,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                         : null,
                     onBackgroundImageError: _studentDetail?.photo.isNotEmpty == true
                         ? (exception, stackTrace) {
-                            print('Image loading failed for student profile: ${_studentDetail?.photoUrl}');
+                            debugPrint('Image loading failed for student profile: ${_studentDetail?.photoUrl}');
                           }
                         : null,
                     child: _studentDetail?.photo.isEmpty == true

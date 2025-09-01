@@ -81,21 +81,21 @@ class _HomeworkScreenState extends State<HomeworkScreen>
   }
 
   Future<void> _loadHomeworkData() async {
-    print('=== HOMEWORK SCREEN DEBUG START ===');
+    debugPrint('=== HOMEWORK SCREEN DEBUG START ===');
     setState(() {
       _isLoading = true;
     });
 
     try {
-      print('Homework Screen - Calling HomeworkService.getStudentHomework()');
-      print('Date range: ${_fromDate.toIso8601String()} to ${_toDate.toIso8601String()}');
+      debugPrint('Homework Screen - Calling HomeworkService.getStudentHomework()');
+      debugPrint('Date range: ${_fromDate.toIso8601String()} to ${_toDate.toIso8601String()}');
 
       final homeworkRecords = await HomeworkService.getStudentHomework(
         fromDate: _fromDate,
         toDate: _toDate,
       );
 
-      print('Homework Screen - Received ${homeworkRecords.length} homework records');
+      debugPrint('Homework Screen - Received ${homeworkRecords.length} homework records');
 
       // Group data by date and calculate subject counts
       _groupDataByDate(homeworkRecords);
@@ -106,11 +106,11 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         _isLoading = false;
       });
 
-      print('Homework Screen - State updated successfully');
-      print('=== HOMEWORK SCREEN DEBUG END ===');
+      debugPrint('Homework Screen - State updated successfully');
+      debugPrint('=== HOMEWORK SCREEN DEBUG END ===');
     } catch (e, stackTrace) {
-      print('Homework Screen - Error occurred: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Homework Screen - Error occurred: $e');
+      debugPrint('Stack trace: $stackTrace');
 
       setState(() {
         _isLoading = false;
@@ -137,7 +137,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
 
     try {
       final fullUrl = '${ApiConstants.baseUrl}$docPath';
-      print('Opening document: $fullUrl');
+      debugPrint('Opening document: $fullUrl');
 
       // Check file extension to determine how to handle it
       final extension = docPath.toLowerCase().split('.').last;
@@ -156,7 +156,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         await _openUrlExternally(fullUrl);
       }
     } catch (e) {
-      print('Error viewing document: $e');
+      debugPrint('Error viewing document: $e');
       CustomSnackbar.showError(
         context,
         message: 'Unable to open document. Please try again.',

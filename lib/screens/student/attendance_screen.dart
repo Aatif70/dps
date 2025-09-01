@@ -107,12 +107,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     });
 
     try {
-      print('=== LOADING ATTENDANCE DATA ===');
-      print('Selected Date: $_selectedDate');
+      debugPrint('=== LOADING ATTENDANCE DATA ===');
+      debugPrint('Selected Date: $_selectedDate');
 
       // Format date for API call (dd-mm-yyyy)
       final dateString = DateFormat('dd-MM-yyyy').format(_selectedDate);
-      print('Formatted Date String: $dateString');
+      debugPrint('Formatted Date String: $dateString');
 
       // Get today's attendance
       final attendanceResponse = await AttendanceService.getStudentAttendance(
@@ -121,11 +121,11 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
       if (attendanceResponse != null) {
         _todayAttendance = attendanceResponse.attendanceList;
-        print('=== TODAY\'S ATTENDANCE LOADED ===');
-        print('Records count: ${_todayAttendance.length}');
+        debugPrint('=== TODAY\'S ATTENDANCE LOADED ===');
+        debugPrint('Records count: ${_todayAttendance.length}');
       } else {
         _todayAttendance = [];
-        print('=== NO ATTENDANCE DATA FOR TODAY ===');
+        debugPrint('=== NO ATTENDANCE DATA FOR TODAY ===');
       }
 
       // Get monthly stats
@@ -135,12 +135,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       );
 
       _monthlyStats = monthlyStats;
-      print('=== MONTHLY STATS LOADED ===');
-      print('Monthly Stats: $_monthlyStats');
+      debugPrint('=== MONTHLY STATS LOADED ===');
+      debugPrint('Monthly Stats: $_monthlyStats');
 
       // Calculate streak (simplified)
       _currentStreak = _calculateCurrentStreak();
-      print('Current Streak: $_currentStreak days');
+      debugPrint('Current Streak: $_currentStreak days');
 
       setState(() {
         _isLoading = false;
@@ -148,8 +148,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       });
 
     } catch (e) {
-      print('=== ERROR LOADING ATTENDANCE DATA ===');
-      print('Error: $e');
+      debugPrint('=== ERROR LOADING ATTENDANCE DATA ===');
+      debugPrint('Error: $e');
 
       setState(() {
         _isLoading = false;

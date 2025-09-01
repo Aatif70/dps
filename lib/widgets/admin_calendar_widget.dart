@@ -64,7 +64,7 @@ class _AdminCalendarWidgetState extends State<AdminCalendarWidget>
         _selectedTeacher = _teacherTimetables.first;
       }
     } catch (e) {
-      print('Error loading calendar data: $e');
+      debugPrint('Error loading calendar data: $e');
       setState(() {
         _isLoading = false;
       });

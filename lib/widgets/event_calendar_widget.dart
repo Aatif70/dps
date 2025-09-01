@@ -330,7 +330,7 @@ class _EventCalendarWidgetState extends State<EventCalendarWidget>
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: (event as CalendarEvent).color,
+                        color: (event).color,
                         shape: BoxShape.circle,
                       ),
                     );

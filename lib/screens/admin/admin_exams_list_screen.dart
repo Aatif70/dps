@@ -60,7 +60,7 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
                 else if (filtered.isEmpty)
                   _hint('No exams found')
                 else
-                  ...filtered.map(_examCard).toList(),
+                  ...filtered.map(_examCard),
               ],
             ),
           );

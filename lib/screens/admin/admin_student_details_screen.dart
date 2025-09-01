@@ -308,7 +308,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
     try {
       Uri.parse(photoUrl);
     } catch (e) {
-      print('Invalid photo URL format: $photoUrl');
+      debugPrint('Invalid photo URL format: $photoUrl');
       return CircleAvatar(
         radius: 34,
         backgroundColor: Colors.white,
@@ -326,7 +326,7 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
           height: 68,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            print('Image loading failed for: $photoUrl - Error: $error');
+            debugPrint('Image loading failed for: $photoUrl - Error: $error');
             return Container(
               width: 68,
               height: 68,

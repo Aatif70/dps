@@ -212,7 +212,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                           backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
                           onBackgroundImageError: _photoUrl.isNotEmpty
                               ? (exception, stackTrace) {
-                                  print('Image loading failed for student dashboard: $_photoUrl');
+                                  debugPrint('Image loading failed for student dashboard: $_photoUrl');
                                 }
                               : null,
                           child: _photoUrl.isEmpty
