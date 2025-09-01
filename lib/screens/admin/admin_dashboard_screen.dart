@@ -187,7 +187,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C5CE7).withOpacity(0.25),
+            color: const Color(0xFF6C5CE7).withValues(alpha:0.25),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -202,7 +202,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 Text(
                   'Welcome back! 👋',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha:0.9),
                     fontSize: 14,
                   ),
                 ),
@@ -221,7 +221,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Row(
@@ -239,7 +239,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha:0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -314,7 +314,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha:0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -329,7 +329,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -397,7 +397,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha:0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -486,7 +486,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -564,7 +564,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFE17055).withOpacity(0.1),
+              color: const Color(0xFFE17055).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
@@ -750,7 +750,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: feature.color.withOpacity(0.08),
+                    color: feature.color.withValues(alpha:0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -766,8 +766,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            feature.color.withOpacity(0.1),
-                            feature.color.withOpacity(0.05),
+                            feature.color.withValues(alpha:0.1),
+                            feature.color.withValues(alpha:0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,

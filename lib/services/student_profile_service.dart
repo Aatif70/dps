@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dps/constants/api_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,7 @@ class StudentProfileService {
 
   static Future<StudentDetailResponse?> getStudentDetails() async {
     try {
-      print('=== STUDENT DETAILS API CALL ===');
+      debugPrint('=== STUDENT DETAILS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       
@@ -31,64 +32,64 @@ class StudentProfileService {
         }
       }
 
-      print('Student ID: $studentId');
-      print('UID: $uid');
+      debugPrint('Student ID: $studentId');
+      debugPrint('UID: $uid');
 
       if (studentId.isEmpty || uid.isEmpty) {
-        print('Missing StudentId or UId in preferences');
+        debugPrint('Missing StudentId or UId in preferences');
         return null;
       }
 
       final url = Uri.parse('$baseUrl/api/user/SearchStudentDetail');
-      print('URL: $url');
+      debugPrint('URL: $url');
 
       final request = http.MultipartRequest('POST', url);
       request.fields['StudentId'] = studentId;
       request.fields['UId'] = uid;
 
-      print('=== REQUEST FIELDS ===');
-      print('StudentId: $studentId');
-      print('UId: $uid');
+      debugPrint('=== REQUEST FIELDS ===');
+      debugPrint('StudentId: $studentId');
+      debugPrint('UId: $uid');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== STUDENT DETAILS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== STUDENT DETAILS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final studentDetail = StudentDetailResponse.fromJson(jsonData);
-          print('=== STUDENT DETAIL PARSED ===');
-          print('Student Name: ${studentDetail.data.studentName}');
-          print('Email: ${studentDetail.data.email}');
-          print('Class: ${studentDetail.data.className}');
+          debugPrint('=== STUDENT DETAIL PARSED ===');
+          debugPrint('Student Name: ${studentDetail.data.studentName}');
+          debugPrint('Email: ${studentDetail.data.email}');
+          debugPrint('Class: ${studentDetail.data.className}');
           return studentDetail;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
           return null;
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return null;
       }
     } catch (e, stackTrace) {
-      print('=== STUDENT DETAILS API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== STUDENT DETAILS API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }
 
   static Future<StudentDocumentsResponse?> getStudentDocuments() async {
     try {
-      print('=== STUDENT DOCUMENTS API CALL ===');
+      debugPrint('=== STUDENT DOCUMENTS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       
@@ -110,58 +111,58 @@ class StudentProfileService {
         }
       }
 
-      print('Student ID: $studentId');
-      print('UID: $uid');
+      debugPrint('Student ID: $studentId');
+      debugPrint('UID: $uid');
 
       if (studentId.isEmpty || uid.isEmpty) {
-        print('Missing StudentId or UId in preferences');
+        debugPrint('Missing StudentId or UId in preferences');
         return null;
       }
 
       final url = Uri.parse('$baseUrl/api/user/StudentDocuments');
-      print('URL: $url');
+      debugPrint('URL: $url');
 
       final request = http.MultipartRequest('POST', url);
       request.fields['StudentId'] = studentId;
       request.fields['UId'] = uid;
 
-      print('=== REQUEST FIELDS ===');
-      print('StudentId: $studentId');
-      print('UId: $uid');
+      debugPrint('=== REQUEST FIELDS ===');
+      debugPrint('StudentId: $studentId');
+      debugPrint('UId: $uid');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== STUDENT DOCUMENTS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== STUDENT DOCUMENTS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final documentsResponse = StudentDocumentsResponse.fromJson(jsonData);
-          print('=== STUDENT DOCUMENTS PARSED ===');
-          print('Document categories: ${documentsResponse.data.length}');
+          debugPrint('=== STUDENT DOCUMENTS PARSED ===');
+          debugPrint('Document categories: ${documentsResponse.data.length}');
           for (var category in documentsResponse.data) {
-            print('${category.category}: ${category.documents.length} documents');
+            debugPrint('${category.category}: ${category.documents.length} documents');
           }
           return documentsResponse;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
           return null;
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return null;
       }
     } catch (e, stackTrace) {
-      print('=== STUDENT DOCUMENTS API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== STUDENT DOCUMENTS API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }

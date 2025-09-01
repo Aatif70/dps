@@ -143,7 +143,7 @@ class _AdminHomeworkListScreenState extends State<AdminHomeworkListScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.task_alt_rounded, color: Color(0xFF4A90E2), size: 20),

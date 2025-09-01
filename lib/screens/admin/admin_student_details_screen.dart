@@ -168,12 +168,12 @@ class _AdminStudentDetailsScreenState extends State<AdminStudentDetailsScreen> {
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
-                Text(d.email, style: TextStyle(color: Colors.white.withOpacity(0.9))),
+                Text(d.email, style: TextStyle(color: Colors.white.withValues(alpha:0.9))),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(

@@ -89,7 +89,7 @@ class AdminAttendanceHubScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6C5CE7).withOpacity(0.25),
+                        color: const Color(0xFF6C5CE7).withValues(alpha:0.25),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -100,7 +100,7 @@ class AdminAttendanceHubScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(
@@ -126,7 +126,7 @@ class AdminAttendanceHubScreen extends StatelessWidget {
                             Text(
                               'Manage student and employee attendance',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha:0.9),
                                 fontSize: 14,
                               ),
                             ),
@@ -163,7 +163,7 @@ class AdminAttendanceHubScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -202,7 +202,7 @@ class AdminAttendanceHubScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: item.color.withOpacity(0.08),
+                  color: item.color.withValues(alpha:0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -218,8 +218,8 @@ class AdminAttendanceHubScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          item.color.withOpacity(0.1),
-                          item.color.withOpacity(0.05),
+                          item.color.withValues(alpha:0.1),
+                          item.color.withValues(alpha:0.05),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,

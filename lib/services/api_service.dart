@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -6,8 +7,8 @@ import 'package:dps/constants/api_constants.dart';
 class ApiService {
   static Future<bool> login({required String email, required String password}) async {
     final url = Uri.parse(ApiConstants.baseUrl + ApiConstants.login);
-    print('Attempting login at: ' + url.toString());
-    print('Sending email: $email');
+    debugPrint('Attempting login at: ' + url.toString());
+    debugPrint('Sending email: $email');
     try {
       final response = await http.post(
         url,
@@ -17,8 +18,8 @@ class ApiService {
           'Password': password,
         }),
       );
-      print('Response status: \'${response.statusCode}\'');
-      print('Response body: ${response.body}');
+      debugPrint('Response status: \'${response.statusCode}\'');
+      debugPrint('Response body: ${response.body}');
       final Map<String, dynamic> res = jsonDecode(response.body);
       if (res['success'] == true && res['data'] != null) {
         final data = res['data'];
@@ -40,18 +41,18 @@ class ApiService {
             }
             if (classIdInt != null) {
               await prefs.setInt('ClassId', classIdInt);
-              print('Stored ClassId: $classIdInt');
+              debugPrint('Stored ClassId: $classIdInt');
             }
           }
         } catch (_) {}
-        print('Login successful, Uid stored: ${data['Uid']}');
+        debugPrint('Login successful, Uid stored: ${data['Uid']}');
         return true;
       } else {
-        print('Login failed: ${res['success']}');
+        debugPrint('Login failed: ${res['success']}');
         return false;
       }
     } catch (e) {
-      print('Login error: $e');
+      debugPrint('Login error: $e');
       return false;
     }
   }

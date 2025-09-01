@@ -14,8 +14,8 @@ class HomeworkService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== HOMEWORK SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== HOMEWORK SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -24,32 +24,32 @@ class HomeworkService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Homework Service - Processed Uid: $uid');
-      print('Homework Service - Id value for request: $idValue');
+      debugPrint('Homework Service - Processed Uid: $uid');
+      debugPrint('Homework Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentHomework}');
-      print('Homework Service - Request URL: $url');
+      debugPrint('Homework Service - Request URL: $url');
 
       // Format dates as dd-MM-yyyy
       final fromDateStr = DateFormat('dd-MM-yyyy').format(fromDate);
       final toDateStr = DateFormat('dd-MM-yyyy').format(toDate);
 
-      print('Homework Service - Date range: $fromDateStr to $toDateStr');
+      debugPrint('Homework Service - Date range: $fromDateStr to $toDateStr');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
@@ -58,56 +58,56 @@ class HomeworkService {
       request.fields['FD'] = fromDateStr;
       request.fields['TD'] = toDateStr;
 
-      print('Homework Service - Multipart fields: ${request.fields}');
+      debugPrint('Homework Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Homework Service - Response status: ${response.statusCode}');
-      print('Homework Service - Response headers: ${response.headers}');
-      print('Homework Service - Raw response body: ${response.body}');
+      debugPrint('Homework Service - Response status: ${response.statusCode}');
+      debugPrint('Homework Service - Response headers: ${response.headers}');
+      debugPrint('Homework Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Homework Service - Parsed JSON response: $jsonResponse');
+        debugPrint('Homework Service - Parsed JSON response: $jsonResponse');
 
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           final List<dynamic> data = jsonResponse['data'];
-          print('Homework Service - Data array length: ${data.length}');
+          debugPrint('Homework Service - Data array length: ${data.length}');
 
           List<StudentHomeworkRecord> homeworkRecords = [];
 
           for (int i = 0; i < data.length; i++) {
             try {
-              print('--- Processing homework record $i ---');
+              debugPrint('--- Processing homework record $i ---');
               final item = data[i];
-              print('Raw item data: $item');
+              debugPrint('Raw item data: $item');
 
               final homeworkRecord = StudentHomeworkRecord.fromJson(item);
-              print('Successfully parsed homework record $i: ${homeworkRecord.subject}');
+              debugPrint('Successfully parsed homework record $i: ${homeworkRecord.subject}');
               homeworkRecords.add(homeworkRecord);
             } catch (e, stackTrace) {
-              print('ERROR parsing homework record $i: $e');
-              print('Stack trace: $stackTrace');
-              print('Failed item data: ${data[i]}');
+              debugPrint('ERROR parsing homework record $i: $e');
+              debugPrint('Stack trace: $stackTrace');
+              debugPrint('Failed item data: ${data[i]}');
             }
           }
 
-          print('Homework Service - Successfully parsed ${homeworkRecords.length} out of ${data.length} records');
-          print('=== HOMEWORK SERVICE DEBUG END ===');
+          debugPrint('Homework Service - Successfully parsed ${homeworkRecords.length} out of ${data.length} records');
+          debugPrint('=== HOMEWORK SERVICE DEBUG END ===');
           return homeworkRecords;
         } else {
-          print('API returned success: false or no data');
+          debugPrint('API returned success: false or no data');
           return [];
         }
       } else {
-        print('Failed to load student homework. Status code: ${response.statusCode}');
-        print('Error response body: ${response.body}');
+        debugPrint('Failed to load student homework. Status code: ${response.statusCode}');
+        debugPrint('Error response body: ${response.body}');
         return [];
       }
     } catch (e, stackTrace) {
-      print('Error fetching student homework: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error fetching student homework: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -137,8 +137,8 @@ class StudentHomeworkRecord {
 
   factory StudentHomeworkRecord.fromJson(Map<String, dynamic> json) {
     try {
-      print('--- StudentHomeworkRecord.fromJson START ---');
-      print('Input JSON: $json');
+      debugPrint('--- StudentHomeworkRecord.fromJson START ---');
+      debugPrint('Input JSON: $json');
 
       final record = StudentHomeworkRecord(
         className: _safeStringExtraction(json, 'ClassName'),
@@ -151,12 +151,12 @@ class StudentHomeworkRecord {
         doc: json['Doc']?.toString(),
       );
 
-      print('--- StudentHomeworkRecord.fromJson SUCCESS ---');
+      debugPrint('--- StudentHomeworkRecord.fromJson SUCCESS ---');
       return record;
     } catch (e, stackTrace) {
-      print('--- StudentHomeworkRecord.fromJson ERROR ---');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('--- StudentHomeworkRecord.fromJson ERROR ---');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }

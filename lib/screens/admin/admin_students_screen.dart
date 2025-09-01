@@ -94,7 +94,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       final StudentSearchResult item = _results[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF4A90E2).withOpacity(0.1),
+                          backgroundColor: const Color(0xFF4A90E2).withValues(alpha:0.1),
                           child: const Icon(Icons.person, color: Color(0xFF4A90E2)),
                         ),
                         title: Text(

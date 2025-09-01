@@ -59,7 +59,7 @@ class _EventCalendarWidgetState extends State<EventCalendarWidget>
         _applyFilters();
       }
     } catch (e) {
-      print('Error loading events: $e');
+      debugPrint('Error loading events: $e');
     }
 
     setState(() => _isLoading = false);
@@ -113,7 +113,7 @@ class _EventCalendarWidgetState extends State<EventCalendarWidget>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha:0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -201,7 +201,7 @@ class _EventCalendarWidgetState extends State<EventCalendarWidget>
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? filter.color : filter.color.withOpacity(0.1),
+                  color: isSelected ? filter.color : filter.color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: filter.color,
@@ -404,10 +404,10 @@ class _EventCalendarWidgetState extends State<EventCalendarWidget>
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: event.color.withOpacity(0.05),
+        color: event.color.withValues(alpha:0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: event.color.withOpacity(0.2),
+          color: event.color.withValues(alpha:0.2),
           width: 1,
         ),
       ),

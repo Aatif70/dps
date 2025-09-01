@@ -94,7 +94,7 @@ class _MarksScreenState extends State<MarksScreen> with SingleTickerProviderStat
             onPressed: _loadExamsAndMarks,
             icon: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0xFF4A90E2).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: const Color(0xFF4A90E2).withValues(alpha:0.1), borderRadius: BorderRadius.circular(12)),
               child: const Icon(Icons.refresh, color: Color(0xFF4A90E2), size: 20),
             ),
           ),
@@ -126,7 +126,7 @@ class _MarksScreenState extends State<MarksScreen> with SingleTickerProviderStat
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [
-        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 6)),
+        BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 12, offset: const Offset(0, 6)),
       ]),
       child: Row(
         children: [
@@ -188,7 +188,7 @@ class _MarksScreenState extends State<MarksScreen> with SingleTickerProviderStat
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 12, offset: const Offset(0, 6))],
       ),
       child: Row(
         children: [
@@ -196,7 +196,7 @@ class _MarksScreenState extends State<MarksScreen> with SingleTickerProviderStat
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: (pass ? const Color(0xFF58CC02) : const Color(0xFFE74C3C)).withOpacity(0.12),
+              color: (pass ? const Color(0xFF58CC02) : const Color(0xFFE74C3C)).withValues(alpha:0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(pass ? Icons.emoji_events_rounded : Icons.warning_amber_rounded, color: pass ? const Color(0xFF58CC02) : const Color(0xFFE74C3C)),
@@ -222,14 +222,14 @@ class _MarksScreenState extends State<MarksScreen> with SingleTickerProviderStat
 
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [
-        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 6)),
+        BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 12, offset: const Offset(0, 6)),
       ]),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
           width: 46,
           height: 46,
-          decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: color.withValues(alpha:0.12), borderRadius: BorderRadius.circular(12)),
           child: Icon(Icons.book_rounded, color: color),
         ),
         title: Text(m.subjectName, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),

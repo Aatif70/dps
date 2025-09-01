@@ -115,7 +115,7 @@ class _AdminStudentPersonalScreenState extends State<AdminStudentPersonalScreen>
         gradient: const LinearGradient(colors: [Color(0xFF4A90E2), Color(0xFF357ABD)]),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Row(
@@ -146,7 +146,7 @@ class _AdminStudentPersonalScreenState extends State<AdminStudentPersonalScreen>
                 const SizedBox(height: 6),
                 Text(
                   d.email,
-                  style: TextStyle(color: Colors.white.withOpacity(0.9)),
+                  style: TextStyle(color: Colors.white.withValues(alpha:0.9)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -176,7 +176,7 @@ class _AdminStudentPersonalScreenState extends State<AdminStudentPersonalScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
         ],
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
@@ -206,7 +206,7 @@ class _AdminStudentPersonalScreenState extends State<AdminStudentPersonalScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha:0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),

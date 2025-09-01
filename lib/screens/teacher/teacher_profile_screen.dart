@@ -55,7 +55,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.08),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -79,7 +79,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF58CC02).withOpacity(0.1),
+                color: const Color(0xFF58CC02).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -156,7 +156,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.25),
+            color: const Color(0xFF58CC02).withValues(alpha:0.25),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -172,7 +172,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha:0.15),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -209,7 +209,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 Text(
                   _email.isEmpty ? 'Email not available' : _email,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha:0.9),
                     fontSize: 13,
                   ),
                 ),
@@ -217,7 +217,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -268,7 +268,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -6,18 +7,18 @@ import 'package:dps/constants/api_constants.dart';
 class AdminEmployeeDetailsService {
   static Future<EmployeeDetailsResponse?> fetchEmployeeDetails({required int empId}) async {
     try {
-      print('AdminEmployeeDetailsService.fetchEmployeeDetails() called with EmpId: ' + empId.toString());
+      debugPrint('AdminEmployeeDetailsService.fetchEmployeeDetails() called with EmpId: $empId');
       // Switch to GET with query parameter as per API contract
-      final Uri url = Uri.parse('${ApiConstants.baseUrl}/api/Employee/EmpDetails?EmpId=' + empId.toString());
-      print('Employee Details URL (GET): ' + url.toString());
+      final Uri url = Uri.parse('${ApiConstants.baseUrl}/api/Employee/EmpDetails?EmpId=$empId');
+      debugPrint('Employee Details URL (GET): $url');
 
       final http.Response response = await http.get(url);
-      print('EmpDetails statusCode: ' + response.statusCode.toString());
+      debugPrint('EmpDetails statusCode: ${response.statusCode}');
       if (response.body.isNotEmpty) {
-        final String preview = response.body.length > 500 ? (response.body.substring(0, 500) + '...') : response.body;
-        print('EmpDetails raw response preview: ' + preview);
+        final String preview = response.body.length > 500 ? ('${response.body.substring(0, 500)}...') : response.body;
+        debugPrint('EmpDetails raw response preview: $preview');
       } else {
-        print('EmpDetails empty response body');
+        debugPrint('EmpDetails empty response body');
       }
 
       if (response.statusCode == 200) {
@@ -25,13 +26,13 @@ class AdminEmployeeDetailsService {
         if (jsonData['success'] == true && jsonData['data'] != null) {
           try {
             final data = jsonData['data'] as Map<String, dynamic>;
-            print('EmpDetails success=true; Keys: ' + data.keys.join(', '));
+            debugPrint('EmpDetails success=true; Keys: ' + data.keys.join(', '));
           } catch (_) {}
           return EmployeeDetailsResponse.fromJson(jsonData['data'] as Map<String, dynamic>);
         }
-        print('EmpDetails success!=true or data==null. success=' + (jsonData['success']?.toString() ?? 'null'));
+        debugPrint('EmpDetails success!=true or data==null. success=' + (jsonData['success']?.toString() ?? 'null'));
       }
-      print('EmpDetails non-200 status or parsing failed');
+      debugPrint('EmpDetails non-200 status or parsing failed');
     } catch (_) {}
     return null;
   }

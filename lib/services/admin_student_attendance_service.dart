@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -9,41 +10,41 @@ class AdminStudentAttendanceService {
   // Get batches for the admin user
   static Future<List<BatchData>> getBatches() async {
     try {
-      print('=== GETTING BATCHES ===');
+      debugPrint('=== GETTING BATCHES ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('Uid: $uid');
+      debugPrint('Uid: $uid');
 
       final url = Uri.parse('$baseUrl${ApiConstants.adminBatches}');
       final request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
 
-      print('Batches API URL: $url');
+      debugPrint('Batches API URL: $url');
 
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
 
-      print('Batches API Response Status: ${response.statusCode}');
-      print('Batches API Response Body: ${response.body}');
+      debugPrint('Batches API Response Status: ${response.statusCode}');
+      debugPrint('Batches API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] is List) {
           final List<dynamic> batches = jsonData['data'];
           final result = batches.map((b) => BatchData.fromJson(b as Map<String, dynamic>)).toList();
-          print('Successfully parsed ${result.length} batches');
+          debugPrint('Successfully parsed ${result.length} batches');
           return result;
         }
       }
       return [];
     } catch (e) {
-      print('Error getting batches: $e');
+      debugPrint('Error getting batches: $e');
       return [];
     }
   }
@@ -51,12 +52,12 @@ class AdminStudentAttendanceService {
   // Get divisions by class ID
   static Future<List<DivisionData>> getDivisionsByClass(int classId) async {
     try {
-      print('=== GETTING DIVISIONS BY CLASS ===');
-      print('ClassId: $classId');
+      debugPrint('=== GETTING DIVISIONS BY CLASS ===');
+      debugPrint('ClassId: $classId');
 
       final url = Uri.parse('$baseUrl/api/Students/DivByClass?ClassId=$classId');
       
-      print('Divisions API URL: $url');
+      debugPrint('Divisions API URL: $url');
 
       final response = await http.get(
         url,
@@ -66,18 +67,18 @@ class AdminStudentAttendanceService {
         },
       );
 
-      print('Divisions API Response Status: ${response.statusCode}');
-      print('Divisions API Response Body: ${response.body}');
+      debugPrint('Divisions API Response Status: ${response.statusCode}');
+      debugPrint('Divisions API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
         final result = jsonData.map((d) => DivisionData.fromJson(d as Map<String, dynamic>)).toList();
-        print('Successfully parsed ${result.length} divisions');
+        debugPrint('Successfully parsed ${result.length} divisions');
         return result;
       }
       return [];
     } catch (e) {
-      print('Error getting divisions: $e');
+      debugPrint('Error getting divisions: $e');
       return [];
     }
   }
@@ -90,12 +91,12 @@ class AdminStudentAttendanceService {
     required int divisionId,
   }) async {
     try {
-      print('=== GETTING CLASS ATTENDANCE ===');
-      print('Month: $month, Year: $year, ClassId: $classId, DivisionId: $divisionId');
+      debugPrint('=== GETTING CLASS ATTENDANCE ===');
+      debugPrint('Month: $month, Year: $year, ClassId: $classId, DivisionId: $divisionId');
 
       final url = Uri.parse('$baseUrl/api/Students/classwiseattendance?month=$month&year=$year&classId=$classId&divisionId=$divisionId');
       
-      print('Class Attendance API URL: $url');
+      debugPrint('Class Attendance API URL: $url');
 
       final response = await http.get(
         url,
@@ -105,20 +106,20 @@ class AdminStudentAttendanceService {
         },
       );
 
-      print('Class Attendance API Response Status: ${response.statusCode}');
-      print('Class Attendance API Response Body: ${response.body}');
+      debugPrint('Class Attendance API Response Status: ${response.statusCode}');
+      debugPrint('Class Attendance API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final result = ClassAttendanceData.fromJson(jsonData['data'] as Map<String, dynamic>);
-          print('Successfully parsed class attendance data');
+          debugPrint('Successfully parsed class attendance data');
           return result;
         }
       }
       return null;
     } catch (e) {
-      print('Error getting class attendance: $e');
+      debugPrint('Error getting class attendance: $e');
       return null;
     }
   }
@@ -131,8 +132,8 @@ class AdminStudentAttendanceService {
     int? year,
   }) async {
     try {
-      print('=== GETTING STUDENT ATTENDANCE ===');
-      print('FilterOption: $filterOption, SelectedDate: $selectedDate, Month: $month, Year: $year');
+      debugPrint('=== GETTING STUDENT ATTENDANCE ===');
+      debugPrint('FilterOption: $filterOption, SelectedDate: $selectedDate, Month: $month, Year: $year');
 
       String url;
       if (filterOption == 'date' && selectedDate != null) {
@@ -140,11 +141,11 @@ class AdminStudentAttendanceService {
       } else if (filterOption == 'monthYear' && month != null && year != null) {
         url = '$baseUrl/api/Students/GetAttendance?filterOption=$filterOption&month=$month&year=$year';
       } else {
-        print('ERROR: Invalid parameters for filter option');
+        debugPrint('ERROR: Invalid parameters for filter option');
         return null;
       }
       
-      print('Student Attendance API URL: $url');
+      debugPrint('Student Attendance API URL: $url');
 
       final response = await http.get(
         Uri.parse(url),
@@ -154,20 +155,20 @@ class AdminStudentAttendanceService {
         },
       );
 
-      print('Student Attendance API Response Status: ${response.statusCode}');
-      print('Student Attendance API Response Body: ${response.body}');
+      debugPrint('Student Attendance API Response Status: ${response.statusCode}');
+      debugPrint('Student Attendance API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['result'] != null) {
           final result = StudentAttendanceData.fromJson(jsonData);
-          print('Successfully parsed student attendance data');
+          debugPrint('Successfully parsed student attendance data');
           return result;
         }
       }
       return null;
     } catch (e) {
-      print('Error getting student attendance: $e');
+      debugPrint('Error getting student attendance: $e');
       return null;
     }
   }

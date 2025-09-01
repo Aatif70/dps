@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -26,7 +27,7 @@ class CalendarService {
       }
       return [];
     } catch (e) {
-      print('Error fetching events: $e');
+      debugPrint('Error fetching events: $e');
       return [];
     }
   }
@@ -52,7 +53,7 @@ class CalendarService {
       }
       throw Exception('Failed to load annual calendar');
     } catch (e) {
-      print('Error fetching annual calendar: $e');
+      debugPrint('Error fetching annual calendar: $e');
       rethrow;
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,7 @@ class TeacherLeaveService {
     DateTime? toDate,
   }) async {
     try {
-      print('=== LEAVE LIST API CALL ===');
+      debugPrint('=== LEAVE LIST API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
@@ -19,7 +20,7 @@ class TeacherLeaveService {
       final fd = DateFormat('dd-MM-yyyy').format(fromDate ?? DateTime.now().subtract(const Duration(days: 30)));
       final td = DateFormat('dd-MM-yyyy').format(toDate ?? DateTime.now());
 
-      print('UID: $uid, EmpId: $empId, FromDate: $fd, ToDate: $td');
+      debugPrint('UID: $uid, EmpId: $empId, FromDate: $fd, ToDate: $td');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.leaveList}');
       final request = http.MultipartRequest('POST', url);
@@ -34,9 +35,9 @@ class TeacherLeaveService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== LEAVE LIST API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== LEAVE LIST API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -47,9 +48,9 @@ class TeacherLeaveService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== LEAVE LIST ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== LEAVE LIST ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -60,22 +61,22 @@ class TeacherLeaveService {
     required String status, // 'Approved' or 'Rejected'
   }) async {
     try {
-      print('=== APPROVE/REJECT LEAVE API CALL ===');
+      debugPrint('=== APPROVE/REJECT LEAVE API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('LeaveId: $leaveId, Status: $status, EmpId: $empId');
+      debugPrint('LeaveId: $leaveId, Status: $status, EmpId: $empId');
 
       // Build URL with query parameters
       final url = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.approveOrRejectLeave}?leaveId=${leaveId}&Status=${Uri.encodeComponent(status)}&empId=${empId}'
+        '${ApiConstants.baseUrl}${ApiConstants.approveOrRejectLeave}?leaveId=$leaveId&Status=${Uri.encodeComponent(status)}&empId=${empId}'
       );
 
       final response = await http.post(url);
 
-      print('=== APPROVE/REJECT LEAVE API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== APPROVE/REJECT LEAVE API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -83,8 +84,8 @@ class TeacherLeaveService {
       }
       return false;
     } catch (e) {
-      print('=== APPROVE/REJECT LEAVE ERROR ===');
-      print('Error: $e');
+      debugPrint('=== APPROVE/REJECT LEAVE ERROR ===');
+      debugPrint('Error: $e');
       return false;
     }
   }

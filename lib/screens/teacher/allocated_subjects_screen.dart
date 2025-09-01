@@ -126,7 +126,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF58CC02).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -183,7 +183,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF58CC02).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withValues(alpha:0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -233,7 +233,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.3),
+            color: const Color(0xFF58CC02).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -250,7 +250,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
                   Text(
                     'Teaching Assignment',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha:0.9),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -269,7 +269,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -309,7 +309,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
         Text(
           label,
           style: TextStyle(
-            color: color.withOpacity(0.8),
+            color: color.withValues(alpha:0.8),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -356,7 +356,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _getClassColor(className).withOpacity(0.1),
+              color: _getClassColor(className).withValues(alpha:0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -367,7 +367,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _getClassColor(className).withOpacity(0.2),
+                    color: _getClassColor(className).withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -431,7 +431,7 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _getSubjectColor(subject.subject).withOpacity(0.1),
+              color: _getSubjectColor(subject.subject).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -468,10 +468,10 @@ class _TeacherAllocatedSubjectsScreenState extends State<TeacherAllocatedSubject
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: _getSubjectColor(subject.subject).withOpacity(0.1),
+              color: _getSubjectColor(subject.subject).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: _getSubjectColor(subject.subject).withOpacity(0.3),
+                color: _getSubjectColor(subject.subject).withValues(alpha:0.3),
               ),
             ),
             child: Text(

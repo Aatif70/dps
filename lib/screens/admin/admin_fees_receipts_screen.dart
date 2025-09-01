@@ -57,7 +57,7 @@ class _AdminFeesReceiptsScreenState extends State<AdminFeesReceiptsScreen> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                                color: const Color(0xFF6C5CE7).withValues(alpha:0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(Icons.receipt, color: Color(0xFF6C5CE7), size: 20),

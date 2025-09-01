@@ -9,8 +9,8 @@ class FeeService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== FEE SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== FEE SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -19,37 +19,37 @@ class FeeService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Fee Service - Processed Uid: $uid');
-      print('Fee Service - Id value for request: $idValue');
+      debugPrint('Fee Service - Processed Uid: $uid');
+      debugPrint('Fee Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
-        print('Uid isEmpty: ${uid.isEmpty}, Id is null: ${idValue == null}');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('Uid isEmpty: ${uid.isEmpty}, Id is null: ${idValue == null}');
         return [];
       }
 
-      print('Calling Paid Fees API...');
+      debugPrint('Calling Paid Fees API...');
       final url = Uri.parse(ApiConstants.baseUrl + ApiConstants.paidfees);
-      print('Fee Service - Request URL: $url');
+      debugPrint('Fee Service - Request URL: $url');
 
       // Try multiple request formats
       final result = await _tryMultipleRequestFormats(url, uid, idValue);
-      print('Paid Fees API - Result length: ${result.length}');
+      debugPrint('Paid Fees API - Result length: ${result.length}');
       return result;
 
     } catch (e, stackTrace) {
-      print('Error fetching paid fees: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error fetching paid fees: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -58,8 +58,8 @@ class FeeService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== REMAINING FEES SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== REMAINING FEES SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -68,82 +68,82 @@ class FeeService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Remaining Fees Service - Processed Uid: $uid');
-      print('Remaining Fees Service - Id value for request: $idValue');
+      debugPrint('Remaining Fees Service - Processed Uid: $uid');
+      debugPrint('Remaining Fees Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/RemainingFees');
-      print('Remaining Fees Service - Request URL: $url');
+      debugPrint('Remaining Fees Service - Request URL: $url');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
       request.fields['Id'] = idValue.toString();
 
-      print('Remaining Fees Service - Multipart fields: ${request.fields}');
+      debugPrint('Remaining Fees Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Remaining Fees Service - Response status: ${response.statusCode}');
-      print('Remaining Fees Service - Response headers: ${response.headers}');
-      print('Remaining Fees Service - Raw response body: ${response.body}');
+      debugPrint('Remaining Fees Service - Response status: ${response.statusCode}');
+      debugPrint('Remaining Fees Service - Response headers: ${response.headers}');
+      debugPrint('Remaining Fees Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Remaining Fees Service - Parsed JSON response: $jsonResponse');
+        debugPrint('Remaining Fees Service - Parsed JSON response: $jsonResponse');
 
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           final List<dynamic> data = jsonResponse['data'];
-          print('Remaining Fees Service - Data array length: ${data.length}');
+          debugPrint('Remaining Fees Service - Data array length: ${data.length}');
 
           List<RemainingFeeRecord> feeRecords = [];
 
           for (int i = 0; i < data.length; i++) {
             try {
-              print('--- Processing remaining fee record $i ---');
+              debugPrint('--- Processing remaining fee record $i ---');
               final item = data[i];
-              print('Raw item data: $item');
+              debugPrint('Raw item data: $item');
 
               final feeRecord = RemainingFeeRecord.fromJson(item);
-              print('Successfully parsed remaining fee record $i: ${feeRecord.particular}');
+              debugPrint('Successfully parsed remaining fee record $i: ${feeRecord.particular}');
               feeRecords.add(feeRecord);
             } catch (e, stackTrace) {
-              print('ERROR parsing remaining fee record $i: $e');
-              print('Stack trace: $stackTrace');
-              print('Failed item data: ${data[i]}');
+              debugPrint('ERROR parsing remaining fee record $i: $e');
+              debugPrint('Stack trace: $stackTrace');
+              debugPrint('Failed item data: ${data[i]}');
             }
           }
 
-          print('Remaining Fees Service - Successfully parsed ${feeRecords.length} out of ${data.length} records');
-          print('=== REMAINING FEES SERVICE DEBUG END ===');
+          debugPrint('Remaining Fees Service - Successfully parsed ${feeRecords.length} out of ${data.length} records');
+          debugPrint('=== REMAINING FEES SERVICE DEBUG END ===');
           return feeRecords;
         } else {
-          print('API returned success: false or no data');
+          debugPrint('API returned success: false or no data');
           return [];
         }
       } else {
-        print('Failed to load remaining fees. Status code: ${response.statusCode}');
-        print('Error response body: ${response.body}');
+        debugPrint('Failed to load remaining fees. Status code: ${response.statusCode}');
+        debugPrint('Error response body: ${response.body}');
         return [];
       }
     } catch (e, stackTrace) {
-      print('Error fetching remaining fees: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error fetching remaining fees: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -154,7 +154,7 @@ class FeeService {
       dynamic idValue
       ) async {
     // Format 1: JSON with Id as integer
-    print('\n--- TRYING FORMAT 1: JSON with Id as integer ---');
+    debugPrint('\n--- TRYING FORMAT 1: JSON with Id as integer ---');
     try {
       final requestBody1 = {
         'Uid': uid,
@@ -164,11 +164,11 @@ class FeeService {
       final result1 = await _makeRequest(url, requestBody1, 'application/json', isJson: true);
       if (result1.isNotEmpty) return result1;
     } catch (e) {
-      print('Format 1 failed: $e');
+      debugPrint('Format 1 failed: $e');
     }
 
     // Format 2: JSON with Id as string
-    print('\n--- TRYING FORMAT 2: JSON with Id as string ---');
+    debugPrint('\n--- TRYING FORMAT 2: JSON with Id as string ---');
     try {
       final requestBody2 = {
         'Uid': uid,
@@ -178,11 +178,11 @@ class FeeService {
       final result2 = await _makeRequest(url, requestBody2, 'application/json', isJson: true);
       if (result2.isNotEmpty) return result2;
     } catch (e) {
-      print('Format 2 failed: $e');
+      debugPrint('Format 2 failed: $e');
     }
 
     // Format 3: Form data
-    print('\n--- TRYING FORMAT 3: Form data ---');
+    debugPrint('\n--- TRYING FORMAT 3: Form data ---');
     try {
       final formData = {
         'Uid': uid,
@@ -192,10 +192,10 @@ class FeeService {
       final result3 = await _makeRequest(url, formData, 'application/x-www-form-urlencoded', isJson: false);
       if (result3.isNotEmpty) return result3;
     } catch (e) {
-      print('Format 3 failed: $e');
+      debugPrint('Format 3 failed: $e');
     }
 
-    print('All request formats failed. Returning empty list.');
+    debugPrint('All request formats failed. Returning empty list.');
     return [];
   }
 
@@ -205,8 +205,8 @@ class FeeService {
       String contentType,
       {required bool isJson}
       ) async {
-    print('Making request with content-type: $contentType');
-    print('Request data: $data');
+    debugPrint('Making request with content-type: $contentType');
+    debugPrint('Request data: $data');
 
     final headers = {
       'Content-Type': contentType,
@@ -223,8 +223,8 @@ class FeeService {
           .join('&');
     }
 
-    print('Request headers: $headers');
-    print('Request body: $body');
+    debugPrint('Request headers: $headers');
+    debugPrint('Request body: $body');
 
     final response = await http.post(url, headers: headers, body: body);
 
@@ -232,52 +232,52 @@ class FeeService {
   }
 
   static Future<List<PaidFeeRecord>> _processResponse(http.Response response) async {
-    print('Response status: ${response.statusCode}');
-    print('Response headers: ${response.headers}');
-    print('Raw response body: ${response.body}');
+    debugPrint('Response status: ${response.statusCode}');
+    debugPrint('Response headers: ${response.headers}');
+    debugPrint('Raw response body: ${response.body}');
 
     if (response.statusCode == 200) {
       try {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Parsed JSON response: $jsonResponse');
+        debugPrint('Parsed JSON response: $jsonResponse');
 
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           final List<dynamic> data = jsonResponse['data'];
-          print('Data array length: ${data.length}');
+          debugPrint('Data array length: ${data.length}');
 
           List<PaidFeeRecord> feeRecords = [];
 
           for (int i = 0; i < data.length; i++) {
             try {
-              print('--- Processing record $i ---');
+              debugPrint('--- Processing record $i ---');
               final item = data[i];
-              print('Raw item data: $item');
+              debugPrint('Raw item data: $item');
 
               final feeRecord = PaidFeeRecord.fromJson(item);
-              print('Successfully parsed record $i: ${feeRecord.receiptNo}');
+              debugPrint('Successfully parsed record $i: ${feeRecord.receiptNo}');
               feeRecords.add(feeRecord);
             } catch (e, stackTrace) {
-              print('ERROR parsing record $i: $e');
-              print('Stack trace: $stackTrace');
-              print('Failed item data: ${data[i]}');
+              debugPrint('ERROR parsing record $i: $e');
+              debugPrint('Stack trace: $stackTrace');
+              debugPrint('Failed item data: ${data[i]}');
             }
           }
 
-          print('Successfully parsed ${feeRecords.length} out of ${data.length} records');
+          debugPrint('Successfully parsed ${feeRecords.length} out of ${data.length} records');
           return feeRecords;
         } else {
-          print('API returned success: false or no data');
-          print('Success value: ${jsonResponse['success']}');
-          print('Data value: ${jsonResponse['data']}');
+          debugPrint('API returned success: false or no data');
+          debugPrint('Success value: ${jsonResponse['success']}');
+          debugPrint('Data value: ${jsonResponse['data']}');
           return [];
         }
       } catch (e) {
-        print('Error parsing JSON response: $e');
+        debugPrint('Error parsing JSON response: $e');
         return [];
       }
     } else {
-      print('Failed to load paid fees. Status code: ${response.statusCode}');
-      print('Error response body: ${response.body}');
+      debugPrint('Failed to load paid fees. Status code: ${response.statusCode}');
+      debugPrint('Error response body: ${response.body}');
       return [];
     }
   }
@@ -305,8 +305,8 @@ class PaidFeeRecord {
 
   factory PaidFeeRecord.fromJson(Map<String, dynamic> json) {
     try {
-      print('--- PaidFeeRecord.fromJson START ---');
-      print('Input JSON: $json');
+      debugPrint('--- PaidFeeRecord.fromJson START ---');
+      debugPrint('Input JSON: $json');
 
       final receiptNo = _safeStringExtraction(json, 'ReceiptNo');
       final particular = _safeStringExtraction(json, 'Particular');
@@ -326,12 +326,12 @@ class PaidFeeRecord {
         headId: headId,
       );
 
-      print('--- PaidFeeRecord.fromJson SUCCESS ---');
+      debugPrint('--- PaidFeeRecord.fromJson SUCCESS ---');
       return record;
     } catch (e, stackTrace) {
-      print('--- PaidFeeRecord.fromJson ERROR ---');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('--- PaidFeeRecord.fromJson ERROR ---');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -443,8 +443,8 @@ class RemainingFeeRecord {
 
   factory RemainingFeeRecord.fromJson(Map<String, dynamic> json) {
     try {
-      print('--- RemainingFeeRecord.fromJson START ---');
-      print('Input JSON: $json');
+      debugPrint('--- RemainingFeeRecord.fromJson START ---');
+      debugPrint('Input JSON: $json');
 
       final record = RemainingFeeRecord(
         feeId: _safeIntExtraction(json, 'FeeId'),
@@ -471,12 +471,12 @@ class RemainingFeeRecord {
         className: _safeStringExtraction(json, 'ClassName'),
       );
 
-      print('--- RemainingFeeRecord.fromJson SUCCESS ---');
+      debugPrint('--- RemainingFeeRecord.fromJson SUCCESS ---');
       return record;
     } catch (e, stackTrace) {
-      print('--- RemainingFeeRecord.fromJson ERROR ---');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('--- RemainingFeeRecord.fromJson ERROR ---');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }

@@ -82,7 +82,7 @@ class AdminFeesHubScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF8A65).withOpacity(0.25),
+                        color: const Color(0xFFFF8A65).withValues(alpha:0.25),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -93,7 +93,7 @@ class AdminFeesHubScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(
@@ -119,7 +119,7 @@ class AdminFeesHubScreen extends StatelessWidget {
                             Text(
                               'Manage receipts, concessions and vouchers',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha:0.9),
                                 fontSize: 14,
                               ),
                             ),
@@ -149,7 +149,7 @@ class AdminFeesHubScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -188,7 +188,7 @@ class AdminFeesHubScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: item.color.withOpacity(0.08),
+                  color: item.color.withValues(alpha:0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -204,8 +204,8 @@ class AdminFeesHubScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          item.color.withOpacity(0.12),
-                          item.color.withOpacity(0.06),
+                          item.color.withValues(alpha:0.12),
+                          item.color.withValues(alpha:0.06),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,

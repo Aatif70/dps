@@ -40,10 +40,10 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         _isLoading = false;
       });
       try {
-        print('👥 Header dropdown teachers: ${_teacherTimetables.length}');
+        debugPrint('👥 Header dropdown teachers: ${_teacherTimetables.length}');
         for (int i = 0; i < _teacherTimetables.length; i++) {
           final t = _teacherTimetables[i] as TeacherTimetableData;
-          print('   - [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
+          debugPrint('   - [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
         }
       } catch (_) {}
     } catch (e) {
@@ -113,9 +113,9 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.1),
+                color: const Color(0xFF6366F1).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+                border: Border.all(color: const Color(0xFF6366F1).withValues(alpha:0.2)),
               ),
               child: Row(
                 children: [
@@ -326,7 +326,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
         border: Border.all(color: Colors.white38),
         boxShadow: [
           BoxShadow(
-            color: Colors.purple.withOpacity(0.05),
+            color: Colors.purple.withValues(alpha:0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -362,7 +362,7 @@ class _AdminTimetableWidgetState extends State<AdminTimetableWidget> {
           if (_selectedTeacher != null) {
             final hasClasses = _selectedTeacher!.timetables.any((entry) => entry.weekDay == dayName);
             if (hasClasses) {
-              print('Calendar: Found classes for $dayName (${day.day}/${day.month})');
+              debugPrint('Calendar: Found classes for $dayName (${day.day}/${day.month})');
             }
             return hasClasses ? [day] : [];
           }
@@ -789,7 +789,7 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
     setState(() {
       _divisions = divs;
       _loadingDivisions = false;
-      print('Divisions loaded: ${_divisions.map((d) => d.divName).toList()}');
+      debugPrint('Divisions loaded: ${_divisions.map((d) => d.divName).toList()}');
     });
   }
 
@@ -875,7 +875,7 @@ class _AddTimetableFormState extends State<_AddTimetableForm> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
               ],
               border: Border.all(color: const Color(0xFFF1F5F9)),
             ),

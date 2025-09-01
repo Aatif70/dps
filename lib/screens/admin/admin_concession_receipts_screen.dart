@@ -57,7 +57,7 @@ class _AdminConcessionReceiptsScreenState extends State<AdminConcessionReceiptsS
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFD79A8).withOpacity(0.1),
+                                color: const Color(0xFFFD79A8).withValues(alpha:0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(Icons.discount, color: Color(0xFFFD79A8), size: 20),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -19,16 +20,16 @@ class StudentMarksService {
       }
 
       if (classId == null) {
-        print('ERROR: Missing ClassId in preferences');
+        debugPrint('ERROR: Missing ClassId in preferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentExamList}?ClassId=$classId');
-      print('StudentExam list URL: $url');
+      debugPrint('StudentExam list URL: $url');
 
       final response = await http.get(url);
-      print('StudentExam list status: ${response.statusCode}');
-      print('StudentExam list body: ${response.body}');
+      debugPrint('StudentExam list status: ${response.statusCode}');
+      debugPrint('StudentExam list body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -39,7 +40,7 @@ class StudentMarksService {
       }
       return [];
     } catch (e, st) {
-      print('Error fetching student exams: $e\n$st');
+      debugPrint('Error fetching student exams: $e\n$st');
       return [];
     }
   }
@@ -54,23 +55,23 @@ class StudentMarksService {
       }
 
       if (uid.isEmpty) {
-        print('ERROR: Missing Uid in preferences');
+        debugPrint('ERROR: Missing Uid in preferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentExamMarks}');
-      print('StudentExamMarks URL: $url');
+      debugPrint('StudentExamMarks URL: $url');
 
       var request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
       request.fields['ExamId'] = examId.toString();
 
-      print('StudentExamMarks fields: ${request.fields}');
+      debugPrint('StudentExamMarks fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      print('StudentExamMarks status: ${response.statusCode}');
-      print('StudentExamMarks body: ${response.body}');
+      debugPrint('StudentExamMarks status: ${response.statusCode}');
+      debugPrint('StudentExamMarks body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -81,7 +82,7 @@ class StudentMarksService {
       }
       return [];
     } catch (e, st) {
-      print('Error fetching student marks: $e\n$st');
+      debugPrint('Error fetching student marks: $e\n$st');
       return [];
     }
   }

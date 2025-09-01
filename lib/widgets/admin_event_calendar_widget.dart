@@ -161,7 +161,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha:0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -255,7 +255,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha:0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -520,7 +520,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? filter.color : filter.color.withOpacity(0.1),
+                  color: isSelected ? filter.color : filter.color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: filter.color,
@@ -576,7 +576,7 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? filter.color : filter.color.withOpacity(0.1),
+                  color: isSelected ? filter.color : filter.color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: filter.color,
@@ -629,10 +629,10 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha:0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha:0.2),
               width: 1,
             ),
           ),
@@ -708,10 +708,10 @@ class _AdminEventCalendarWidgetState extends State<AdminEventCalendarWidget> wit
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha:0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha:0.2),
               width: 1,
             ),
           ),

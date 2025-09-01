@@ -161,7 +161,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              color: const Color(0xFFE74C3C).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -194,7 +194,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE74C3C).withOpacity(0.3),
+            color: const Color(0xFFE74C3C).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -217,7 +217,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                     Text(
                       'Your Study Journey',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -237,7 +237,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                 Text(
                   '$uniqueSubjects subjects • $totalClasses classes',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha:0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -247,10 +247,10 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha:0.2),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha:0.3),
                 width: 2,
               ),
             ),
@@ -445,7 +445,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -542,7 +542,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: _getTypeColor(material.materialType).withOpacity(0.1),
+                      color: _getTypeColor(material.materialType).withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -587,7 +587,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: _getSubjectColor(material.subject).withOpacity(0.1),
+                                color: _getSubjectColor(material.subject).withValues(alpha:0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -727,7 +727,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   }
 
   void _showUploadDialog(BuildContext context) {
-    print('=== SHOWING UPLOAD DIALOG ===');
+    debugPrint('=== SHOWING UPLOAD DIALOG ===');
     // Reset form data
     _selectedUploadClass = null;
     _selectedUploadSubject = null;
@@ -869,9 +869,9 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                               );
                             }).toList(),
                             onChanged: (ClassData? newValue) {
-                              print('=== CLASS SELECTION CHANGED ===');
-                              print('Selected Class: ${newValue?.className}');
-                              print('ClassMasterId: ${newValue?.classMasterId}');
+                              debugPrint('=== CLASS SELECTION CHANGED ===');
+                              debugPrint('Selected Class: ${newValue?.className}');
+                              debugPrint('ClassMasterId: ${newValue?.classMasterId}');
 
                               setModalState(() {
                                 _selectedUploadClass = newValue;
@@ -948,9 +948,9 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                               );
                             }).toList(),
                             onChanged: (SubjectData? newValue) {
-                              print('=== SUBJECT SELECTION CHANGED ===');
-                              print('Selected Subject: ${newValue?.subjectName}');
-                              print('SubjectId: ${newValue?.subjectId}');
+                              debugPrint('=== SUBJECT SELECTION CHANGED ===');
+                              debugPrint('Selected Subject: ${newValue?.subjectName}');
+                              debugPrint('SubjectId: ${newValue?.subjectId}');
 
                               setModalState(() {
                                 _selectedUploadSubject = newValue;
@@ -990,8 +990,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                               value: 'File',
                               groupValue: _uploadType,
                               onChanged: (value) {
-                                print('=== UPLOAD TYPE CHANGED ===');
-                                print('Selected Type: $value');
+                                debugPrint('=== UPLOAD TYPE CHANGED ===');
+                                debugPrint('Selected Type: $value');
                                 setModalState(() {
                                   _uploadType = value!;
                                 });
@@ -1005,8 +1005,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
                               value: 'YTLink',
                               groupValue: _uploadType,
                               onChanged: (value) {
-                                print('=== UPLOAD TYPE CHANGED ===');
-                                print('Selected Type: $value');
+                                debugPrint('=== UPLOAD TYPE CHANGED ===');
+                                debugPrint('Selected Type: $value');
                                 setModalState(() {
                                   _uploadType = value!;
                                 });
@@ -1148,23 +1148,23 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   }
 
   Future<void> _loadUploadClasses(StateSetter setModalState) async {
-    print('=== LOADING UPLOAD CLASSES ===');
+    debugPrint('=== LOADING UPLOAD CLASSES ===');
     setModalState(() {
       _isLoadingUploadClasses = true;
     });
 
     try {
       final classes = await TeacherStudyMaterialService.getClasses();
-      print('=== UPLOAD CLASSES LOADED ===');
-      print('Number of classes: ${classes.length}');
+      debugPrint('=== UPLOAD CLASSES LOADED ===');
+      debugPrint('Number of classes: ${classes.length}');
 
       setModalState(() {
         _uploadClasses = classes;
         _isLoadingUploadClasses = false;
       });
     } catch (e) {
-      print('=== LOAD UPLOAD CLASSES ERROR ===');
-      print('Error: $e');
+      debugPrint('=== LOAD UPLOAD CLASSES ERROR ===');
+      debugPrint('Error: $e');
       setModalState(() {
         _isLoadingUploadClasses = false;
       });
@@ -1172,8 +1172,8 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   }
 
   Future<void> _loadSubjects(int classMasterId, StateSetter setModalState) async {
-    print('=== LOADING SUBJECTS ===');
-    print('ClassMasterId: $classMasterId');
+    debugPrint('=== LOADING SUBJECTS ===');
+    debugPrint('ClassMasterId: $classMasterId');
 
     setModalState(() {
       _isLoadingSubjects = true;
@@ -1181,16 +1181,16 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
 
     try {
       final subjects = await TeacherStudyMaterialService.getSubjects(classMasterId);
-      print('=== SUBJECTS LOADED ===');
-      print('Number of subjects: ${subjects.length}');
+      debugPrint('=== SUBJECTS LOADED ===');
+      debugPrint('Number of subjects: ${subjects.length}');
 
       setModalState(() {
         _subjectsForUpload = subjects;
         _isLoadingSubjects = false;
       });
     } catch (e) {
-      print('=== LOAD SUBJECTS ERROR ===');
-      print('Error: $e');
+      debugPrint('=== LOAD SUBJECTS ERROR ===');
+      debugPrint('Error: $e');
       setModalState(() {
         _isLoadingSubjects = false;
       });
@@ -1198,7 +1198,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
   }
 
   Future<void> _pickFile(StateSetter setModalState) async {
-    print('=== PICKING FILE ===');
+    debugPrint('=== PICKING FILE ===');
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.any,
@@ -1206,25 +1206,25 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       );
 
       if (result != null) {
-        print('=== FILE PICKED ===');
-        print('File path: ${result.files.single.path}');
-        print('File name: ${result.files.single.name}');
-        print('File size: ${result.files.single.size}');
+        debugPrint('=== FILE PICKED ===');
+        debugPrint('File path: ${result.files.single.path}');
+        debugPrint('File name: ${result.files.single.name}');
+        debugPrint('File size: ${result.files.single.size}');
 
         setModalState(() {
           _selectedFile = File(result.files.single.path!);
         });
       } else {
-        print('=== FILE PICKER CANCELLED ===');
+        debugPrint('=== FILE PICKER CANCELLED ===');
       }
     } catch (e) {
-      print('=== FILE PICKER ERROR ===');
-      print('Error: $e');
+      debugPrint('=== FILE PICKER ERROR ===');
+      debugPrint('Error: $e');
     }
   }
 
   Future<void> _uploadMaterial(StateSetter setModalState) async {
-    print('=== STARTING UPLOAD MATERIAL ===');
+    debugPrint('=== STARTING UPLOAD MATERIAL ===');
 
     // Validation
     if (_chapterController.text.isEmpty) {
@@ -1252,7 +1252,7 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       return;
     }
 
-    print('=== VALIDATION PASSED ===');
+    debugPrint('=== VALIDATION PASSED ===');
 
     setModalState(() {
       _isUploading = true;
@@ -1274,18 +1274,18 @@ class _TeacherStudyMaterialScreenState extends State<TeacherStudyMaterialScreen>
       });
 
       if (success) {
-        print('=== UPLOAD SUCCESSFUL ===');
+        debugPrint('=== UPLOAD SUCCESSFUL ===');
         Navigator.pop(context);
         CustomSnackbar.showSuccess(context, message: 'Study material uploaded successfully!');
         // Reload the materials list
         _loadStudyMaterials();
       } else {
-        print('=== UPLOAD FAILED ===');
+        debugPrint('=== UPLOAD FAILED ===');
         _showErrorMessage('Failed to upload study material. Please try again.');
       }
     } catch (e) {
-      print('=== UPLOAD ERROR ===');
-      print('Error: $e');
+      debugPrint('=== UPLOAD ERROR ===');
+      debugPrint('Error: $e');
       setModalState(() {
         _isUploading = false;
       });
@@ -1580,7 +1580,7 @@ class _FilePreviewModalState extends State<FilePreviewModal> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: _getTypeColor(widget.material.materialType).withOpacity(0.1),
+                color: _getTypeColor(widget.material.materialType).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(

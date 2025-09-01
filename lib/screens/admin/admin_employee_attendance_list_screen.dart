@@ -113,7 +113,7 @@ class _AttendanceDayCard extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF6C5CE7).withOpacity(0.1),
+              color: const Color(0xFF6C5CE7).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.calendar_month_rounded, color: Color(0xFF6C5CE7)),
@@ -136,7 +136,7 @@ class _AttendanceDayCard extends StatelessWidget {
                       width: 12,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.2),
+                        color: color.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: color),
                       ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:dps/constants/api_constants.dart';
 
@@ -6,12 +7,12 @@ class AdminEmployeeMetricsService {
   static Future<EmployeeMetrics?> fetchMetrics() async {
     try {
       final Uri url = Uri.parse(ApiConstants.baseUrl + ApiConstants.employeeCount);
-      print('[AdminEmployeeMetrics] GET ' + url.toString());
+      debugPrint('[AdminEmployeeMetrics] GET ' + url.toString());
       final http.Response response = await http.get(url);
-      print('[AdminEmployeeMetrics] status=' + response.statusCode.toString());
+      debugPrint('[AdminEmployeeMetrics] status=' + response.statusCode.toString());
       if (response.body.isNotEmpty) {
         final String preview = response.body.length > 400 ? response.body.substring(0, 400) + '...' : response.body;
-        print('[AdminEmployeeMetrics] body=' + preview);
+        debugPrint('[AdminEmployeeMetrics] body=' + preview);
       }
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body) as Map<String, dynamic>;
@@ -20,7 +21,7 @@ class AdminEmployeeMetricsService {
         }
       }
     } catch (e) {
-      print('[AdminEmployeeMetrics] error=' + e.toString());
+      debugPrint('[AdminEmployeeMetrics] error=' + e.toString());
     }
     return null;
   }

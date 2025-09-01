@@ -109,7 +109,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     borderRadius: BorderRadius.circular(25),
     boxShadow: [
     BoxShadow(
-    color: const Color(0xFF58CC02).withOpacity(0.3),
+    color: const Color(0xFF58CC02).withValues(alpha:0.3),
     blurRadius: 20,
     offset: const Offset(0, 10),
     ),
@@ -127,7 +127,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     Text(
     '${AppStrings.welcome}! 👨‍🏫',
     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-    color: Colors.white.withOpacity(0.9),
+    color: Colors.white.withValues(alpha:0.9),
     fontSize: 16,
     ),
     ),
@@ -160,7 +160,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     border: Border.all(color: Colors.white, width: 3),
     boxShadow: [
     BoxShadow(
-    color: Colors.black.withOpacity(0.2),
+    color: Colors.black.withValues(alpha:0.2),
     blurRadius: 10,
     offset: const Offset(0, 5),
     ),
@@ -218,9 +218,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isNext ? color.withOpacity(0.05) : const Color(0xFFF8F9FA),
+        color: isNext ? color.withValues(alpha:0.05) : const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(16),
-        border: isNext ? Border.all(color: color.withOpacity(0.2)) : null,
+        border: isNext ? Border.all(color: color.withValues(alpha:0.2)) : null,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,8 +230,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  color.withOpacity(0.1),
-                  color.withOpacity(0.05),
+                  color.withValues(alpha:0.1),
+                  color.withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -437,7 +437,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: feature.color.withOpacity(0.08),
+              color: feature.color.withValues(alpha:0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -454,8 +454,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      feature.color.withOpacity(0.1),
-                      feature.color.withOpacity(0.05),
+                      feature.color.withValues(alpha:0.1),
+                      feature.color.withValues(alpha:0.05),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -498,7 +498,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.3),
+            color: const Color(0xFF58CC02).withValues(alpha:0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -598,10 +598,10 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: action.color.withOpacity(0.05),
+          color: action.color.withValues(alpha:0.05),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: action.color.withOpacity(0.1),
+            color: action.color.withValues(alpha:0.1),
             width: 1,
           ),
         ),
@@ -612,8 +612,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    action.color.withOpacity(0.1),
-                    action.color.withOpacity(0.05),
+                    action.color.withValues(alpha:0.1),
+                    action.color.withValues(alpha:0.05),
                   ],
                 ),
                 shape: BoxShape.circle,

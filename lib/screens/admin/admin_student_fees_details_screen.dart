@@ -141,7 +141,7 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: const Color(0xFF4A90E2).withOpacity(0.1),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),
@@ -181,7 +181,7 @@ class _AdminStudentFeesDetailsScreenState extends State<AdminStudentFeesDetailsS
               maintainState: true,
               leading: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: const Color(0xFF4A90E2).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: const Color(0xFF4A90E2).withValues(alpha:0.1), borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.category_rounded, color: Color(0xFF4A90E2)),
               ),
               title: Text(cw.className, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B))),

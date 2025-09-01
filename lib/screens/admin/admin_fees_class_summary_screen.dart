@@ -59,7 +59,7 @@ class _AdminFeesClassSummaryScreenState extends State<AdminFeesClassSummaryScree
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFF8A65).withOpacity(0.25),
+                    color: const Color(0xFFFF8A65).withValues(alpha:0.25),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -70,7 +70,7 @@ class _AdminFeesClassSummaryScreenState extends State<AdminFeesClassSummaryScree
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(Icons.analytics_outlined, color: Colors.white, size: 24),
@@ -163,7 +163,7 @@ class _AdminFeesClassSummaryScreenState extends State<AdminFeesClassSummaryScree
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                        BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
                       ],
                       border: Border.all(color: const Color(0xFFF1F5F9)),
                     ),
@@ -215,7 +215,7 @@ class _AdminFeesClassSummaryScreenState extends State<AdminFeesClassSummaryScree
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

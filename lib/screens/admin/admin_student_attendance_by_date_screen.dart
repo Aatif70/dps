@@ -86,7 +86,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF58CC02).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -420,7 +420,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: (percentage >= 80 ? const Color(0xFF58CC02) : percentage >= 60 ? const Color(0xFFFFA726) : const Color(0xFFFF6B6B)).withOpacity(0.3),
+            color: (percentage >= 80 ? const Color(0xFF58CC02) : percentage >= 60 ? const Color(0xFFFFA726) : const Color(0xFFFF6B6B)).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -446,7 +446,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
                         Text(
                           'Overall Attendance',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha:0.9),
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -466,10 +466,10 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha:0.3),
                           width: 1,
                         ),
                       ),
@@ -488,10 +488,10 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha:0.3),
                     width: 2,
                   ),
                 ),
@@ -532,10 +532,10 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha:0.2),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha:0.3),
           width: 1,
         ),
       ),
@@ -553,7 +553,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha:0.9),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -606,7 +606,7 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00CEC9).withOpacity(0.1),
+                    color: const Color(0xFF00CEC9).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -649,8 +649,8 @@ class _AdminStudentAttendanceByDateScreenState extends State<AdminStudentAttenda
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF00CEC9).withOpacity(0.1),
-                  const Color(0xFF00CEC9).withOpacity(0.05),
+                  const Color(0xFF00CEC9).withValues(alpha:0.1),
+                  const Color(0xFF00CEC9).withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),

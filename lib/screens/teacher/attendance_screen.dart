@@ -91,14 +91,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   // UPDATED: Load real students data instead of generating mock data
   Future<void> _loadStudentList() async {
     if (!_canShowStudentList()) {
-      print('Cannot load students - missing parameters');
+      debugPrint('Cannot load students - missing parameters');
       return;
     }
 
     setState(() => _isLoadingStudents = true);
 
     try {
-      print('=== LOADING STUDENT LIST ===');
+      debugPrint('=== LOADING STUDENT LIST ===');
       final students = await TeacherAttendanceService.getAttendanceStudentList(
         subjectId: _selectedSubject!.subjectId,
         classId: _selectedBatch!.classId,
@@ -109,9 +109,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         _students = students;
       });
 
-      print('Loaded ${_students.length} students successfully');
+      debugPrint('Loaded ${_students.length} students successfully');
     } catch (e) {
-      print('Error loading students: $e');
+      debugPrint('Error loading students: $e');
       CustomSnackbar.showError(context, message: 'Failed to load students');
     } finally {
       setState(() => _isLoadingStudents = false);
@@ -120,9 +120,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   // NEW: Load attendance records for date range
   Future<void> _loadAttendanceRecords() async {
-    print('=== LOADING ATTENDANCE RECORDS ===');
-    print('From Date: ${DateFormat('dd-MM-yyyy').format(_fromDate)}');
-    print('To Date: ${DateFormat('dd-MM-yyyy').format(_toDate)}');
+    debugPrint('=== LOADING ATTENDANCE RECORDS ===');
+    debugPrint('From Date: ${DateFormat('dd-MM-yyyy').format(_fromDate)}');
+    debugPrint('To Date: ${DateFormat('dd-MM-yyyy').format(_toDate)}');
 
     setState(() => _isLoadingRecords = true);
 
@@ -136,9 +136,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         _attendanceRecords = records;
       });
 
-      print('Loaded ${_attendanceRecords.length} attendance records successfully');
+      debugPrint('Loaded ${_attendanceRecords.length} attendance records successfully');
     } catch (e) {
-      print('Error loading attendance records: $e');
+      debugPrint('Error loading attendance records: $e');
       CustomSnackbar.showError(context, message: 'Failed to load attendance records');
     } finally {
       setState(() => _isLoadingRecords = false);
@@ -147,11 +147,11 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   // NEW: Navigate to attendance details screen
   void _navigateToAttendanceDetails(AttendanceRecord record) {
-    print('=== NAVIGATING TO ATTENDANCE DETAILS ===');
-    print('Attendance ID: ${record.attId}');
-    print('Date: ${record.attDate}');
-    print('Subject: ${record.subjectName}');
-    print('Class: ${record.className}');
+    debugPrint('=== NAVIGATING TO ATTENDANCE DETAILS ===');
+    debugPrint('Attendance ID: ${record.attId}');
+    debugPrint('Date: ${record.attDate}');
+    debugPrint('Subject: ${record.subjectName}');
+    debugPrint('Class: ${record.className}');
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -162,7 +162,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   // NEW: Show date range picker for records
   Future<void> _showDateRangePicker() async {
-    print('=== SHOWING DATE RANGE PICKER ===');
+    debugPrint('=== SHOWING DATE RANGE PICKER ===');
     
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -189,7 +189,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         _fromDate = picked.start;
         _toDate = picked.end;
       });
-      print('Date range selected: ${DateFormat('dd-MM-yyyy').format(_fromDate)} to ${DateFormat('dd-MM-yyyy').format(_toDate)}');
+      debugPrint('Date range selected: ${DateFormat('dd-MM-yyyy').format(_fromDate)} to ${DateFormat('dd-MM-yyyy').format(_toDate)}');
       _loadAttendanceRecords();
     }
   }
@@ -208,7 +208,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -246,7 +246,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -559,7 +559,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -573,7 +573,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -602,10 +602,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A90E2).withOpacity(0.05),
+                color: const Color(0xFF4A90E2).withValues(alpha:0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF4A90E2).withOpacity(0.2),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.2),
                 ),
               ),
               child: Row(
@@ -756,7 +756,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                        color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -791,7 +791,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        color: const Color(0xFF10B981).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -868,9 +868,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A90E2).withOpacity(0.1),
+        color: const Color(0xFF4A90E2).withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF4A90E2).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF4A90E2).withValues(alpha:0.3)),
       ),
       child: Row(
         children: [
@@ -928,7 +928,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha:0.04),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -968,7 +968,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -1021,7 +1021,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         gradient: LinearGradient(
           colors: [
             const Color(0xFF4A90E2),
-            const Color(0xFF357ABD).withOpacity(0.9),
+            const Color(0xFF357ABD).withValues(alpha:0.9),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -1032,7 +1032,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -1045,7 +1045,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -1069,7 +1069,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -1088,7 +1088,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.3),
+              backgroundColor: Colors.white.withValues(alpha:0.3),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               minHeight: 6,
             ),
@@ -1097,7 +1097,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           Text(
             'Complete all fields to proceed',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha:0.9),
               fontSize: 14,
             ),
           ),
@@ -1126,10 +1126,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.05),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFF4A90E2).withOpacity(0.2),
+                color: const Color(0xFF4A90E2).withValues(alpha:0.2),
                 width: 1,
               ),
             ),
@@ -1138,7 +1138,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -1312,7 +1312,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             border: Border.all(
               color: isEnabled
                   ? (dropdownValue != null
-                  ? const Color(0xFF4A90E2).withOpacity(0.3)
+                  ? const Color(0xFF4A90E2).withValues(alpha:0.3)
                   : Colors.grey.shade300)
                   : Colors.grey.shade200,
               width: 1,
@@ -1320,7 +1320,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             boxShadow: [
               if (isEnabled && dropdownValue != null)
                 BoxShadow(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -1343,7 +1343,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation(
-                    const Color(0xFF4A90E2).withOpacity(0.7),
+                    const Color(0xFF4A90E2).withValues(alpha:0.7),
                   ),
                 ),
               )
@@ -1405,7 +1405,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -1501,7 +1501,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: student.attendanceStatus
-                ? const Color(0xFF10B981).withOpacity(0.3)
+                ? const Color(0xFF10B981).withValues(alpha:0.3)
                 : Colors.grey.shade200,
           ),
         ),
@@ -1511,7 +1511,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: const Color(0xFF4A90E2).withOpacity(0.1),
+                backgroundColor: const Color(0xFF4A90E2).withValues(alpha:0.1),
                 child: Text(
                   student.name.isNotEmpty ? student.name.substring(0, 1).toUpperCase() : '?',
                   style: const TextStyle(
@@ -1588,14 +1588,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         setState(() {
           student.attendanceStatus = status;
         });
-        print('Updated ${student.name} attendance to: $status');
+        debugPrint('Updated ${student.name} attendance to: $status');
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withOpacity(0.1),
+          color: isSelected ? color : color.withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: color,
@@ -1623,7 +1623,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -1634,7 +1634,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         minimum: const EdgeInsets.only(bottom: 6),
         child: ElevatedButton(
           onPressed: () async {
-            print('=== SUBMIT ATTENDANCE CLICKED ===');
+            debugPrint('=== SUBMIT ATTENDANCE CLICKED ===');
 
             // Show loading dialog
             showDialog(
@@ -1679,7 +1679,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               }
             } catch (e) {
               Navigator.of(context).pop(); // Close loading dialog
-              print('Error saving attendance: $e');
+              debugPrint('Error saving attendance: $e');
               _showErrorSnackBar('Error saving attendance: $e');
             }
           },
@@ -1747,8 +1747,8 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
   }
 
   Future<void> _loadStudentDetails() async {
-    print('=== LOADING STUDENT DETAILS ===');
-    print('Attendance ID: ${widget.attendanceRecord.attId}');
+    debugPrint('=== LOADING STUDENT DETAILS ===');
+    debugPrint('Attendance ID: ${widget.attendanceRecord.attId}');
 
     setState(() => _isLoading = true);
 
@@ -1761,9 +1761,9 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
         _studentDetails = details;
       });
 
-      print('Loaded ${_studentDetails.length} student details successfully');
+      debugPrint('Loaded ${_studentDetails.length} student details successfully');
     } catch (e) {
-      print('Error loading student details: $e');
+      debugPrint('Error loading student details: $e');
       CustomSnackbar.showError(context, message: 'Failed to load student details');
     } finally {
       setState(() => _isLoading = false);
@@ -1804,7 +1804,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
         gradient: LinearGradient(
           colors: [
             const Color(0xFF4A90E2),
-            const Color(0xFF357ABD).withOpacity(0.9),
+            const Color(0xFF357ABD).withValues(alpha:0.9),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -1812,7 +1812,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.25),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.25),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -1828,7 +1828,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(
@@ -1856,7 +1856,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                         '${widget.attendanceRecord.className} • ${widget.attendanceRecord.batch}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha:0.9),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1898,9 +1898,9 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.16),
+        color: Colors.white.withValues(alpha:0.16),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.22)),
+        border: Border.all(color: Colors.white.withValues(alpha:0.22)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1958,9 +1958,9 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha:0.2)),
       ),
       child: Text(
         text,
@@ -2084,8 +2084,8 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: student.status
-                ? const Color(0xFF10B981).withOpacity(0.3)
-                : const Color(0xFFEF4444).withOpacity(0.3),
+                ? const Color(0xFF10B981).withValues(alpha:0.3)
+                : const Color(0xFFEF4444).withValues(alpha:0.3),
           ),
         ),
         child: Padding(
@@ -2095,8 +2095,8 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: student.status
-                    ? const Color(0xFF10B981).withOpacity(0.1)
-                    : const Color(0xFFEF4444).withOpacity(0.1),
+                    ? const Color(0xFF10B981).withValues(alpha:0.1)
+                    : const Color(0xFFEF4444).withValues(alpha:0.1),
                 child: Text(
                   student.name.isNotEmpty ? student.name.substring(0, 1).toUpperCase() : '?',
                   style: TextStyle(
@@ -2134,8 +2134,8 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: student.status
-                      ? const Color(0xFF10B981).withOpacity(0.1)
-                      : const Color(0xFFEF4444).withOpacity(0.1),
+                      ? const Color(0xFF10B981).withValues(alpha:0.1)
+                      : const Color(0xFFEF4444).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(

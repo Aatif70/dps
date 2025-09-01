@@ -150,7 +150,7 @@ class _AdminEmployeeAttendanceReportScreenState extends State<AdminEmployeeAtten
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFF1F5F9))),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Row(children: [
-                          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF4A90E2).withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.person, color: Color(0xFF4A90E2))),
+                          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF4A90E2).withValues(alpha:0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.person, color: Color(0xFF4A90E2))),
                           const SizedBox(width: 12),
                           Expanded(child: Text(_report!.employeeName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B)))),
                         ]),
@@ -184,7 +184,7 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.3))),
+      decoration: BoxDecoration(color: color.withValues(alpha:0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha:0.3))),
       child: Row(children: [Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)), const SizedBox(width: 6), Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w700))]),
     );
   }

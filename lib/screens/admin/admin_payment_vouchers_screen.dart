@@ -57,7 +57,7 @@ class _AdminPaymentVouchersScreenState extends State<AdminPaymentVouchersScreen>
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE17055).withOpacity(0.1),
+                                color: const Color(0xFFE17055).withValues(alpha:0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(Icons.payment, color: Color(0xFFE17055), size: 20),

@@ -167,7 +167,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading homework data: $e');
+      debugPrint('Error loading homework data: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -264,7 +264,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha:0.1),
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -364,9 +364,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha:0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -405,7 +405,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha:0.1),
             spreadRadius: 0,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -573,7 +573,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _getSubjectColor(homework.subject).withOpacity(0.1),
+                    color: _getSubjectColor(homework.subject).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -618,7 +618,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF58CC02).withOpacity(0.1),
+                        color: const Color(0xFF58CC02).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -818,44 +818,44 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
 
   Future<void> _loadDivisions() async {
     if (_selectedBatch == null) {
-      print('[DEBUG] _loadDivisions: No batch selected');
+      debugPrint('[DEBUG] _loadDivisions: No batch selected');
       return;
     }
 
-    print('[DEBUG] _loadDivisions: Fetching divisions for ClassId: ${_selectedBatch!.classId}');
+    debugPrint('[DEBUG] _loadDivisions: Fetching divisions for ClassId: ${_selectedBatch!.classId}');
     setState(() => _isLoading = true);
     try {
       final divisions = await TeacherHomeworkService.getDivisions(_selectedBatch!.classId);
-      print('[DEBUG] _loadDivisions: Divisions fetched: ${divisions.map((d) => d.name).toList()}');
+      debugPrint('[DEBUG] _loadDivisions: Divisions fetched: ${divisions.map((d) => d.name).toList()}');
       setState(() {
         _divisions = divisions;
         _selectedDivision = null;
         _isLoading = false;
       });
     } catch (e) {
-      print('[DEBUG] _loadDivisions: Error: $e');
+      debugPrint('[DEBUG] _loadDivisions: Error: $e');
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadSubjects() async {
     if (_selectedBatch == null) {
-      print('[DEBUG] _loadSubjects: No batch selected');
+      debugPrint('[DEBUG] _loadSubjects: No batch selected');
       return;
     }
 
-    print('[DEBUG] _loadSubjects: Fetching subjects for ClassMasterId: ${_selectedBatch!.classMasterId}');
+    debugPrint('[DEBUG] _loadSubjects: Fetching subjects for ClassMasterId: ${_selectedBatch!.classMasterId}');
     setState(() => _isLoading = true);
     try {
       final subjects = await TeacherHomeworkService.getSubjects(_selectedBatch!.classMasterId);
-      print('[DEBUG] _loadSubjects: Subjects fetched: ${subjects.map((s) => s.subjectName).toList()}');
+      debugPrint('[DEBUG] _loadSubjects: Subjects fetched: ${subjects.map((s) => s.subjectName).toList()}');
       setState(() {
         _subjects = subjects;
         _selectedSubject = null;
         _isLoading = false;
       });
     } catch (e) {
-      print('[DEBUG] _loadSubjects: Error: $e');
+      debugPrint('[DEBUG] _loadSubjects: Error: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -982,7 +982,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       onChanged: (course) {
                         setState(() {
                           _selectedCourse = course;
-                          print('[DEBUG] Selected Course: ${course?.courseName}, id: ${course?.courseMasterId}');
+                          debugPrint('[DEBUG] Selected Course: ${course?.courseName}, id: ${course?.courseMasterId}');
                         });
                         _loadBatches();
                       },
@@ -1006,7 +1006,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       onChanged: (batch) {
                         setState(() {
                           _selectedBatch = batch;
-                          print('[DEBUG] Selected Batch: ${batch?.batchName}, ClassId: ${batch?.classId}, ClassMasterId: ${batch?.classMasterId}');
+                          debugPrint('[DEBUG] Selected Batch: ${batch?.batchName}, ClassId: ${batch?.classId}, ClassMasterId: ${batch?.classMasterId}');
                           _selectedDivision = null;
                           _divisions = [];
                         });
@@ -1033,7 +1033,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       onChanged: (division) {
                         setState(() {
                           _selectedDivision = division;
-                          print('[DEBUG] Selected Division: ${division?.name}, id: ${division?.divisionId}');
+                          debugPrint('[DEBUG] Selected Division: ${division?.name}, id: ${division?.divisionId}');
                         });
                       },
                       validator: (value) => value == null ? 'Please select a division' : null,

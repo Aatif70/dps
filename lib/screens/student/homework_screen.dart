@@ -445,7 +445,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -519,7 +519,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -564,9 +564,9 @@ class _HomeworkScreenState extends State<HomeworkScreen>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFF4A90E2).withOpacity(0.3)),
+          border: Border.all(color: const Color(0xFF4A90E2).withValues(alpha:0.3)),
           borderRadius: BorderRadius.circular(12),
-          color: const Color(0xFF4A90E2).withOpacity(0.05),
+          color: const Color(0xFF4A90E2).withValues(alpha:0.05),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -611,7 +611,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -634,7 +634,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                     Text(
                       'Homework Overview 📚',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -675,7 +675,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         Text(
           label,
           style: TextStyle(
-            color: color.withOpacity(0.8),
+            color: color.withValues(alpha:0.8),
             fontSize: 12,
           ),
         ),
@@ -739,10 +739,10 @@ class _HomeworkScreenState extends State<HomeworkScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: subjectColor.withOpacity(0.1),
+        color: subjectColor.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: subjectColor.withOpacity(0.3),
+          color: subjectColor.withValues(alpha:0.3),
           width: 1,
         ),
       ),
@@ -852,7 +852,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
           decoration: BoxDecoration(
-            color: isToday ? const Color(0xFF4A90E2).withOpacity(0.1) : Colors.grey.shade50,
+            color: isToday ? const Color(0xFF4A90E2).withValues(alpha:0.1) : Colors.grey.shade50,
             border: Border(
               top: BorderSide(
                 color: Colors.grey.shade200,
@@ -939,12 +939,12 @@ class _HomeworkScreenState extends State<HomeworkScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: subjectColor.withOpacity(0.2),
+          color: subjectColor.withValues(alpha:0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: subjectColor.withOpacity(0.05),
+            color: subjectColor.withValues(alpha:0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -958,7 +958,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: subjectColor.withOpacity(0.1),
+                  color: subjectColor.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -996,7 +996,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF58CC02).withOpacity(0.1),
+                      color: const Color(0xFF58CC02).withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -1093,7 +1093,7 @@ class _HomeworkScreenState extends State<HomeworkScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(

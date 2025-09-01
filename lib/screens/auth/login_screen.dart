@@ -188,10 +188,10 @@ class _LoginScreenState extends State<LoginScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: _primaryColor.withOpacity(0.1),
+            color: _primaryColor.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: _primaryColor.withOpacity(0.2),
+              color: _primaryColor.withValues(alpha:0.2),
               width: 1,
             ),
           ),
@@ -244,12 +244,12 @@ class _LoginScreenState extends State<LoginScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha:0.02),
             blurRadius: 48,
             offset: const Offset(0, 16),
           ),
@@ -465,7 +465,7 @@ class _LoginScreenState extends State<LoginScreen>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            disabledBackgroundColor: _primaryColor.withOpacity(0.6),
+            disabledBackgroundColor: _primaryColor.withValues(alpha:0.6),
           ),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),

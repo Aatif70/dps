@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +14,7 @@ class TeacherHomeworkService {
     DateTime? toDate,
   }) async {
     try {
-      print('=== HOMEWORK LIST API CALL ===');
+      debugPrint('=== HOMEWORK LIST API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
@@ -22,7 +23,7 @@ class TeacherHomeworkService {
       final fd = DateFormat('dd-MM-yyyy').format(fromDate ?? DateTime.now().subtract(const Duration(days: 30)));
       final td = DateFormat('dd-MM-yyyy').format(toDate ?? DateTime.now());
 
-      print('UID: $uid, EmpId: $empId, FromDate: $fd, ToDate: $td');
+      debugPrint('UID: $uid, EmpId: $empId, FromDate: $fd, ToDate: $td');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.homeworkList}');
       final request = http.MultipartRequest('POST', url);
@@ -36,9 +37,9 @@ class TeacherHomeworkService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== HOMEWORK LIST API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== HOMEWORK LIST API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -50,9 +51,9 @@ class TeacherHomeworkService {
 
       return [];
     } catch (e, stackTrace) {
-      print('=== HOMEWORK LIST ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== HOMEWORK LIST ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -60,12 +61,12 @@ class TeacherHomeworkService {
   // Fetch courses dropdown
   static Future<List<Course>> getCourses() async {
     try {
-      print('=== COURSES API CALL ===');
+      debugPrint('=== COURSES API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
 
-      print('Fetching courses for UID: $uid');
+      debugPrint('Fetching courses for UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.courseList}');
       final request = http.MultipartRequest('POST', url);
@@ -74,9 +75,9 @@ class TeacherHomeworkService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== COURSES API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== COURSES API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -88,8 +89,8 @@ class TeacherHomeworkService {
 
       return [];
     } catch (e) {
-      print('=== COURSES ERROR ===');
-      print('Error: $e');
+      debugPrint('=== COURSES ERROR ===');
+      debugPrint('Error: $e');
       return [];
     }
   }
@@ -97,13 +98,13 @@ class TeacherHomeworkService {
   // Fetch batches dropdown
   static Future<List<Batch>> getBatches(int courseMasterId) async {
     try {
-      print('=== BATCHES API CALL ===');
+      debugPrint('=== BATCHES API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('Fetching batches for UID: $uid, EmpId: $empId, CourseMasterId: $courseMasterId');
+      debugPrint('Fetching batches for UID: $uid, EmpId: $empId, CourseMasterId: $courseMasterId');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.batches}');
       final request = http.MultipartRequest('POST', url);
@@ -116,9 +117,9 @@ class TeacherHomeworkService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== BATCHES API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== BATCHES API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -130,8 +131,8 @@ class TeacherHomeworkService {
 
       return [];
     } catch (e) {
-      print('=== BATCHES ERROR ===');
-      print('Error: $e');
+      debugPrint('=== BATCHES ERROR ===');
+      debugPrint('Error: $e');
       return [];
     }
   }
@@ -139,13 +140,13 @@ class TeacherHomeworkService {
   // Fetch divisions dropdown
   static Future<List<Division>> getDivisions(int classId) async {
     try {
-      print('=== DIVISIONS API CALL ===');
+      debugPrint('=== DIVISIONS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('Fetching divisions for UID: $uid, EmpId: $empId, ClassId: $classId');
+      debugPrint('Fetching divisions for UID: $uid, EmpId: $empId, ClassId: $classId');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.divisionList}');
       final request = http.MultipartRequest('POST', url);
@@ -158,9 +159,9 @@ class TeacherHomeworkService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== DIVISIONS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== DIVISIONS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -172,8 +173,8 @@ class TeacherHomeworkService {
 
       return [];
     } catch (e) {
-      print('=== DIVISIONS ERROR ===');
-      print('Error: $e');
+      debugPrint('=== DIVISIONS ERROR ===');
+      debugPrint('Error: $e');
       return [];
     }
   }
@@ -181,13 +182,13 @@ class TeacherHomeworkService {
   // Fetch subjects dropdown
   static Future<List<Subject>> getSubjects(int classMasterId) async {
     try {
-      print('=== SUBJECTS API CALL ===');
+      debugPrint('=== SUBJECTS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      print('Fetching subjects for UID: $uid, EmpId: $empId, ClassMasterId: $classMasterId');
+      debugPrint('Fetching subjects for UID: $uid, EmpId: $empId, ClassMasterId: $classMasterId');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.subjectList}');
       final request = http.MultipartRequest('POST', url);
@@ -200,9 +201,9 @@ class TeacherHomeworkService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== SUBJECTS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== SUBJECTS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -214,8 +215,8 @@ class TeacherHomeworkService {
 
       return [];
     } catch (e) {
-      print('=== SUBJECTS ERROR ===');
-      print('Error: $e');
+      debugPrint('=== SUBJECTS ERROR ===');
+      debugPrint('Error: $e');
       return [];
     }
   }
@@ -231,22 +232,22 @@ class TeacherHomeworkService {
     File? file,
   }) async {
     try {
-      print('=== ADD HOMEWORK API CALL ===');
+      debugPrint('=== ADD HOMEWORK API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
 
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
-      print('Adding homework with:');
-      print('CreatedBy: $uid');
-      print('SubjectId: $subjectId');
-      print('Date: $dateString');
-      print('ClassMasterId: $classMasterId');
-      print('ClassId: $classId');
-      print('DivisionId: $divisionId');
-      print('HomeWork: $homework');
-      print('File: ${file?.path ?? 'No file'}');
+      debugPrint('Adding homework with:');
+      debugPrint('CreatedBy: $uid');
+      debugPrint('SubjectId: $subjectId');
+      debugPrint('Date: $dateString');
+      debugPrint('ClassMasterId: $classMasterId');
+      debugPrint('ClassId: $classId');
+      debugPrint('DivisionId: $divisionId');
+      debugPrint('HomeWork: $homework');
+      debugPrint('File: ${file?.path ?? 'No file'}');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.homeworkAdd}');
       final request = http.MultipartRequest('POST', url);
@@ -263,15 +264,15 @@ class TeacherHomeworkService {
 
       if (file != null) {
         request.files.add(await http.MultipartFile.fromPath('file', file.path));
-        print('File added to request: ${file.path}');
+        debugPrint('File added to request: ${file.path}');
       }
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== ADD HOMEWORK API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== ADD HOMEWORK API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -280,8 +281,8 @@ class TeacherHomeworkService {
 
       return false;
     } catch (e) {
-      print('=== ADD HOMEWORK ERROR ===');
-      print('Error: $e');
+      debugPrint('=== ADD HOMEWORK ERROR ===');
+      debugPrint('Error: $e');
       return false;
     }
   }

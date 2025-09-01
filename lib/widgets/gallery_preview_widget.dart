@@ -62,7 +62,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
         _latestEventTitle = sortedEvents.isNotEmpty ? sortedEvents.first.title : 'School Memories';
       }
     } catch (e) {
-      print('Error loading gallery preview: $e');
+      debugPrint('Error loading gallery preview: $e');
     }
 
     setState(() => _isLoading = false);
@@ -112,7 +112,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha:0.04),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -144,7 +144,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -162,7 +162,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: const Color(0xFF4A90E2).withOpacity(0.1),
+                            color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                             child: const Icon(
                               Icons.image_outlined,
                               size: 48,
@@ -172,7 +172,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                         },
                       )
                           : Container(
-                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                        color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                       ),
                     ),
 
@@ -185,8 +185,8 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.3),
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withValues(alpha:0.3),
+                              Colors.black.withValues(alpha:0.7),
                             ],
                             stops: const [0.0, 0.5, 1.0],
                           ),
@@ -211,7 +211,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withValues(alpha:0.2),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: const Icon(
@@ -254,7 +254,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                           Text(
                             '$_totalMediaCount photos and videos',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha:0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -284,7 +284,7 @@ class _GalleryPreviewWidgetState extends State<GalleryPreviewWidget>
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withValues(alpha:0.3),
                                       child: const Icon(
                                         Icons.image_outlined,
                                         size: 16,

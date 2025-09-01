@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dps/constants/api_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,9 +74,9 @@ class AdminAdmissionsService {
   // --- Divisions by Class (GET /api/Students/DivByClass?ClassId=...) ---
   static Future<List<DivisionLite>> fetchDivisionsByClass({required int classId}) async {
     final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.divisionsByClass}?ClassId=$classId');
-    print('[Service] GET DivByClass -> $uri');
+    debugPrint('[Service] GET DivByClass -> $uri');
     final response = await http.get(uri);
-    print('[Service] DivByClass status=${response.statusCode}');
+    debugPrint('[Service] DivByClass status=${response.statusCode}');
     if (response.statusCode != 200) {
       return [];
     }
@@ -86,9 +87,9 @@ class AdminAdmissionsService {
   // --- Classwise subjects (GET /api/Register/GetclasswiseSubject?ClassId=...) ---
   static Future<List<SubjectOption>> fetchClasswiseSubjects({required int classId}) async {
     final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.classwiseSubjects}?ClassId=$classId');
-    print('[Service] GET ClasswiseSubject -> $uri');
+    debugPrint('[Service] GET ClasswiseSubject -> $uri');
     final response = await http.get(uri);
-    print('[Service] ClasswiseSubject status=${response.statusCode}');
+    debugPrint('[Service] ClasswiseSubject status=${response.statusCode}');
     if (response.statusCode != 200) {
       return [];
     }
@@ -103,9 +104,9 @@ class AdminAdmissionsService {
   // --- Practical batches by division (GET /api/Register/GetPracticalBatchCP?Id=DivisionId) ---
   static Future<List<PracticalBatch>> fetchPracticalBatches({required int divisionId}) async {
     final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.practicalBatchesByDivision}?Id=$divisionId');
-    print('[Service] GET PracticalBatchCP -> $uri');
+    debugPrint('[Service] GET PracticalBatchCP -> $uri');
     final response = await http.get(uri);
-    print('[Service] PracticalBatchCP status=${response.statusCode}');
+    debugPrint('[Service] PracticalBatchCP status=${response.statusCode}');
     if (response.statusCode != 200) {
       return [];
     }
@@ -140,14 +141,14 @@ class AdminAdmissionsService {
       'StudSubjects': subjects.map((e) => e.toJson()).toList(),
       'UserId': uid,
     };
-    print('[Service] POST CreateAdmission -> ${ApiConstants.baseUrl + ApiConstants.createAdmission}');
-    print('[Service] CreateAdmission body=${json.encode(body)}');
+    debugPrint('[Service] POST CreateAdmission -> ${ApiConstants.baseUrl + ApiConstants.createAdmission}');
+    debugPrint('[Service] CreateAdmission body=${json.encode(body)}');
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: json.encode(body),
     );
-    print('[Service] CreateAdmission status=${response.statusCode} body=${response.body}');
+    debugPrint('[Service] CreateAdmission status=${response.statusCode} body=${response.body}');
     if (response.statusCode != 200) {
       return false;
     }

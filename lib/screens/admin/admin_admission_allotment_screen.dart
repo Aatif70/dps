@@ -125,7 +125,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 16, offset: const Offset(0, 8)),
+                BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 16, offset: const Offset(0, 8)),
               ],
             ),
             child: Row(
@@ -133,7 +133,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), borderRadius: BorderRadius.circular(16)),
                   child: const Icon(Icons.assignment_ind_rounded, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 16),
@@ -141,7 +141,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(s.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
                     const SizedBox(height: 6),
-                    Text('Requested: ${s.className ?? '-'} • ${s.acadYear ?? '-'}', style: TextStyle(color: Colors.white.withOpacity(0.95))),
+                    Text('Requested: ${s.className ?? '-'} • ${s.acadYear ?? '-'}', style: TextStyle(color: Colors.white.withValues(alpha:0.95))),
                   ]),
                 ),
               ],
@@ -313,7 +313,7 @@ class _AdminAdmissionAllotmentScreenState extends State<AdminAdmissionAllotmentS
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
         ],
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),

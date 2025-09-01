@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -7,24 +8,24 @@ class AdminDashboardService {
   // Get dashboard counter stats
   static Future<DashboardCounterData?> getDashboardCounter() async {
     try {
-      print('=== DASHBOARD COUNTER API CALL ===');
+      debugPrint('=== DASHBOARD COUNTER API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.dashboardcounter}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('=== DASHBOARD COUNTER REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== DASHBOARD COUNTER REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== DASHBOARD COUNTER API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== DASHBOARD COUNTER API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -34,9 +35,9 @@ class AdminDashboardService {
       }
       return null;
     } catch (e, stackTrace) {
-      print('=== DASHBOARD COUNTER ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== DASHBOARD COUNTER ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -44,24 +45,24 @@ class AdminDashboardService {
   // Get last 10 fees receipts
   static Future<List<FeesReceiptData>> getLast10FeesReceipt() async {
     try {
-      print('=== LAST 10 FEES RECEIPT API CALL ===');
+      debugPrint('=== LAST 10 FEES RECEIPT API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.last10feesreceipt}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('=== LAST 10 FEES RECEIPT REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== LAST 10 FEES RECEIPT REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== LAST 10 FEES RECEIPT API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== LAST 10 FEES RECEIPT API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -72,9 +73,9 @@ class AdminDashboardService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== LAST 10 FEES RECEIPT ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== LAST 10 FEES RECEIPT ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -82,24 +83,24 @@ class AdminDashboardService {
   // Get last 10 concession fees receipts
   static Future<List<FeesReceiptData>> getLast10ConcessionFeesReceipt() async {
     try {
-      print('=== LAST 10 CONCESSION FEES RECEIPT API CALL ===');
+      debugPrint('=== LAST 10 CONCESSION FEES RECEIPT API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.last10concessionfeesreceipt}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('=== LAST 10 CONCESSION FEES RECEIPT REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== LAST 10 CONCESSION FEES RECEIPT REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== LAST 10 CONCESSION FEES RECEIPT API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== LAST 10 CONCESSION FEES RECEIPT API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -110,9 +111,9 @@ class AdminDashboardService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== LAST 10 CONCESSION FEES RECEIPT ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== LAST 10 CONCESSION FEES RECEIPT ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -120,24 +121,24 @@ class AdminDashboardService {
   // Get last 10 payment vouchers
   static Future<List<PaymentVoucherData>> getLast10PaymentVouchers() async {
     try {
-      print('=== LAST 10 PAYMENT VOUCHERS API CALL ===');
+      debugPrint('=== LAST 10 PAYMENT VOUCHERS API CALL ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.last10paymentvouchers}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('=== LAST 10 PAYMENT VOUCHERS REQUEST FIELDS ===');
-      print('Request Fields: ${request.fields}');
+      debugPrint('=== LAST 10 PAYMENT VOUCHERS REQUEST FIELDS ===');
+      debugPrint('Request Fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== LAST 10 PAYMENT VOUCHERS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== LAST 10 PAYMENT VOUCHERS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -148,9 +149,9 @@ class AdminDashboardService {
       }
       return [];
     } catch (e, stackTrace) {
-      print('=== LAST 10 PAYMENT VOUCHERS ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== LAST 10 PAYMENT VOUCHERS ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }

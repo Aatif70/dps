@@ -165,7 +165,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
             gradient: LinearGradient(
               colors: [
                 const Color(0xFFF8F9FA),
-                const Color(0xFFE3F2FD).withOpacity(0.3),
+                const Color(0xFFE3F2FD).withValues(alpha:0.3),
                 const Color(0xFFF8F9FA),
               ],
               begin: Alignment.topLeft,
@@ -184,7 +184,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                   height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                   ),
                 ),
               ),
@@ -196,7 +196,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF58CC02).withOpacity(0.08),
+                    color: const Color(0xFF58CC02).withValues(alpha:0.08),
                   ),
                 ),
               ),
@@ -228,7 +228,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF4A90E2).withOpacity(0.3),
+                      color: const Color(0xFF4A90E2).withValues(alpha:0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -345,12 +345,12 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: role.gradient.colors.first.withOpacity(0.3),
+                    color: role.gradient.colors.first.withValues(alpha:0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
                   BoxShadow(
-                    color: role.gradient.colors.first.withOpacity(0.1),
+                    color: role.gradient.colors.first.withValues(alpha:0.1),
                     blurRadius: 40,
                     offset: const Offset(0, 20),
                   ),
@@ -370,10 +370,10 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                             width: 70,
                             height: 70,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha:0.2),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha:0.3),
                                 width: 1,
                               ),
                             ),
@@ -413,7 +413,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                               Text(
                                 role.description,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha:0.9),
                                   height: 1.4,
                                 ),
                               ),
@@ -424,7 +424,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha:0.2),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -449,10 +449,10 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha:0.2),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha:0.3),
                               width: 1,
                             ),
                           ),

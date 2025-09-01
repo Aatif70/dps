@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dps/constants/api_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +15,7 @@ class TeacherAttendanceService {
       final empId = prefs.get('Id')?.toString() ?? '';
 
       if (uid.isEmpty || empId.isEmpty) {
-        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        debugPrint('ERROR: Uid or EmpId not found in SharedPreferences');
         return [];
       }
 
@@ -28,7 +29,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Classes API Response: ${response.body}');
+      debugPrint('Classes API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -40,7 +41,7 @@ class TeacherAttendanceService {
       }
       return [];
     } catch (e) {
-      print('Error getting classes: $e');
+      debugPrint('Error getting classes: $e');
       return [];
     }
   }
@@ -53,7 +54,7 @@ class TeacherAttendanceService {
       final empId = prefs.get('Id')?.toString() ?? '';
 
       if (uid.isEmpty || empId.isEmpty) {
-        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        debugPrint('ERROR: Uid or EmpId not found in SharedPreferences');
         return [];
       }
 
@@ -68,7 +69,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Batches API Response: ${response.body}');
+      debugPrint('Batches API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -80,7 +81,7 @@ class TeacherAttendanceService {
       }
       return [];
     } catch (e) {
-      print('Error getting batches: $e');
+      debugPrint('Error getting batches: $e');
       return [];
     }
   }
@@ -92,7 +93,7 @@ class TeacherAttendanceService {
       final uid = prefs.getString('Uid') ?? '';
 
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
@@ -106,7 +107,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Divisions API Response: ${response.body}');
+      debugPrint('Divisions API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final List jsonData = json.decode(response.body);
@@ -114,7 +115,7 @@ class TeacherAttendanceService {
       }
       return [];
     } catch (e) {
-      print('Error getting divisions: $e');
+      debugPrint('Error getting divisions: $e');
       return [];
     }
   }
@@ -127,7 +128,7 @@ class TeacherAttendanceService {
       final empId = prefs.get('Id')?.toString() ?? '';
 
       if (uid.isEmpty || empId.isEmpty) {
-        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        debugPrint('ERROR: Uid or EmpId not found in SharedPreferences');
         return [];
       }
 
@@ -142,7 +143,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Subjects API Response: ${response.body}');
+      debugPrint('Subjects API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -154,7 +155,7 @@ class TeacherAttendanceService {
       }
       return [];
     } catch (e) {
-      print('Error getting subjects: $e');
+      debugPrint('Error getting subjects: $e');
       return [];
     }
   }
@@ -170,12 +171,12 @@ class TeacherAttendanceService {
       final uid = prefs.getString('Uid') ?? '';
 
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('=== LOADING ATTENDANCE STUDENT LIST ===');
-      print('SubjectId: $subjectId, ClassId: $classId, DivisionId: $divisionId');
+      debugPrint('=== LOADING ATTENDANCE STUDENT LIST ===');
+      debugPrint('SubjectId: $subjectId, ClassId: $classId, DivisionId: $divisionId');
 
       final url = Uri.parse('$baseUrl/api/User/AttendanceStudntList');
       final response = await http.post(
@@ -189,7 +190,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Attendance Students API Response: ${response.body}');
+      debugPrint('Attendance Students API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -197,17 +198,17 @@ class TeacherAttendanceService {
           final students = (jsonData['data'] as List)
               .map((item) => AttendanceStudent.fromJson(item))
               .toList();
-          print('Successfully loaded ${students.length} students');
+          debugPrint('Successfully loaded ${students.length} students');
           return students;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
+        debugPrint('API call failed with status: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('Error getting attendance student list: $e');
+      debugPrint('Error getting attendance student list: $e');
       return [];
     }
   }
@@ -227,12 +228,12 @@ class TeacherAttendanceService {
       final empId = prefs.get('Id')?.toString() ?? '';
 
       if (uid.isEmpty || empId.isEmpty) {
-        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        debugPrint('ERROR: Uid or EmpId not found in SharedPreferences');
         return false;
       }
 
-      print('=== SAVING ATTENDANCE ===');
-      print('Date: $attendanceDate, SubjectId: $subjectId, ClassId: $classId, DivisionId: $divisionId');
+      debugPrint('=== SAVING ATTENDANCE ===');
+      debugPrint('Date: $attendanceDate, SubjectId: $subjectId, ClassId: $classId, DivisionId: $divisionId');
 
       // Prepare attendance data
       final attendanceData = {
@@ -260,7 +261,7 @@ class TeacherAttendanceService {
         }).toList()
       };
 
-      print('Attendance data to save: ${json.encode(attendanceData)}');
+      debugPrint('Attendance data to save: ${json.encode(attendanceData)}');
 
       final url = Uri.parse('$baseUrl/api/User/AttendanceSave');
       final response = await http.post(
@@ -272,22 +273,22 @@ class TeacherAttendanceService {
         body: json.encode(attendanceData),
       );
 
-      print('Save Attendance API Response: ${response.body}');
+      debugPrint('Save Attendance API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          print('Attendance saved successfully');
+          debugPrint('Attendance saved successfully');
           return true;
         } else {
-          print('API returned success=false: ${jsonData['message'] ?? 'Unknown error'}');
+          debugPrint('API returned success=false: ${jsonData['message'] ?? 'Unknown error'}');
         }
       } else {
-        print('Save attendance failed with status: ${response.statusCode}');
+        debugPrint('Save attendance failed with status: ${response.statusCode}');
       }
       return false;
     } catch (e) {
-      print('Error saving attendance: $e');
+      debugPrint('Error saving attendance: $e');
       return false;
     }
   }
@@ -303,12 +304,12 @@ class TeacherAttendanceService {
       final empId = prefs.get('Id')?.toString() ?? '';
 
       if (uid.isEmpty || empId.isEmpty) {
-        print('ERROR: Uid or EmpId not found in SharedPreferences');
+        debugPrint('ERROR: Uid or EmpId not found in SharedPreferences');
         return [];
       }
 
-      print('=== GETTING ATTENDANCE RECORDS ===');
-      print('From Date: $fromDate, To Date: $toDate');
+      debugPrint('=== GETTING ATTENDANCE RECORDS ===');
+      debugPrint('From Date: $fromDate, To Date: $toDate');
 
       final url = Uri.parse('$baseUrl${ApiConstants.attendanceEmpIndex}');
       final response = await http.post(
@@ -322,7 +323,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Attendance Records API Response: ${response.body}');
+      debugPrint('Attendance Records API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -330,17 +331,17 @@ class TeacherAttendanceService {
           final records = (jsonData['data'] as List)
               .map((item) => AttendanceRecord.fromJson(item))
               .toList();
-          print('Successfully loaded ${records.length} attendance records');
+          debugPrint('Successfully loaded ${records.length} attendance records');
           return records;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
         }
       } else {
-        print('Get attendance records failed with status: ${response.statusCode}');
+        debugPrint('Get attendance records failed with status: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('Error getting attendance records: $e');
+      debugPrint('Error getting attendance records: $e');
       return [];
     }
   }
@@ -354,12 +355,12 @@ class TeacherAttendanceService {
       final uid = prefs.getString('Uid') ?? '';
 
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('=== GETTING STUDENT DETAILS ===');
-      print('Attendance ID: $attId');
+      debugPrint('=== GETTING STUDENT DETAILS ===');
+      debugPrint('Attendance ID: $attId');
 
       final url = Uri.parse('$baseUrl${ApiConstants.studentDetails}');
       final response = await http.post(
@@ -371,7 +372,7 @@ class TeacherAttendanceService {
         },
       );
 
-      print('Student Details API Response: ${response.body}');
+      debugPrint('Student Details API Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -379,17 +380,17 @@ class TeacherAttendanceService {
           final details = (jsonData['data'] as List)
               .map((item) => StudentAttendanceDetail.fromJson(item))
               .toList();
-          print('Successfully loaded ${details.length} student details');
+          debugPrint('Successfully loaded ${details.length} student details');
           return details;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
         }
       } else {
-        print('Get student details failed with status: ${response.statusCode}');
+        debugPrint('Get student details failed with status: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('Error getting student details: $e');
+      debugPrint('Error getting student details: $e');
       return [];
     }
   }

@@ -103,7 +103,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
-                  BoxShadow(color: const Color(0xFFFF8A65).withOpacity(0.25), blurRadius: 15, offset: const Offset(0, 8)),
+                  BoxShadow(color: const Color(0xFFFF8A65).withValues(alpha:0.25), blurRadius: 15, offset: const Offset(0, 8)),
                 ],
               ),
               child: Row(
@@ -111,7 +111,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), borderRadius: BorderRadius.circular(16)),
                     child: const Icon(Icons.groups_rounded, color: Colors.white, size: 24),
                   ),
                   const SizedBox(width: 16),
@@ -121,7 +121,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Text('Academic Year:', style: TextStyle(color: Colors.white.withOpacity(0.95))),
+                          Text('Academic Year:', style: TextStyle(color: Colors.white.withValues(alpha:0.95))),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
@@ -134,9 +134,9 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                                 isDense: true,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 hintText: 'YYYY',
-                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                hintStyle: TextStyle(color: Colors.white.withValues(alpha:0.8)),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.15),
+                                fillColor: Colors.white.withValues(alpha:0.15),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(color: Colors.white24),
@@ -219,7 +219,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
-                        BoxShadow(color: item.color.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 8)),
+                        BoxShadow(color: item.color.withValues(alpha:0.08), blurRadius: 20, offset: const Offset(0, 8)),
                       ],
                     ),
                     child: Padding(
@@ -231,7 +231,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [item.color.withOpacity(0.12), item.color.withOpacity(0.06)],
+                                colors: [item.color.withValues(alpha:0.12), item.color.withValues(alpha:0.06)],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -272,7 +272,7 @@ class _AdminStudentsHubScreenState extends State<AdminStudentsHubScreen> {
   Widget _pill(String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(label == 'Total Students' ? Icons.people_rounded : Icons.check_circle_rounded, color: Colors.white, size: 14),
         const SizedBox(width: 6),

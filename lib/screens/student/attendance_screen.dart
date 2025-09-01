@@ -313,7 +313,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -355,7 +355,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -373,7 +373,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                     Text(
                       DateFormat('MMMM yyyy').format(_selectedDate),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -405,7 +405,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                     Text(
                       'Overall Attendance',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha:0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -419,10 +419,10 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha:0.2),
                             borderRadius: BorderRadius.circular(25),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha:0.3),
                               width: 1,
                             ),
                           ),
@@ -477,13 +477,13 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                           "${_monthlyStats['totalDays']?.toInt() ?? 0} days",
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha:0.8),
                           ),
                         ),
                       ],
                     ),
                     progressColor: Colors.white,
-                    backgroundColor: Colors.white.withOpacity(0.3),
+                    backgroundColor: Colors.white.withValues(alpha:0.3),
                     circularStrokeCap: CircularStrokeCap.round,
                     animation: true,
                     animationDuration: 2000,
@@ -559,7 +559,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: stat.color.withOpacity(0.08),
+            color: stat.color.withValues(alpha:0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -576,8 +576,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      stat.color.withOpacity(0.1),
-                      stat.color.withOpacity(0.05),
+                      stat.color.withValues(alpha:0.1),
+                      stat.color.withValues(alpha:0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -661,7 +661,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF4A90E2).withOpacity(0.1),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -721,8 +721,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _todayAttendance.isNotEmpty
-                        ? const Color(0xFF58CC02).withOpacity(0.1)
-                        : const Color(0xFF718096).withOpacity(0.1),
+                        ? const Color(0xFF58CC02).withValues(alpha:0.1)
+                        : const Color(0xFF718096).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -800,8 +800,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  statusColor.withOpacity(0.1),
-                  statusColor.withOpacity(0.05),
+                  statusColor.withValues(alpha:0.1),
+                  statusColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),

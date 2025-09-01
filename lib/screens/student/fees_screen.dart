@@ -156,7 +156,7 @@ class _FeesScreenState extends State<FeesScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF58CC02).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -191,7 +191,7 @@ class _FeesScreenState extends State<FeesScreen> {
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.3),
+            color: const Color(0xFF58CC02).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -217,7 +217,7 @@ class _FeesScreenState extends State<FeesScreen> {
                         Text(
                           'Total Paid',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha:0.9),
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -237,10 +237,10 @@ class _FeesScreenState extends State<FeesScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha:0.3),
                           width: 1,
                         ),
                       ),
@@ -259,10 +259,10 @@ class _FeesScreenState extends State<FeesScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha:0.3),
                     width: 2,
                   ),
                 ),
@@ -357,15 +357,15 @@ class _FeesScreenState extends State<FeesScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            category.color.withOpacity(0.1),
-            category.color.withOpacity(0.05),
+            category.color.withValues(alpha:0.1),
+            category.color.withValues(alpha:0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: category.color.withOpacity(0.2),
+          color: category.color.withValues(alpha:0.2),
           width: 1,
         ),
       ),
@@ -378,7 +378,7 @@ class _FeesScreenState extends State<FeesScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: category.color.withOpacity(0.1),
+                  color: category.color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -390,7 +390,7 @@ class _FeesScreenState extends State<FeesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: category.color.withOpacity(0.1),
+                  color: category.color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -445,7 +445,7 @@ class _FeesScreenState extends State<FeesScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF28A745).withOpacity(0.2),
+                color: const Color(0xFF28A745).withValues(alpha:0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -472,7 +472,7 @@ class _FeesScreenState extends State<FeesScreen> {
                     'Congratulations! You have no pending fees at the moment.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: const Color(0xFF155724).withOpacity(0.8),
+                      color: const Color(0xFF155724).withValues(alpha:0.8),
                     ),
                   ),
                 ],
@@ -521,7 +521,7 @@ class _FeesScreenState extends State<FeesScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                  color: const Color(0xFFFF6B6B).withValues(alpha:0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -532,7 +532,7 @@ class _FeesScreenState extends State<FeesScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
@@ -559,7 +559,7 @@ class _FeesScreenState extends State<FeesScreen> {
                         '${remainingFees.length} Fee${remainingFees.length > 1 ? 's' : ''} Due',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha:0.9),
                         ),
                       ),
                     ],
@@ -580,7 +580,7 @@ class _FeesScreenState extends State<FeesScreen> {
                       'Total Due',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha:0.8),
                       ),
                     ),
                   ],
@@ -619,8 +619,8 @@ class _FeesScreenState extends State<FeesScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  categoryColor.withOpacity(0.1),
-                  categoryColor.withOpacity(0.05),
+                  categoryColor.withValues(alpha:0.1),
+                  categoryColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
@@ -667,7 +667,7 @@ class _FeesScreenState extends State<FeesScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B6B).withOpacity(0.1),
+                          color: const Color(0xFFFF6B6B).withValues(alpha:0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -808,7 +808,7 @@ class _FeesScreenState extends State<FeesScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF58CC02).withOpacity(0.1),
+                    color: const Color(0xFF58CC02).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -852,8 +852,8 @@ class _FeesScreenState extends State<FeesScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  categoryColor.withOpacity(0.1),
-                  categoryColor.withOpacity(0.05),
+                  categoryColor.withValues(alpha:0.1),
+                  categoryColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
@@ -899,7 +899,7 @@ class _FeesScreenState extends State<FeesScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getPaymentModeColor(fee.paymentMode).withOpacity(0.1),
+                        color: _getPaymentModeColor(fee.paymentMode).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

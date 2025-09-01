@@ -81,7 +81,7 @@ class _AdminEmployeesHubScreenState extends State<AdminEmployeesHubScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: item.color.withOpacity(0.06),
+                    color: item.color.withValues(alpha:0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -94,7 +94,7 @@ class _AdminEmployeesHubScreenState extends State<AdminEmployeesHubScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: item.color.withOpacity(0.1),
+                      color: item.color.withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(item.icon, color: item.color),
@@ -144,9 +144,9 @@ Widget _buildMetricsPill(String label, String value, Color color, {Color? bg}) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.9),
+      color: Colors.white.withValues(alpha:0.9),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: color.withOpacity(0.3), width: 1),
+      border: Border.all(color: color.withValues(alpha:0.3), width: 1),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -200,7 +200,7 @@ extension on _AdminEmployeesHubScreenState {
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 18, offset: const Offset(0, 10)),
+          BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 18, offset: const Offset(0, 10)),
         ],
       ),
       child: Column(
@@ -211,7 +211,7 @@ extension on _AdminEmployeesHubScreenState {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.group_rounded, color: Colors.white, size: 24),
@@ -231,8 +231,8 @@ extension on _AdminEmployeesHubScreenState {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _buildMetricsPill('Present', present.toString(), const Color(0xFF10B981), bg: const Color(0xFF10B981).withOpacity(0.2)),
-              _buildMetricsPill('Absent', absent.toString(), const Color(0xFFEF4444), bg: const Color(0xFFEF4444).withOpacity(0.2)),
+              _buildMetricsPill('Present', present.toString(), const Color(0xFF10B981), bg: const Color(0xFF10B981).withValues(alpha:0.2)),
+              _buildMetricsPill('Absent', absent.toString(), const Color(0xFFEF4444), bg: const Color(0xFFEF4444).withValues(alpha:0.2)),
             ],
           ),
         ],

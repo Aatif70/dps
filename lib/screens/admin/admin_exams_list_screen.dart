@@ -80,13 +80,13 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Row(children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), borderRadius: BorderRadius.circular(16)),
           child: const Icon(Icons.fact_check_rounded, color: Colors.white, size: 24),
         ),
         const SizedBox(width: 16),
@@ -109,7 +109,7 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
   Widget _pill(String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.analytics_outlined, color: Colors.white, size: 14),
         const SizedBox(width: 6),
@@ -125,7 +125,7 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
         ],
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
@@ -157,7 +157,7 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+              BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
             ],
             border: Border.all(color: const Color(0xFFF1F5F9)),
           ),
@@ -167,7 +167,7 @@ class _AdminExamsListScreenState extends State<AdminExamsListScreen> {
                 Container(
                   width: 44,
                   height: 44,
-                  decoration: BoxDecoration(color: const Color(0xFF4A90E2).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: const Color(0xFF4A90E2).withValues(alpha:0.1), borderRadius: BorderRadius.circular(12)),
                   child: const Icon(Icons.event_note_rounded, color: Color(0xFF4A90E2)),
                 ),
                 const SizedBox(width: 14),

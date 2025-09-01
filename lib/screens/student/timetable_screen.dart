@@ -33,10 +33,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
     });
 
     try {
-      print('=== LOADING TIMETABLE ===');
+      debugPrint('=== LOADING TIMETABLE ===');
       final records = await TimetableService.getStudentTimetable();
-      print('=== TIMETABLE LOADED ===');
-      print('Total records: ${records.length}');
+      debugPrint('=== TIMETABLE LOADED ===');
+      debugPrint('Total records: ${records.length}');
 
       if (mounted) {
         setState(() {
@@ -45,14 +45,14 @@ class _TimetableScreenState extends State<TimetableScreen> {
           _isLoading = false;
         });
 
-        print('=== GROUPED TIMETABLE ===');
+        debugPrint('=== GROUPED TIMETABLE ===');
         _groupedTimetable.forEach((day, records) {
-          print('$day: ${records.length} records');
+          debugPrint('$day: ${records.length} records');
         });
       }
     } catch (e) {
-      print('=== TIMETABLE LOAD ERROR ===');
-      print('Error: $e');
+      debugPrint('=== TIMETABLE LOAD ERROR ===');
+      debugPrint('Error: $e');
       if (mounted) {
         setState(() {
           _errorMessage = 'Failed to load timetable: $e';
@@ -215,7 +215,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -248,7 +248,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -268,7 +268,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                           ? '${_timetableRecords.first.className} - ${_timetableRecords.first.division}'
                           : 'Weekly Schedule',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -296,7 +296,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     Text(
                       'Total Classes This Week',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha:0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -307,10 +307,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha:0.3),
                           width: 1,
                         ),
                       ),
@@ -340,7 +340,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -362,7 +362,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     Text(
                       'Subjects',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha:0.8),
                         fontSize: 12,
                       ),
                     ),
@@ -440,7 +440,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: stat.color.withOpacity(0.08),
+            color: stat.color.withValues(alpha:0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -457,8 +457,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      stat.color.withOpacity(0.1),
-                      stat.color.withOpacity(0.05),
+                      stat.color.withValues(alpha:0.1),
+                      stat.color.withValues(alpha:0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -551,14 +551,14 @@ class _TimetableScreenState extends State<TimetableScreen> {
                         color: isSelected
                             ? Colors.transparent
                             : hasClasses
-                            ? const Color(0xFF4A90E2).withOpacity(0.3)
+                            ? const Color(0xFF4A90E2).withValues(alpha:0.3)
                             : Colors.grey.shade300,
                         width: 1,
                       ),
                       boxShadow: [
                         if (isSelected)
                           BoxShadow(
-                            color: const Color(0xFF4A90E2).withOpacity(0.3),
+                            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -640,8 +640,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: dayRecords.isNotEmpty
-                        ? const Color(0xFF4A90E2).withOpacity(0.1)
-                        : const Color(0xFF718096).withOpacity(0.1),
+                        ? const Color(0xFF4A90E2).withValues(alpha:0.1)
+                        : const Color(0xFF718096).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -718,8 +718,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  subjectColor.withOpacity(0.1),
-                  subjectColor.withOpacity(0.05),
+                  subjectColor.withValues(alpha:0.1),
+                  subjectColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
@@ -757,7 +757,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: subjectColor.withOpacity(0.1),
+                        color: subjectColor.withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -796,10 +796,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: subjectColor.withOpacity(0.1),
+                  color: subjectColor.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: subjectColor.withOpacity(0.2),
+                    color: subjectColor.withValues(alpha:0.2),
                     width: 1,
                   ),
                 ),
@@ -816,7 +816,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     Text(
                       record.toTime,
                       style: TextStyle(
-                        color: subjectColor.withOpacity(0.8),
+                        color: subjectColor.withValues(alpha:0.8),
                         fontSize: 12,
                       ),
                     ),

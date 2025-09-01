@@ -152,7 +152,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4A90E2).withOpacity(0.3),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.3),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -170,7 +170,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                       Text(
                         'Welcome back! 👋',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha:0.9),
                           fontSize: 16,
                         ),
                       ),
@@ -200,7 +200,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                           border: Border.all(color: Colors.white, width: 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha:0.2),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -381,7 +381,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: feature.color.withOpacity(0.08),
+              color: feature.color.withValues(alpha:0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -398,8 +398,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      feature.color.withOpacity(0.1),
-                      feature.color.withOpacity(0.05),
+                      feature.color.withValues(alpha:0.1),
+                      feature.color.withValues(alpha:0.05),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,

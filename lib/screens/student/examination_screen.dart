@@ -262,7 +262,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF2ECC71).withOpacity(0.1),
+              color: const Color(0xFF2ECC71).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -295,7 +295,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2ECC71).withOpacity(0.3),
+            color: const Color(0xFF2ECC71).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -321,7 +321,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                         Text(
                           'Exam Performance 📊',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha:0.9),
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -342,7 +342,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                       Text(
                         'Until ${nextExam.name} (${nextExam.subject})',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha:0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -358,7 +358,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                       Text(
                         'All caught up! 🎉',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha:0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -369,10 +369,10 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha:0.3),
                           width: 1,
                         ),
                       ),
@@ -409,7 +409,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                     child: CircularProgressIndicator(
                       value: _averagePerformance,
                       strokeWidth: 8,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha:0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
@@ -431,7 +431,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                           Text(
                             'Average',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha:0.8),
                               fontSize: 10,
                             ),
                           ),
@@ -561,7 +561,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                 shape: BoxShape.circle,
               ),
               todayDecoration: BoxDecoration(
-                color: const Color(0xFF2ECC71).withOpacity(0.3),
+                color: const Color(0xFF2ECC71).withValues(alpha:0.3),
                 shape: BoxShape.circle,
               ),
               markerDecoration: const BoxDecoration(
@@ -666,7 +666,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2ECC71).withOpacity(0.1),
+                    color: const Color(0xFF2ECC71).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -727,8 +727,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  subjectColor.withOpacity(0.1),
-                  subjectColor.withOpacity(0.05),
+                  subjectColor.withValues(alpha:0.1),
+                  subjectColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
@@ -790,7 +790,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: subjectColor.withOpacity(0.1),
+              color: subjectColor.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -818,7 +818,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _getExamTypeColor(exam.examType).withOpacity(0.08),
+            color: _getExamTypeColor(exam.examType).withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -832,8 +832,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  _getExamTypeColor(exam.examType).withOpacity(0.1),
-                  _getExamTypeColor(exam.examType).withOpacity(0.05),
+                  _getExamTypeColor(exam.examType).withValues(alpha:0.1),
+                  _getExamTypeColor(exam.examType).withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -850,8 +850,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        _getExamTypeColor(exam.examType).withOpacity(0.2),
-                        _getExamTypeColor(exam.examType).withOpacity(0.1),
+                        _getExamTypeColor(exam.examType).withValues(alpha:0.2),
+                        _getExamTypeColor(exam.examType).withValues(alpha:0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -879,7 +879,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: _getExamTypeColor(exam.examType).withOpacity(0.1),
+                          color: _getExamTypeColor(exam.examType).withValues(alpha:0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -897,7 +897,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2ECC71).withOpacity(0.1),
+                    color: const Color(0xFF2ECC71).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -989,8 +989,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  subjectColor.withOpacity(0.1),
-                  subjectColor.withOpacity(0.05),
+                  subjectColor.withValues(alpha:0.1),
+                  subjectColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
@@ -1085,17 +1085,17 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: isToday
-                  ? const Color(0xFFE74C3C).withOpacity(0.1)
+                  ? const Color(0xFFE74C3C).withValues(alpha:0.1)
                   : isTomorrow
-                  ? const Color(0xFFFF9500).withOpacity(0.1)
-                  : const Color(0xFF2ECC71).withOpacity(0.1),
+                  ? const Color(0xFFFF9500).withValues(alpha:0.1)
+                  : const Color(0xFF2ECC71).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isToday
-                    ? const Color(0xFFE74C3C).withOpacity(0.3)
+                    ? const Color(0xFFE74C3C).withValues(alpha:0.3)
                     : isTomorrow
-                    ? const Color(0xFFFF9500).withOpacity(0.3)
-                    : const Color(0xFF2ECC71).withOpacity(0.3),
+                    ? const Color(0xFFFF9500).withValues(alpha:0.3)
+                    : const Color(0xFF2ECC71).withValues(alpha:0.3),
                 width: 1,
               ),
             ),
@@ -1144,7 +1144,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _getGradeColor(grade).withOpacity(0.08),
+            color: _getGradeColor(grade).withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -1158,8 +1158,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  _getGradeColor(grade).withOpacity(0.1),
-                  _getGradeColor(grade).withOpacity(0.05),
+                  _getGradeColor(grade).withValues(alpha:0.1),
+                  _getGradeColor(grade).withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -1178,8 +1178,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            _getGradeColor(grade).withOpacity(0.2),
-                            _getGradeColor(grade).withOpacity(0.1),
+                            _getGradeColor(grade).withValues(alpha:0.2),
+                            _getGradeColor(grade).withValues(alpha:0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
@@ -1207,7 +1207,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: _getExamTypeColor(exam.examType).withOpacity(0.1),
+                              color: _getExamTypeColor(exam.examType).withValues(alpha:0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -1249,7 +1249,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha:0.7),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -1337,8 +1337,8 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  subjectColor.withOpacity(0.1),
-                  subjectColor.withOpacity(0.05),
+                  subjectColor.withValues(alpha:0.1),
+                  subjectColor.withValues(alpha:0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
@@ -1399,7 +1399,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getGradeColor(grade).withOpacity(0.1),
+                  color: _getGradeColor(grade).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -1460,7 +1460,7 @@ class _ExaminationScreenState extends State<ExaminationScreen>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha:0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

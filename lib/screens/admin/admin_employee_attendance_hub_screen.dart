@@ -62,7 +62,7 @@ class AdminEmployeeAttendanceHubScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: item.color.withOpacity(0.06),
+                    color: item.color.withValues(alpha:0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -75,7 +75,7 @@ class AdminEmployeeAttendanceHubScreen extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: item.color.withOpacity(0.1),
+                      color: item.color.withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(item.icon, color: item.color),

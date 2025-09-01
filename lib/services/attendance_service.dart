@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dps/constants/api_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,8 +14,8 @@ class AttendanceService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== ATTENDANCE SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== ATTENDANCE SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -23,21 +24,21 @@ class AttendanceService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Attendance Service - Processed Uid: $uid');
-      print('Attendance Service - Id value for request: $idValue');
+      debugPrint('Attendance Service - Processed Uid: $uid');
+      debugPrint('Attendance Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
         return null;
       }
 
@@ -46,10 +47,10 @@ class AttendanceService {
           '$baseUrl/api/User/StudentAttendanceList?studentid=$studentId&AttDate=$attDate'
       );
 
-      print('=== ATTENDANCE API CALL ===');
-      print('URL: $url');
-      print('Student ID: $studentId');
-      print('Attendance Date: $attDate');
+      debugPrint('=== ATTENDANCE API CALL ===');
+      debugPrint('URL: $url');
+      debugPrint('Student ID: $studentId');
+      debugPrint('Attendance Date: $attDate');
 
       final response = await http.get(
         url,
@@ -59,37 +60,37 @@ class AttendanceService {
         },
       );
 
-      print('=== ATTENDANCE API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== ATTENDANCE API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
-        print('Attendance List Count: ${jsonData['AttendanceList']?.length ?? 0}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
+        debugPrint('Attendance List Count: ${jsonData['AttendanceList']?.length ?? 0}');
 
         if (jsonData['success'] == true && jsonData['AttendanceList'] != null) {
           final attendanceResponse = AttendanceResponse.fromJson(jsonData);
-          print('=== ATTENDANCE RECORDS ===');
+          debugPrint('=== ATTENDANCE RECORDS ===');
           // for (int i = 0; i < attendanceResponse.attendanceList.length; i++) {
           //   final record = attendanceResponse.attendanceList[i];
-          //   print('Record $i: ${record.subject} - ${record.status} (${record.fromTime}-${record.toTime})');
+          //   debugPrint('Record $i: ${record.subject} - ${record.status} (${record.fromTime}-${record.toTime})');
           // }
           return attendanceResponse;
         } else {
-          print('API returned success=false or null attendance list');
+          debugPrint('API returned success=false or null attendance list');
           return null;
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return null;
       }
     } catch (e, stackTrace) {
-      print('=== ATTENDANCE API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== ATTENDANCE API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -107,11 +108,11 @@ class AttendanceService {
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
       if (idValue == null) {
-        print('ERROR: Id not found in SharedPreferences');
+        debugPrint('ERROR: Id not found in SharedPreferences');
         return {
           'totalDays': 0.0,
           'presentDays': 0.0,
@@ -120,8 +121,8 @@ class AttendanceService {
       }
 
       final studentId = idValue.toString();
-      print('=== GETTING MONTHLY STATS ===');
-      print('Student ID: $studentId, Year: $year, Month: $month');
+      debugPrint('=== GETTING MONTHLY STATS ===');
+      debugPrint('Student ID: $studentId, Year: $year, Month: $month');
 
       final daysInMonth = DateTime(year, month + 1, 0).day;
       int totalDays = 0;
@@ -153,10 +154,10 @@ class AttendanceService {
 
       final attendancePercentage = totalDays > 0 ? presentDays / totalDays : 0.0;
 
-      print('=== MONTHLY STATS RESULT ===');
-      print('Total Days: $totalDays');
-      print('Present Days: $presentDays');
-      print('Attendance Percentage: ${(attendancePercentage * 100).toStringAsFixed(1)}%');
+      debugPrint('=== MONTHLY STATS RESULT ===');
+      debugPrint('Total Days: $totalDays');
+      debugPrint('Present Days: $presentDays');
+      debugPrint('Attendance Percentage: ${(attendancePercentage * 100).toStringAsFixed(1)}%');
 
       return {
         'totalDays': totalDays.toDouble(),
@@ -164,8 +165,8 @@ class AttendanceService {
         'attendancePercentage': attendancePercentage,
       };
     } catch (e) {
-      print('=== MONTHLY STATS ERROR ===');
-      print('Error: $e');
+      debugPrint('=== MONTHLY STATS ERROR ===');
+      debugPrint('Error: $e');
       return {
         'totalDays': 0.0,
         'presentDays': 0.0,

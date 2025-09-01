@@ -242,7 +242,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -271,7 +271,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withOpacity(0.3),
+            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -292,7 +292,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha:0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -336,7 +336,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                     Text(
                       _studentDetail?.className ?? 'Class Information',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 14,
                       ),
                     ),
@@ -347,7 +347,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Text(
@@ -435,7 +435,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: stat.color.withOpacity(0.08),
+            color: stat.color.withValues(alpha:0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -452,8 +452,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      stat.color.withOpacity(0.1),
-                      stat.color.withOpacity(0.05),
+                      stat.color.withValues(alpha:0.1),
+                      stat.color.withValues(alpha:0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -534,7 +534,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -611,7 +611,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -635,7 +635,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -712,8 +712,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen>
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: document.isUploaded
-                  ? const Color(0xFF58CC02).withOpacity(0.1)
-                  : const Color(0xFFE74C3C).withOpacity(0.1),
+                  ? const Color(0xFF58CC02).withValues(alpha:0.1)
+                  : const Color(0xFFE74C3C).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -926,7 +926,7 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -937,7 +937,7 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
@@ -1082,7 +1082,7 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha:0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -1127,7 +1127,7 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90E2).withOpacity(0.1),
+              color: const Color(0xFF4A90E2).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -1211,7 +1211,7 @@ class _DocumentViewerModalState extends State<DocumentViewerModal> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF58CC02).withOpacity(0.1),
+              color: const Color(0xFF58CC02).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -8,8 +9,8 @@ class LeaveService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== STUDENT LEAVE SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== STUDENT LEAVE SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -18,82 +19,82 @@ class LeaveService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Student Leave Service - Processed Uid: $uid');
-      print('Student Leave Service - Id value for request: $idValue');
+      debugPrint('Student Leave Service - Processed Uid: $uid');
+      debugPrint('Student Leave Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/StudentLeave');
-      print('Student Leave Service - Request URL: $url');
+      debugPrint('Student Leave Service - Request URL: $url');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
       request.fields['StudentId'] = idValue.toString();
 
-      print('Student Leave Service - Multipart fields: ${request.fields}');
+      debugPrint('Student Leave Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Student Leave Service - Response status: ${response.statusCode}');
-      print('Student Leave Service - Response headers: ${response.headers}');
-      print('Student Leave Service - Raw response body: ${response.body}');
+      debugPrint('Student Leave Service - Response status: ${response.statusCode}');
+      debugPrint('Student Leave Service - Response headers: ${response.headers}');
+      debugPrint('Student Leave Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Student Leave Service - Parsed JSON response: $jsonResponse');
+        debugPrint('Student Leave Service - Parsed JSON response: $jsonResponse');
 
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           final List<dynamic> data = jsonResponse['data'];
-          print('Student Leave Service - Data array length: ${data.length}');
+          debugPrint('Student Leave Service - Data array length: ${data.length}');
 
           List<StudentLeaveRecord> leaveRecords = [];
 
           for (int i = 0; i < data.length; i++) {
             try {
-              print('--- Processing student leave record $i ---');
+              debugPrint('--- Processing student leave record $i ---');
               final item = data[i];
-              print('Raw item data: $item');
+              debugPrint('Raw item data: $item');
 
               final leaveRecord = StudentLeaveRecord.fromJson(item);
-              print('Successfully parsed student leave record $i: ${leaveRecord.sleaveId}');
+              debugPrint('Successfully parsed student leave record $i: ${leaveRecord.sleaveId}');
               leaveRecords.add(leaveRecord);
             } catch (e, stackTrace) {
-              print('ERROR parsing student leave record $i: $e');
-              print('Stack trace: $stackTrace');
-              print('Failed item data: ${data[i]}');
+              debugPrint('ERROR parsing student leave record $i: $e');
+              debugPrint('Stack trace: $stackTrace');
+              debugPrint('Failed item data: ${data[i]}');
             }
           }
 
-          print('Student Leave Service - Successfully parsed ${leaveRecords.length} out of ${data.length} records');
-          print('=== STUDENT LEAVE SERVICE DEBUG END ===');
+          debugPrint('Student Leave Service - Successfully parsed ${leaveRecords.length} out of ${data.length} records');
+          debugPrint('=== STUDENT LEAVE SERVICE DEBUG END ===');
           return leaveRecords;
         } else {
-          print('API returned success: false or no data');
+          debugPrint('API returned success: false or no data');
           return [];
         }
       } else {
-        print('Failed to load student leaves. Status code: ${response.statusCode}');
-        print('Error response body: ${response.body}');
+        debugPrint('Failed to load student leaves. Status code: ${response.statusCode}');
+        debugPrint('Error response body: ${response.body}');
         return [];
       }
     } catch (e, stackTrace) {
-      print('Error fetching student leaves: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error fetching student leaves: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -106,7 +107,7 @@ class LeaveService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== ADD LEAVE SERVICE DEBUG START ===');
+      debugPrint('=== ADD LEAVE SERVICE DEBUG START ===');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -115,26 +116,26 @@ class LeaveService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
       // Check if Id exists and get its value regardless of type
       if (prefs.containsKey('Id')) {
         idValue = prefs.get('Id');
-        print('Id raw value: $idValue (type: ${idValue.runtimeType})');
+        debugPrint('Id raw value: $idValue (type: ${idValue.runtimeType})');
       }
 
-      print('Add Leave Service - Processed Uid: $uid');
-      print('Add Leave Service - Id value for request: $idValue');
+      debugPrint('Add Leave Service - Processed Uid: $uid');
+      debugPrint('Add Leave Service - Id value for request: $idValue');
 
       if (uid.isEmpty || idValue == null) {
-        print('ERROR: Uid or Id not found in SharedPreferences');
+        debugPrint('ERROR: Uid or Id not found in SharedPreferences');
         return false;
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/AddLeaveMobile');
-      print('Add Leave Service - Request URL: $url');
+      debugPrint('Add Leave Service - Request URL: $url');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
@@ -144,31 +145,31 @@ class LeaveService {
       request.fields['ToDate'] = toDate;
       request.fields['Description'] = description;
 
-      print('Add Leave Service - Multipart fields: ${request.fields}');
+      debugPrint('Add Leave Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Add Leave Service - Response status: ${response.statusCode}');
-      print('Add Leave Service - Response headers: ${response.headers}');
-      print('Add Leave Service - Raw response body: ${response.body}');
+      debugPrint('Add Leave Service - Response status: ${response.statusCode}');
+      debugPrint('Add Leave Service - Response headers: ${response.headers}');
+      debugPrint('Add Leave Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Add Leave Service - Parsed JSON response: $jsonResponse');
+        debugPrint('Add Leave Service - Parsed JSON response: $jsonResponse');
 
         final success = jsonResponse['success'] == true;
-        print('Add Leave Service - Success: $success');
-        print('=== ADD LEAVE SERVICE DEBUG END ===');
+        debugPrint('Add Leave Service - Success: $success');
+        debugPrint('=== ADD LEAVE SERVICE DEBUG END ===');
         return success;
       } else {
-        print('Failed to add leave. Status code: ${response.statusCode}');
-        print('Error response body: ${response.body}');
+        debugPrint('Failed to add leave. Status code: ${response.statusCode}');
+        debugPrint('Error response body: ${response.body}');
         return false;
       }
     } catch (e, stackTrace) {
-      print('Error adding leave: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error adding leave: $e');
+      debugPrint('Stack trace: $stackTrace');
       return false;
     }
   }
@@ -202,8 +203,8 @@ class StudentLeaveRecord {
 
   factory StudentLeaveRecord.fromJson(Map<String, dynamic> json) {
     try {
-      print('--- StudentLeaveRecord.fromJson START ---');
-      print('Input JSON: $json');
+      debugPrint('--- StudentLeaveRecord.fromJson START ---');
+      debugPrint('Input JSON: $json');
 
       final record = StudentLeaveRecord(
         sleaveId: _safeIntExtraction(json, 'SleaveId'),
@@ -218,12 +219,12 @@ class StudentLeaveRecord {
         fromDate: _safeDateTimeExtraction(json, 'FromDate'),
       );
 
-      print('--- StudentLeaveRecord.fromJson SUCCESS ---');
+      debugPrint('--- StudentLeaveRecord.fromJson SUCCESS ---');
       return record;
     } catch (e, stackTrace) {
-      print('--- StudentLeaveRecord.fromJson ERROR ---');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('--- StudentLeaveRecord.fromJson ERROR ---');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }

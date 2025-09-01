@@ -68,7 +68,7 @@ class AdminClassesHubScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF22C55E).withOpacity(0.25),
+                        color: const Color(0xFF22C55E).withValues(alpha:0.25),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -79,7 +79,7 @@ class AdminClassesHubScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(
@@ -105,7 +105,7 @@ class AdminClassesHubScreen extends StatelessWidget {
                             Text(
                               'Manage classes, batches and divisions',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha:0.9),
                                 fontSize: 14,
                               ),
                             ),
@@ -135,7 +135,7 @@ class AdminClassesHubScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -174,7 +174,7 @@ class AdminClassesHubScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: item.color.withOpacity(0.08),
+                  color: item.color.withValues(alpha:0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -190,8 +190,8 @@ class AdminClassesHubScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          item.color.withOpacity(0.12),
-                          item.color.withOpacity(0.06),
+                          item.color.withValues(alpha:0.12),
+                          item.color.withValues(alpha:0.06),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,

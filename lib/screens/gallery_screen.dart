@@ -115,7 +115,7 @@ class _GalleryScreenState extends State<GalleryScreen>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha:0.3),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -135,7 +135,7 @@ class _GalleryScreenState extends State<GalleryScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha:0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -203,7 +203,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.white
-                          : Colors.white.withOpacity(0.2),
+                          : Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Text(
@@ -235,13 +235,13 @@ class _GalleryScreenState extends State<GalleryScreen>
             Icon(
               Icons.photo_library_outlined,
               size: 64,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha:0.5),
             ),
             const SizedBox(height: 16),
             Text(
               'No events found',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha:0.7),
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
@@ -250,7 +250,7 @@ class _GalleryScreenState extends State<GalleryScreen>
             Text(
               'Check back later for school memories',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha:0.5),
                 fontSize: 14,
               ),
             ),
@@ -296,15 +296,15 @@ class _GalleryScreenState extends State<GalleryScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.white.withOpacity(0.1),
-                  Colors.white.withOpacity(0.05),
+                  Colors.white.withValues(alpha:0.1),
+                  Colors.white.withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha:0.2),
                 width: 1,
               ),
             ),
@@ -313,7 +313,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -339,7 +339,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                       Text(
                         _formatEventDate(event.date),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha:0.7),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -350,7 +350,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -420,7 +420,7 @@ class _GalleryScreenState extends State<GalleryScreen>
           borderRadius: BorderRadius.circular(12),
           color: Colors.grey.shade900,
           border: Border.all(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha:0.1),
             width: 1,
           ),
         ),
@@ -443,7 +443,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                               ? loadingProgress.cumulativeBytesLoaded /
                               loadingProgress.expectedTotalBytes!
                               : null,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha:0.5),
                         ),
                       ),
                     );
@@ -463,7 +463,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                           Text(
                             'Failed to load',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha:0.5),
                               fontSize: 10,
                             ),
                             textAlign: TextAlign.center,
@@ -542,7 +542,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha:0.7),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Icon(
@@ -558,7 +558,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(11),
-                    color: Colors.white.withOpacity(0.0),
+                    color: Colors.white.withValues(alpha:0.0),
                   ),
                 ),
               ),
@@ -693,7 +693,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: (media.isYoutube ? Colors.red : Colors.blue).withOpacity(0.3),
+                          color: (media.isYoutube ? Colors.red : Colors.blue).withValues(alpha:0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -720,7 +720,7 @@ class _MediaViewerScreenState extends State<MediaViewerScreen> {
                         Text(
                           'Tap to open',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha:0.8),
                             fontSize: 14,
                           ),
                         ),

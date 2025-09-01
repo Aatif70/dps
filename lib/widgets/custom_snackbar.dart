@@ -220,7 +220,7 @@ class _CustomSnackbarWidgetState extends State<_CustomSnackbarWidget>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: _getBackgroundColor().withOpacity(0.3),
+                    color: _getBackgroundColor().withValues(alpha:0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -271,7 +271,7 @@ class _CustomSnackbarWidgetState extends State<_CustomSnackbarWidget>
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Icon(

@@ -76,7 +76,7 @@ class _AdminFeesStudentSearchScreenState extends State<AdminFeesStudentSearchScr
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: const Color(0xFFFF8A65).withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 6)),
+                BoxShadow(color: const Color(0xFFFF8A65).withValues(alpha:0.25), blurRadius: 12, offset: const Offset(0, 6)),
               ],
             ),
             child: Row(children: const [
@@ -125,7 +125,7 @@ class _AdminFeesStudentSearchScreenState extends State<AdminFeesStudentSearchScr
                       final StudentSearchResult item = _results[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFFFF8A65).withOpacity(0.12),
+                          backgroundColor: const Color(0xFFFF8A65).withValues(alpha:0.12),
                           child: const Icon(Icons.person, color: Color(0xFFFF7043)),
                         ),
                         title: Text(

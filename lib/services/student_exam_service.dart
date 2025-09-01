@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dps/constants/api_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -124,62 +125,62 @@ class StudentExamService {
       
       final uri = Uri.parse('${ApiConstants.baseUrl}/api/OnlineExam/StudentExam?ClassId=$classIdString');
       
-      // Debug: Print request details
-      print('🔍 [STUDENT EXAMS API] Request Details:');
-      print('   📍 URL: $uri');
-      print('   🔑 ClassId: $classIdString');
-      print('   📝 Method: GET');
-      print('   ⏰ Timestamp: ${DateTime.now()}');
-      print('');
+      // Debug: debugPrint request details
+      debugPrint('🔍 [STUDENT EXAMS API] Request Details:');
+      debugPrint('   📍 URL: $uri');
+      debugPrint('   🔑 ClassId: $classIdString');
+      debugPrint('   📝 Method: GET');
+      debugPrint('   ⏰ Timestamp: ${DateTime.now()}');
+      debugPrint('');
       
       final res = await http.get(uri);
       
-      // Debug: Print response details
-      print('📡 [STUDENT EXAMS API] Response Details:');
-      print('   📊 Status Code: ${res.statusCode}');
-      print('   📏 Content Length: ${res.body.length}');
-      print('   📄 Response Body:');
-      print('   ${res.body}');
-      print('');
+      // Debug: debugPrint response details
+      debugPrint('📡 [STUDENT EXAMS API] Response Details:');
+      debugPrint('   📊 Status Code: ${res.statusCode}');
+      debugPrint('   📏 Content Length: ${res.body.length}');
+      debugPrint('   📄 Response Body:');
+      debugPrint('   ${res.body}');
+      debugPrint('');
       
       if (res.statusCode != 200) {
-        print('❌ [STUDENT EXAMS API] Error: Status code ${res.statusCode}');
+        debugPrint('❌ [STUDENT EXAMS API] Error: Status code ${res.statusCode}');
         return [];
       }
       
       final decoded = json.decode(res.body) as Map<String, dynamic>;
       
-      // Debug: Print parsed response
-      print('✅ [STUDENT EXAMS API] Parsed Response:');
-      print('   🎯 Success: ${decoded['success']}');
-      print('   📊 Data Type: ${decoded['data'].runtimeType}');
+      // Debug: debugPrint parsed response
+      debugPrint('✅ [STUDENT EXAMS API] Parsed Response:');
+      debugPrint('   🎯 Success: ${decoded['success']}');
+      debugPrint('   📊 Data Type: ${decoded['data'].runtimeType}');
       if (decoded['data'] is List) {
-        print('   📋 Data Count: ${(decoded['data'] as List).length}');
+        debugPrint('   📋 Data Count: ${(decoded['data'] as List).length}');
         for (int i = 0; i < (decoded['data'] as List).length; i++) {
           final exam = decoded['data'][i];
-          print('   📝 Exam ${i + 1}: ${exam['Title']} (ID: ${exam['ExamId']})');
+          debugPrint('   📝 Exam ${i + 1}: ${exam['Title']} (ID: ${exam['ExamId']})');
         }
       }
-      print('');
+      debugPrint('');
       
       if (decoded['success'] == true && decoded['data'] is List) {
         final List<dynamic> data = decoded['data'] as List<dynamic>;
         final exams = data.map((e) => StudentExamItem.fromJson(e as Map<String, dynamic>)).toList();
         
-        print('🎉 [STUDENT EXAMS API] Successfully parsed ${exams.length} exams');
-        print('');
+        debugPrint('🎉 [STUDENT EXAMS API] Successfully parsed ${exams.length} exams');
+        debugPrint('');
         
         return exams;
       }
       
-      print('⚠️ [STUDENT EXAMS API] No valid data found in response');
-      print('');
+      debugPrint('⚠️ [STUDENT EXAMS API] No valid data found in response');
+      debugPrint('');
       return [];
     } catch (e) {
-      print('💥 [STUDENT EXAMS API] Exception occurred:');
-      print('   🚨 Error: $e');
-      print('   📍 Stack Trace: ${StackTrace.current}');
-      print('');
+      debugPrint('💥 [STUDENT EXAMS API] Exception occurred:');
+      debugPrint('   🚨 Error: $e');
+      debugPrint('   📍 Stack Trace: ${StackTrace.current}');
+      debugPrint('');
       return [];
     }
   }
@@ -192,7 +193,7 @@ class StudentExamService {
       final uidString = uid.toString();
       
       if (uidString.isEmpty) {
-        print('❌ [STUDENT EXAM MARKS API] Uid not found in SharedPreferences');
+        debugPrint('❌ [STUDENT EXAM MARKS API] Uid not found in SharedPreferences');
         return [];
       }
       
@@ -203,67 +204,67 @@ class StudentExamService {
       request.fields['Uid'] = uidString;
       request.fields['ExamId'] = examId.toString();
       
-      // Debug: Print request details
-      print('🔍 [STUDENT EXAM MARKS API] Request Details:');
-      print('   📍 URL: $uri');
-      print('   🔑 Uid: $uidString');
-      print('   📝 ExamId: $examId');
-      print('   📝 Method: POST');
-      print('   📋 Form Data:');
-      print('     - Uid: $uidString');
-      print('     - ExamId: $examId');
-      print('   ⏰ Timestamp: ${DateTime.now()}');
-      print('');
+      // Debug: debugPrint request details
+      debugPrint('🔍 [STUDENT EXAM MARKS API] Request Details:');
+      debugPrint('   📍 URL: $uri');
+      debugPrint('   🔑 Uid: $uidString');
+      debugPrint('   📝 ExamId: $examId');
+      debugPrint('   📝 Method: POST');
+      debugPrint('   📋 Form Data:');
+      debugPrint('     - Uid: $uidString');
+      debugPrint('     - ExamId: $examId');
+      debugPrint('   ⏰ Timestamp: ${DateTime.now()}');
+      debugPrint('');
       
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
       
-      // Debug: Print response details
-      print('📡 [STUDENT EXAM MARKS API] Response Details:');
-      print('   📊 Status Code: ${response.statusCode}');
-      print('   📏 Content Length: ${response.body.length}');
-      print('   📄 Response Body:');
-      print('   ${response.body}');
-      print('');
+      // Debug: debugPrint response details
+      debugPrint('📡 [STUDENT EXAM MARKS API] Response Details:');
+      debugPrint('   📊 Status Code: ${response.statusCode}');
+      debugPrint('   📏 Content Length: ${response.body.length}');
+      debugPrint('   📄 Response Body:');
+      debugPrint('   ${response.body}');
+      debugPrint('');
       
       if (response.statusCode != 200) {
-        print('❌ [STUDENT EXAM MARKS API] Error: Status code ${response.statusCode}');
+        debugPrint('❌ [STUDENT EXAM MARKS API] Error: Status code ${response.statusCode}');
         return [];
       }
       
       final decoded = json.decode(response.body) as Map<String, dynamic>;
       
-      // Debug: Print parsed response
-      print('✅ [STUDENT EXAM MARKS API] Parsed Response:');
-      print('   🎯 Success: ${decoded['success']}');
-      print('   📊 Data Type: ${decoded['data'].runtimeType}');
+      // Debug: debugPrint parsed response
+      debugPrint('✅ [STUDENT EXAM MARKS API] Parsed Response:');
+      debugPrint('   🎯 Success: ${decoded['success']}');
+      debugPrint('   📊 Data Type: ${decoded['data'].runtimeType}');
       if (decoded['data'] is List) {
-        print('   📋 Data Count: ${(decoded['data'] as List).length}');
+        debugPrint('   📋 Data Count: ${(decoded['data'] as List).length}');
         for (int i = 0; i < (decoded['data'] as List).length; i++) {
           final mark = decoded['data'][i];
-          print('   📝 Subject ${i + 1}: ${mark['SubjectName']} - ${mark['TheoryMarks']}/${mark['MaxMarks']} (${mark['Status']})');
+          debugPrint('   📝 Subject ${i + 1}: ${mark['SubjectName']} - ${mark['TheoryMarks']}/${mark['MaxMarks']} (${mark['Status']})');
         }
       }
-      print('');
+      debugPrint('');
       
       if (decoded['success'] == true && decoded['data'] is List) {
         final List<dynamic> data = decoded['data'] as List<dynamic>;
         final marks = data.map((e) => StudentExamMarksItem.fromJson(e as Map<String, dynamic>)).toList();
         
-        print('🎉 [STUDENT EXAM MARKS API] Successfully parsed ${marks.length} subject marks');
-        print('');
+        debugPrint('🎉 [STUDENT EXAM MARKS API] Successfully parsed ${marks.length} subject marks');
+        debugPrint('');
         
         return marks;
       }
       
-      print('⚠️ [STUDENT EXAM MARKS API] No valid data found in response');
-      print('');
+      debugPrint('⚠️ [STUDENT EXAM MARKS API] No valid data found in response');
+      debugPrint('');
       return [];
     } catch (e) {
-      print('💥 [STUDENT EXAM MARKS API] Exception occurred:');
-      print('   🚨 Error: $e');
-      print('   📍 Stack Trace: ${StackTrace.current}');
-      print('');
+      debugPrint('💥 [STUDENT EXAM MARKS API] Exception occurred:');
+      debugPrint('   🚨 Error: $e');
+      debugPrint('   📍 Stack Trace: ${StackTrace.current}');
+      debugPrint('');
       return [];
     }
   }

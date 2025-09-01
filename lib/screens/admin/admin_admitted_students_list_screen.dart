@@ -103,14 +103,14 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.school_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 16),
@@ -118,7 +118,7 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Admissions - Admitted', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
               const SizedBox(height: 6),
-              Text('Students currently admitted', style: TextStyle(color: Colors.white.withOpacity(0.95))),
+              Text('Students currently admitted', style: TextStyle(color: Colors.white.withValues(alpha:0.95))),
             ]),
           ),
         ],
@@ -133,7 +133,7 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
         ],
         border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
@@ -179,7 +179,7 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+            BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
           ],
           border: Border.all(color: const Color(0xFFF1F5F9)),
         ),
@@ -192,7 +192,7 @@ class _AdminAdmittedStudentsListScreenState extends State<AdminAdmittedStudentsL
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),

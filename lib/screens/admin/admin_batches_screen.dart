@@ -131,7 +131,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
                                   boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+                                    BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
                                   ],
                                   border: Border.all(color: const Color(0xFFF1F5F9)),
                                 ),
@@ -141,7 +141,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                                       width: 44,
                                       height: 44,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF58CC02).withOpacity(0.1),
+                                        color: const Color(0xFF58CC02).withValues(alpha:0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: const Icon(Icons.layers_rounded, color: Color(0xFF58CC02)),

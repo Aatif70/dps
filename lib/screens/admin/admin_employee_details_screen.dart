@@ -148,7 +148,7 @@ Widget _buildHeroHeader(BuildContext context, EmployeeDetailsResponse details) {
       borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
-          color: const Color(0xFF6C5CE7).withOpacity(0.25),
+          color: const Color(0xFF6C5CE7).withValues(alpha:0.25),
           blurRadius: 18,
           offset: const Offset(0, 10),
         ),
@@ -164,7 +164,7 @@ Widget _buildHeroHeader(BuildContext context, EmployeeDetailsResponse details) {
             Text(name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: Colors.orange.withOpacity(0.85), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: Colors.orange.withValues(alpha:0.85), borderRadius: BorderRadius.circular(10)),
               child: Text(role, style:  TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
             ),
 
@@ -192,7 +192,7 @@ Widget _buildPersonalSection(BuildContext context, EmployeeDetailsResponse detai
         //   Container(
         //     width: 56,
         //     height: 56,
-        //     decoration: BoxDecoration(color: const Color(0xFF6C5CE7).withOpacity(0.1), borderRadius: BorderRadius.circular(14)),
+        //     decoration: BoxDecoration(color: const Color(0xFF6C5CE7).withValues(alpha:0.1), borderRadius: BorderRadius.circular(14)),
         //     child: const Icon(Icons.person, color: Color(0xFF6C5CE7), size: 28),
         //   ),
         //   const SizedBox(width: 14),
@@ -203,7 +203,7 @@ Widget _buildPersonalSection(BuildContext context, EmployeeDetailsResponse detai
         //   //     Row(children: [
         //   //       Container(
         //   //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        //   //         decoration: BoxDecoration(color: const Color(0xFF00CEC9).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+        //   //         decoration: BoxDecoration(color: const Color(0xFF00CEC9).withValues(alpha:0.1), borderRadius: BorderRadius.circular(10)),
         //   //         child: Text(p.designation, style: const TextStyle(color: Color(0xFF00CEC9), fontWeight: FontWeight.w600, fontSize: 12)),
         //   //       ),
         //   //     ]),
@@ -251,7 +251,7 @@ Widget _buildClassesSection(BuildContext context, EmployeeDetailsResponse detail
                   Text(cls.className, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(color: const Color(0xFF6C5CE7).withOpacity(0.08), borderRadius: BorderRadius.circular(999)),
+                    decoration: BoxDecoration(color: const Color(0xFF6C5CE7).withValues(alpha:0.08), borderRadius: BorderRadius.circular(999)),
                     child: Text('$count subjects', style: const TextStyle(color: Color(0xFF6C5CE7), fontWeight: FontWeight.w600, fontSize: 12)),
                   ),
                 ],
@@ -337,7 +337,7 @@ Widget _buildTimetableSection(BuildContext context, EmployeeDetailsResponse deta
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6C5CE7).withOpacity(0.05),
+                        color: const Color(0xFF6C5CE7).withValues(alpha:0.05),
                         blurRadius: 14,
                         offset: const Offset(0, 8),
                       ),
@@ -349,7 +349,7 @@ Widget _buildTimetableSection(BuildContext context, EmployeeDetailsResponse deta
                       width: 82,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6C5CE7).withOpacity(0.08),
+                        color: const Color(0xFF6C5CE7).withValues(alpha:0.08),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -388,7 +388,7 @@ Widget _buildTimetableSection(BuildContext context, EmployeeDetailsResponse deta
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.15),
+                              color: const Color(0xFF10B981).withValues(alpha:0.15),
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
@@ -489,7 +489,7 @@ class _InfoTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: const Color(0xFF6C5CE7).withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: const Color(0xFF6C5CE7).withValues(alpha:0.05), blurRadius: 10, offset: const Offset(0, 6))],
       ),
       child: Row(children: [
         Container(

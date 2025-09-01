@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -8,8 +9,8 @@ class StudyMaterialService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== STUDY MATERIAL SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== STUDY MATERIAL SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -17,74 +18,74 @@ class StudyMaterialService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
-      print('Study Material Service - Processed Uid: $uid');
+      debugPrint('Study Material Service - Processed Uid: $uid');
 
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentStudyMaterial}');
-      print('Study Material Service - Request URL: $url');
+      debugPrint('Study Material Service - Request URL: $url');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
 
-      print('Study Material Service - Multipart fields: ${request.fields}');
+      debugPrint('Study Material Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Study Material Service - Response status: ${response.statusCode}');
-      print('Study Material Service - Response headers: ${response.headers}');
-      print('Study Material Service - Raw response body: ${response.body}');
+      debugPrint('Study Material Service - Response status: ${response.statusCode}');
+      debugPrint('Study Material Service - Response headers: ${response.headers}');
+      debugPrint('Study Material Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Study Material Service - Parsed JSON response: $jsonResponse');
+        debugPrint('Study Material Service - Parsed JSON response: $jsonResponse');
 
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           final List<dynamic> data = jsonResponse['data'];
-          print('Study Material Service - Data array length: ${data.length}');
+          debugPrint('Study Material Service - Data array length: ${data.length}');
 
           List<ApiStudyMaterialRecord> materialRecords = [];
 
           for (int i = 0; i < data.length; i++) {
             try {
-              print('--- Processing study material record $i ---');
+              debugPrint('--- Processing study material record $i ---');
               final item = data[i];
-              print('Raw item data: $item');
+              debugPrint('Raw item data: $item');
 
               final materialRecord = ApiStudyMaterialRecord.fromJson(item);
-              print('Successfully parsed study material record $i: ${materialRecord.chapter}');
+              debugPrint('Successfully parsed study material record $i: ${materialRecord.chapter}');
               materialRecords.add(materialRecord);
             } catch (e, stackTrace) {
-              print('ERROR parsing study material record $i: $e');
-              print('Stack trace: $stackTrace');
-              print('Failed item data: ${data[i]}');
+              debugPrint('ERROR parsing study material record $i: $e');
+              debugPrint('Stack trace: $stackTrace');
+              debugPrint('Failed item data: ${data[i]}');
             }
           }
 
-          print('Study Material Service - Successfully parsed ${materialRecords.length} out of ${data.length} records');
-          print('=== STUDY MATERIAL SERVICE DEBUG END ===');
+          debugPrint('Study Material Service - Successfully parsed ${materialRecords.length} out of ${data.length} records');
+          debugPrint('=== STUDY MATERIAL SERVICE DEBUG END ===');
           return materialRecords;
         } else {
-          print('API returned success: false or no data');
+          debugPrint('API returned success: false or no data');
           return [];
         }
       } else {
-        print('Failed to load study materials. Status code: ${response.statusCode}');
-        print('Error response body: ${response.body}');
+        debugPrint('Failed to load study materials. Status code: ${response.statusCode}');
+        debugPrint('Error response body: ${response.body}');
         return [];
       }
     } catch (e, stackTrace) {
-      print('Error fetching study materials: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error fetching study materials: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -158,7 +159,7 @@ class StudyMaterialService {
       final response = await http.head(Uri.parse(url));
       return response.statusCode == 200;
     } catch (e) {
-      print('URL accessibility check failed: $e');
+      debugPrint('URL accessibility check failed: $e');
       return false;
     }
   }
@@ -171,7 +172,7 @@ class StudyMaterialService {
       if (contentLength != null) {
         final sizeInBytes = int.parse(contentLength);
         if (sizeInBytes < 1024) {
-          return '${sizeInBytes} B';
+          return '$sizeInBytes B';
         } else if (sizeInBytes < 1024 * 1024) {
           return '${(sizeInBytes / 1024).toStringAsFixed(1)} KB';
         } else {
@@ -200,7 +201,7 @@ class StudyMaterialService {
 
   // Test method to verify URL construction
   static void testUrlConstruction() {
-    print('=== URL CONSTRUCTION TEST ===');
+    debugPrint('=== URL CONSTRUCTION TEST ===');
     
     final testCases = [
       '/StudyMaterial/10002---test.pdf',
@@ -215,14 +216,14 @@ class StudyMaterialService {
       final fileType = getFileType(testCase);
       final isViewable = isViewableInBrowser(testCase);
       
-      print('Input: "$testCase"');
-      print('URL: "$url"');
-      print('Type: $fileType');
-      print('Viewable: $isViewable');
-      print('---');
+      debugPrint('Input: "$testCase"');
+      debugPrint('URL: "$url"');
+      debugPrint('Type: $fileType');
+      debugPrint('Viewable: $isViewable');
+      debugPrint('---');
     }
     
-    print('=== END URL CONSTRUCTION TEST ===');
+    debugPrint('=== END URL CONSTRUCTION TEST ===');
   }
 }
 
@@ -260,8 +261,8 @@ class ApiStudyMaterialRecord {
 
   factory ApiStudyMaterialRecord.fromJson(Map<String, dynamic> json) {
     try {
-      print('--- ApiStudyMaterialRecord.fromJson START ---');
-      print('Input JSON: $json');
+      debugPrint('--- ApiStudyMaterialRecord.fromJson START ---');
+      debugPrint('Input JSON: $json');
 
       final record = ApiStudyMaterialRecord(
         studyMaterialId: _safeIntExtraction(json, 'StudyMaterialId'),
@@ -279,12 +280,12 @@ class ApiStudyMaterialRecord {
         isActive: json['IsActive'] == true,
       );
 
-      print('--- ApiStudyMaterialRecord.fromJson SUCCESS ---');
+      debugPrint('--- ApiStudyMaterialRecord.fromJson SUCCESS ---');
       return record;
     } catch (e, stackTrace) {
-      print('--- ApiStudyMaterialRecord.fromJson ERROR ---');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('--- ApiStudyMaterialRecord.fromJson ERROR ---');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }

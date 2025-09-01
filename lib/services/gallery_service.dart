@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -7,59 +8,59 @@ import 'package:dps/constants/api_constants.dart';
 class GalleryService {
   static Future<GalleryResponse?> getGallery() async {
     try {
-      print('=== GALLERY API CALL ===');
+      debugPrint('=== GALLERY API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
 
-      print('UID: $uid');
+      debugPrint('UID: $uid');
 
       if (uid.isEmpty) {
-        print('Missing UID in preferences');
+        debugPrint('Missing UID in preferences');
         return null;
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/Gallery?Uid=$uid');
-      print('URL: $url');
+      debugPrint('URL: $url');
 
       final response = await http.get(url);
 
-      print('=== GALLERY API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== GALLERY API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final galleryResponse = GalleryResponse.fromJson(jsonData);
-          print('=== GALLERY PARSED ===');
-          print('Events: ${galleryResponse.data.length}');
+          debugPrint('=== GALLERY PARSED ===');
+          debugPrint('Events: ${galleryResponse.data.length}');
 
           // Count total media
           int totalMedia = 0;
           for (var event in galleryResponse.data) {
             totalMedia += event.media.length;
-            print('${event.title}: ${event.media.length} media items');
+            debugPrint('${event.title}: ${event.media.length} media items');
           }
-          print('Total media items: $totalMedia');
+          debugPrint('Total media items: $totalMedia');
 
           return galleryResponse;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
           return null;
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return null;
       }
     } catch (e, stackTrace) {
-      print('=== GALLERY API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== GALLERY API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -143,7 +144,7 @@ class GalleryEvent {
         return DateTime(year, month, day);
       }
     } catch (e) {
-      print('Error parsing date: $date');
+      debugPrint('Error parsing date: $date');
     }
     return DateTime.now();
   }

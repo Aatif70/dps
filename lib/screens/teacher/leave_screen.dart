@@ -142,7 +142,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF8E44AD).withOpacity(0.1),
+              color: const Color(0xFF8E44AD).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -157,7 +157,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF8E44AD).withOpacity(0.1),
+              color: const Color(0xFF8E44AD).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -266,7 +266,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF8E44AD).withOpacity(0.1),
+                color: const Color(0xFF8E44AD).withValues(alpha:0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -320,7 +320,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: statusColor.withOpacity(0.08),
+            color: statusColor.withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -334,8 +334,8 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  statusColor.withOpacity(0.1),
-                  statusColor.withOpacity(0.05),
+                  statusColor.withValues(alpha:0.1),
+                  statusColor.withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -352,8 +352,8 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        statusColor.withOpacity(0.2),
-                        statusColor.withOpacity(0.1),
+                        statusColor.withValues(alpha:0.2),
+                        statusColor.withValues(alpha:0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -394,9 +394,9 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
+                    border: Border.all(color: statusColor.withValues(alpha:0.3), width: 1),
                   ),
                   child: Text(
                     _getStatusText(leave.status),
@@ -421,7 +421,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8E44AD).withOpacity(0.05),
+                    color: const Color(0xFF8E44AD).withValues(alpha:0.05),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
@@ -438,7 +438,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF8E44AD).withOpacity(0.1),
+                              color: const Color(0xFF8E44AD).withValues(alpha:0.1),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -565,7 +565,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withValues(alpha:0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(Icons.person_rounded, color: statusColor, size: 16),
@@ -679,7 +679,7 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isCompleted ? color : color.withOpacity(0.1),
+            color: isCompleted ? color : color.withValues(alpha:0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: isCompleted ? Colors.white : color, size: 16),

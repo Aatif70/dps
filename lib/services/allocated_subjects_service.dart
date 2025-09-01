@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -7,12 +8,12 @@ class AllocatedSubjectsService {
 
   static Future<List<AllocatedSubject>> getAllocatedSubjects() async {
     try {
-      print('=== ALLOCATED SUBJECTS API CALL ===');
+      debugPrint('=== ALLOCATED SUBJECTS API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
 
-      print('Fetching allocated subjects for UID: $uid');
+      debugPrint('Fetching allocated subjects for UID: $uid');
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/user/TeacherAllocatedSubject');
       final request = http.MultipartRequest('POST', url);
@@ -21,9 +22,9 @@ class AllocatedSubjectsService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== ALLOCATED SUBJECTS API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== ALLOCATED SUBJECTS API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -35,9 +36,9 @@ class AllocatedSubjectsService {
 
       return [];
     } catch (e, stackTrace) {
-      print('=== ALLOCATED SUBJECTS ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== ALLOCATED SUBJECTS ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }

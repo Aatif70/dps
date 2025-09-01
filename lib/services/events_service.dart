@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -8,63 +9,63 @@ import 'package:dps/constants/api_constants.dart';
 class EventsService {
   static Future<EventCalendarResponse?> getEventCalendar({int? year}) async {
     try {
-      print('=== EVENT CALENDAR API CALL ===');
+      debugPrint('=== EVENT CALENDAR API CALL ===');
 
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       final currentYear = year ?? DateTime.now().year;
 
-      print('UID: $uid');
-      print('Year: $currentYear');
+      debugPrint('UID: $uid');
+      debugPrint('Year: $currentYear');
 
       if (uid.isEmpty) {
-        print('Missing UID in preferences');
+        debugPrint('Missing UID in preferences');
         return null;
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.eventCalendar}');
-      print('URL: $url');
+      debugPrint('URL: $url');
 
       final request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
       request.fields['Year'] = currentYear.toString();
 
-      print('=== REQUEST FIELDS ===');
-      print('Uid: $uid');
-      print('Year: $currentYear');
+      debugPrint('=== REQUEST FIELDS ===');
+      debugPrint('Uid: $uid');
+      debugPrint('Year: $currentYear');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('=== EVENT CALENDAR API RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      debugPrint('=== EVENT CALENDAR API RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final eventCalendar = EventCalendarResponse.fromJson(jsonData);
-          print('=== EVENT CALENDAR PARSED ===');
-          print('Holidays: ${eventCalendar.data.holidays.length}');
-          print('Events: ${eventCalendar.data.events.length}');
-          print('Exams: ${eventCalendar.data.exams.length}');
+          debugPrint('=== EVENT CALENDAR PARSED ===');
+          debugPrint('Holidays: ${eventCalendar.data.holidays.length}');
+          debugPrint('Events: ${eventCalendar.data.events.length}');
+          debugPrint('Exams: ${eventCalendar.data.exams.length}');
           return eventCalendar;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
           return null;
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return null;
       }
     } catch (e, stackTrace) {
-      print('=== EVENT CALENDAR API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== EVENT CALENDAR API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }

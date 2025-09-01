@@ -64,19 +64,19 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   }
 
   Future<void> _loadStudyMaterials() async {
-    print('=== STUDY MATERIAL SCREEN DEBUG START ===');
+    debugPrint('=== STUDY MATERIAL SCREEN DEBUG START ===');
     setState(() {
       _isLoading = true;
     });
 
     try {
-      print('Study Material Screen - Calling StudyMaterialService.getStudyMaterials()');
+      debugPrint('Study Material Screen - Calling StudyMaterialService.getStudyMaterials()');
       final apiMaterials = await study_service.StudyMaterialService.getStudyMaterials();
-      print('Study Material Screen - Received ${apiMaterials.length} study material records');
+      debugPrint('Study Material Screen - Received ${apiMaterials.length} study material records');
 
       // Convert to legacy format for compatibility with existing UI
       final studyMaterials = apiMaterials.map((material) => material.toLegacyStudyMaterial()).toList();
-      print('Study Material Screen - Converted to ${studyMaterials.length} legacy study materials');
+      debugPrint('Study Material Screen - Converted to ${studyMaterials.length} legacy study materials');
 
       // Extract unique subjects from API data
       final subjects = {'All'};
@@ -98,11 +98,11 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         _fadeController.forward();
       });
 
-      print('Study Material Screen - State updated successfully');
-      print('=== STUDY MATERIAL SCREEN DEBUG END ===');
+      debugPrint('Study Material Screen - State updated successfully');
+      debugPrint('=== STUDY MATERIAL SCREEN DEBUG END ===');
     } catch (e, stackTrace) {
-      print('Study Material Screen - Error occurred: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Study Material Screen - Error occurred: $e');
+      debugPrint('Stack trace: $stackTrace');
 
       setState(() {
         _isLoading = false;
@@ -196,7 +196,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              color: const Color(0xFFE74C3C).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -225,7 +225,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE74C3C).withOpacity(0.3),
+            color: const Color(0xFFE74C3C).withValues(alpha:0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -248,7 +248,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                     Text(
                       'Your Study Journey',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -268,7 +268,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                 Text(
                   'From ${_getUniqueSubjectsCount()} subjects',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha:0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -277,10 +277,10 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                 // Container(
                 //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 //   decoration: BoxDecoration(
-                //     color: Colors.white.withOpacity(0.2),
+                //     color: Colors.white.withValues(alpha:0.2),
                 //     borderRadius: BorderRadius.circular(25),
                 //     border: Border.all(
-                //       color: Colors.white.withOpacity(0.3),
+                //       color: Colors.white.withValues(alpha:0.3),
                 //       width: 1,
                 //     ),
                 //   ),
@@ -311,10 +311,10 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha:0.2),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha:0.3),
                 width: 2,
               ),
             ),
@@ -423,7 +423,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                     boxShadow: [
                       BoxShadow(
                         color: isSelected
-                            ? const Color(0xFFE74C3C).withOpacity(0.3)
+                            ? const Color(0xFFE74C3C).withValues(alpha:0.3)
                             : Colors.grey.shade100,
                         blurRadius: isSelected ? 12 : 8,
                         offset: Offset(0, isSelected ? 6 : 3),
@@ -468,7 +468,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF4A90E2).withOpacity(0.1)
+                        ? const Color(0xFF4A90E2).withValues(alpha:0.1)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -557,7 +557,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: subjectColor.withOpacity(0.08),
+            color: subjectColor.withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -571,8 +571,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  subjectColor.withOpacity(0.1),
-                  subjectColor.withOpacity(0.05),
+                  subjectColor.withValues(alpha:0.1),
+                  subjectColor.withValues(alpha:0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -626,7 +626,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: subjectColor.withOpacity(0.1),
+                              color: subjectColor.withValues(alpha:0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -643,7 +643,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                color: const Color(0xFF4A90E2).withValues(alpha:0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -686,7 +686,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: subjectColor.withOpacity(0.1),
+                      backgroundColor: subjectColor.withValues(alpha:0.1),
                       child: Text(
                         material.teacherAvatar,
                         style: TextStyle(
@@ -800,8 +800,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            color.withOpacity(0.2),
-            color.withOpacity(0.1),
+            color.withValues(alpha:0.2),
+            color.withValues(alpha:0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -819,7 +819,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -850,7 +850,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFFE74C3C).withOpacity(0.1),
+                color: const Color(0xFFE74C3C).withValues(alpha:0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -950,8 +950,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
   // Action Methods
   void _viewMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) async {
     HapticFeedback.lightImpact();
-    print('Viewing material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
-    print('File path: ${apiRecord.fileName}');
+    debugPrint('Viewing material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
+    debugPrint('File path: ${apiRecord.fileName}');
 
     if (apiRecord.fileName.isEmpty) {
       CustomSnackbar.showError(
@@ -965,9 +965,9 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     final fileType = study_service.StudyMaterialService.getFileType(apiRecord.fileName);
     final isViewableInBrowser = study_service.StudyMaterialService.isViewableInBrowser(apiRecord.fileName);
 
-    print('Constructed file URL: $fileUrl');
-    print('File type: $fileType');
-    print('Viewable in browser: $isViewableInBrowser');
+    debugPrint('Constructed file URL: $fileUrl');
+    debugPrint('File type: $fileType');
+    debugPrint('Viewable in browser: $isViewableInBrowser');
 
     // Show loading message
     // CustomSnackbar.showInfo(
@@ -996,7 +996,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         }
       }
     } catch (e) {
-      print('Error opening file: $e');
+      debugPrint('Error opening file: $e');
       CustomSnackbar.showError(
         context,
         message: 'Failed to open ${apiRecord.chapter}. Please try again.',
@@ -1101,8 +1101,8 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
 
   void _downloadMaterial(study_service.StudyMaterial material, study_service.ApiStudyMaterialRecord apiRecord) async {
     HapticFeedback.lightImpact();
-    print('Downloading material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
-    print('File path: ${apiRecord.fileName}');
+    debugPrint('Downloading material: ${apiRecord.chapter} (ID: ${apiRecord.studyMaterialId})');
+    debugPrint('File path: ${apiRecord.fileName}');
 
     if (apiRecord.fileName.isEmpty) {
       CustomSnackbar.showError(
@@ -1113,7 +1113,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
     }
 
     final fileUrl = study_service.StudyMaterialService.getFileUrl(apiRecord.fileName);
-    print('Download URL: $fileUrl');
+    debugPrint('Download URL: $fileUrl');
 
     try {
       final uri = Uri.parse(fileUrl);
@@ -1130,7 +1130,7 @@ class _StudyMaterialScreenState extends State<StudyMaterialScreen>
         );
       }
     } catch (e) {
-      print('Error downloading file: $e');
+      debugPrint('Error downloading file: $e');
       CustomSnackbar.showError(
         context,
         message: 'Failed to download ${apiRecord.chapter}. Please try again.',
@@ -1161,7 +1161,7 @@ class _PdfViewerScreenState extends State<_PdfViewerScreen> {
   @override
   void initState() {
     super.initState();
-    print('PDF Viewer - Initializing with URL: ${widget.url}');
+    debugPrint('PDF Viewer - Initializing with URL: ${widget.url}');
   }
 
   @override
@@ -1229,20 +1229,20 @@ class _PdfViewerScreenState extends State<_PdfViewerScreen> {
               ),
             ),
             onLoadStart: (controller, url) {
-              print('PDF Viewer - Loading started: $url');
+              debugPrint('PDF Viewer - Loading started: $url');
               setState(() {
                 _isLoading = true;
                 _hasError = false;
               });
             },
             onLoadStop: (controller, url) {
-              print('PDF Viewer - Loading stopped: $url');
+              debugPrint('PDF Viewer - Loading stopped: $url');
               setState(() {
                 _isLoading = false;
               });
             },
             onLoadError: (controller, url, code, message) {
-              print('PDF Viewer - Load error: $code - $message');
+              debugPrint('PDF Viewer - Load error: $code - $message');
               setState(() {
                 _isLoading = false;
                 _hasError = true;
@@ -1250,7 +1250,7 @@ class _PdfViewerScreenState extends State<_PdfViewerScreen> {
               });
             },
             onLoadHttpError: (controller, url, statusCode, description) {
-              print('PDF Viewer - HTTP error: $statusCode - $description');
+              debugPrint('PDF Viewer - HTTP error: $statusCode - $description');
               setState(() {
                 _isLoading = false;
                 _hasError = true;
@@ -1258,7 +1258,7 @@ class _PdfViewerScreenState extends State<_PdfViewerScreen> {
               });
             },
             onReceivedError: (controller, request, error) {
-              print('PDF Viewer - Received error: $error');
+              debugPrint('PDF Viewer - Received error: $error');
               setState(() {
                 _isLoading = false;
                 _hasError = true;
@@ -1266,11 +1266,11 @@ class _PdfViewerScreenState extends State<_PdfViewerScreen> {
               });
             },
             onReceivedServerTrustAuthRequest: (controller, challenge) async {
-              print('PDF Viewer - Server trust auth request');
+              debugPrint('PDF Viewer - Server trust auth request');
               return ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
             },
             onPermissionRequest: (controller, request) async {
-              print('PDF Viewer - Permission request: ${request.resources}');
+              debugPrint('PDF Viewer - Permission request: ${request.resources}');
               return PermissionResponse(
                 resources: request.resources,
                 action: PermissionResponseAction.GRANT,

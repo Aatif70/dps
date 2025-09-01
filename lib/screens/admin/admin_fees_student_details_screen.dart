@@ -92,7 +92,7 @@ class _AdminFeesStudentDetailsScreenState extends State<AdminFeesStudentDetailsS
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF8A65).withOpacity(0.25),
+            color: const Color(0xFFFF8A65).withValues(alpha:0.25),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -117,12 +117,12 @@ class _AdminFeesStudentDetailsScreenState extends State<AdminFeesStudentDetailsS
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
-                Text(d.email, style: TextStyle(color: Colors.white.withOpacity(0.9))),
+                Text(d.email, style: TextStyle(color: Colors.white.withValues(alpha:0.9))),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -153,7 +153,7 @@ class _AdminFeesStudentDetailsScreenState extends State<AdminFeesStudentDetailsS
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.08),
+              color: color.withValues(alpha:0.08),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -166,7 +166,7 @@ class _AdminFeesStudentDetailsScreenState extends State<AdminFeesStudentDetailsS
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: color),

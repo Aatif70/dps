@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -8,8 +9,8 @@ class TimetableService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      print('=== TIMETABLE SERVICE DEBUG START ===');
-      print('All SharedPreferences keys: ${prefs.getKeys()}');
+      debugPrint('=== TIMETABLE SERVICE DEBUG START ===');
+      debugPrint('All SharedPreferences keys: ${prefs.getKeys()}');
 
       // Safe retrieval that handles both string and int types
       String uid = '';
@@ -17,38 +18,38 @@ class TimetableService {
       // Check if Uid exists and get its value regardless of type
       if (prefs.containsKey('Uid')) {
         final uidValue = prefs.get('Uid');
-        print('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
+        debugPrint('Uid raw value: $uidValue (type: ${uidValue.runtimeType})');
         uid = uidValue.toString();
       }
 
-      print('Timetable Service - Processed Uid: $uid');
+      debugPrint('Timetable Service - Processed Uid: $uid');
 
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.studentTimetable}');
-      print('Timetable Service - Request URL: $url');
+      debugPrint('Timetable Service - Request URL: $url');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', url);
       request.fields['Uid'] = uid;
 
-      print('Timetable Service - Multipart fields: ${request.fields}');
+      debugPrint('Timetable Service - Multipart fields: ${request.fields}');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Timetable Service - Response status: ${response.statusCode}');
-      print('Timetable Service - Response headers: ${response.headers}');
-      print('Timetable Service - Raw response body: ${response.body}');
+      debugPrint('Timetable Service - Response status: ${response.statusCode}');
+      debugPrint('Timetable Service - Response headers: ${response.headers}');
+      debugPrint('Timetable Service - Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('=== PARSED JSON DATA ===');
-        print('Success: ${jsonData['success']}');
-        print('Data Count: ${jsonData['data']?.length ?? 0}');
+        debugPrint('=== PARSED JSON DATA ===');
+        debugPrint('Success: ${jsonData['success']}');
+        debugPrint('Data Count: ${jsonData['data']?.length ?? 0}');
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final List<dynamic> dataList = jsonData['data'];
@@ -56,26 +57,26 @@ class TimetableService {
               .map((item) => TimetableRecord.fromJson(item))
               .toList();
 
-          print('=== TIMETABLE RECORDS ===');
+          debugPrint('=== TIMETABLE RECORDS ===');
           for (int i = 0; i < timetableRecords.length; i++) {
             final record = timetableRecords[i];
-            print('Record $i: ${record.subject} - ${record.weekDay} (${record.fromTime}-${record.toTime})');
+            debugPrint('Record $i: ${record.subject} - ${record.weekDay} (${record.fromTime}-${record.toTime})');
           }
 
           return timetableRecords;
         } else {
-          print('API returned success=false or null data');
+          debugPrint('API returned success=false or null data');
           return [];
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Error body: ${response.body}');
+        debugPrint('API call failed with status: ${response.statusCode}');
+        debugPrint('Error body: ${response.body}');
         return [];
       }
     } catch (e, stackTrace) {
-      print('=== TIMETABLE API ERROR ===');
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('=== TIMETABLE API ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }

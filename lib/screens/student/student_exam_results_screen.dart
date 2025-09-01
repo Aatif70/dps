@@ -76,14 +76,14 @@ class _StudentExamResultsScreenState extends State<StudentExamResultsScreen> {
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.25), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(color: const Color(0xFF4A90E2).withValues(alpha:0.25), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.assessment_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 16),
@@ -98,7 +98,7 @@ class _StudentExamResultsScreenState extends State<StudentExamResultsScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        Divider(color: Colors.white.withOpacity(0.3)),
+        Divider(color: Colors.white.withValues(alpha:0.3)),
         const SizedBox(height: 12),
         Wrap(spacing: 16, runSpacing: 10, children: [
           _headerKv('Start Date', _fmtDate(widget.exam.startDate)),
@@ -112,7 +112,7 @@ class _StudentExamResultsScreenState extends State<StudentExamResultsScreen> {
   Widget _pill(String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.15), borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white24)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Text('$label: ', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
         Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -137,7 +137,7 @@ class _StudentExamResultsScreenState extends State<StudentExamResultsScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 6)),
+            BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 6)),
           ],
           border: Border.all(color: const Color(0xFFF1F5F9)),
         ),
@@ -147,7 +147,7 @@ class _StudentExamResultsScreenState extends State<StudentExamResultsScreen> {
               Container(
                 width: 44,
                 height: 44,
-                decoration: BoxDecoration(color: const Color(0xFF4A90E2).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: const Color(0xFF4A90E2).withValues(alpha:0.1), borderRadius: BorderRadius.circular(12)),
                 child: const Icon(Icons.person_rounded, color: Color(0xFF4A90E2)),
               ),
               const SizedBox(width: 14),

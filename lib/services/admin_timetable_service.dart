@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dps/constants/api_constants.dart';
@@ -17,30 +18,30 @@ class AdminTimetableService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('🔍 === GET TEACHER TIMETABLES ===');
-      print('   🌐 URL: $url');
-      print('   🔑 UId: $uid');
-      print('   📥 Status: ${response.statusCode}');
-      print('   📄 Body: ${response.body}');
+      debugPrint('🔍 === GET TEACHER TIMETABLES ===');
+      debugPrint('   🌐 URL: $url');
+      debugPrint('   🔑 UId: $uid');
+      debugPrint('   📥 Status: ${response.statusCode}');
+      debugPrint('   📄 Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final List<dynamic> data = jsonData['data'];
           final list = data.map((json) => TeacherTimetableData.fromJson(json)).toList();
-          print('   ✅ Parsed teachers: ${list.length}');
+          debugPrint('   ✅ Parsed teachers: ${list.length}');
           for (int i = 0; i < list.length; i++) {
             final t = list[i];
-            print('     👤 [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
+            debugPrint('     👤 [$i] EmpId=${t.empId}, Name=${t.teacherName}, classes=${t.timetables.length}');
           }
           return list;
         } else {
-          print('   ❌ Unexpected JSON shape for teacher timetables');
+          debugPrint('   ❌ Unexpected JSON shape for teacher timetables');
         }
       }
       return [];
     } catch (e) {
-      print('Error fetching teacher timetables: $e');
+      debugPrint('Error fetching teacher timetables: $e');
       return [];
     }
   }
@@ -58,16 +59,16 @@ class AdminTimetableService {
     required int subTypeId,
   }) async {
     try {
-      print('=== ADDING TIMETABLE ===');
-      print('ClassId: $classId');
-      print('BatchId: $batchId');
-      print('DivisionId: $divisionId');
-      print('EmpId: $empId');
-      print('WeekDay: $weekDay');
-      print('SubId: $subId');
-      print('FromTime: $fromTime');
-      print('ToTime: $toTime');
-      print('SubTypeId: $subTypeId');
+      debugPrint('=== ADDING TIMETABLE ===');
+      debugPrint('ClassId: $classId');
+      debugPrint('BatchId: $batchId');
+      debugPrint('DivisionId: $divisionId');
+      debugPrint('EmpId: $empId');
+      debugPrint('WeekDay: $weekDay');
+      debugPrint('SubId: $subId');
+      debugPrint('FromTime: $fromTime');
+      debugPrint('ToTime: $toTime');
+      debugPrint('SubTypeId: $subTypeId');
 
       final url = Uri.parse('${ApiConstants.baseUrl}/api/Teacher/AddTimeTable');
       
@@ -83,7 +84,7 @@ class AdminTimetableService {
         "SubTypeId": subTypeId
       };
 
-      print('Request body: ${json.encode(body)}');
+      debugPrint('Request body: ${json.encode(body)}');
 
       final response = await http.post(
         url,
@@ -94,18 +95,18 @@ class AdminTimetableService {
         body: json.encode(body),
       );
 
-      print('Add Timetable API Response Status: ${response.statusCode}');
-      print('Add Timetable API Response Body: ${response.body}');
+      debugPrint('Add Timetable API Response Status: ${response.statusCode}');
+      debugPrint('Add Timetable API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         return jsonData;
       } else {
-        print('Error: HTTP ${response.statusCode}');
+        debugPrint('Error: HTTP ${response.statusCode}');
         return {'success': false, 'message': 'HTTP ${response.statusCode} error'};
       }
     } catch (e) {
-      print('Error adding timetable: $e');
+      debugPrint('Error adding timetable: $e');
       return {'success': false, 'message': 'Error: $e'};
     }
   }
@@ -113,58 +114,58 @@ class AdminTimetableService {
   // Get all classes
   static Future<List<ClassMasterItem>> getClasses() async {
     try {
-      print('🔍 === GETTING CLASSES ===');
+      debugPrint('🔍 === GETTING CLASSES ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('   🔑 Uid: $uid');
+      debugPrint('   🔑 Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.classMasters}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('   🌐 Classes API URL: $url');
+      debugPrint('   🌐 Classes API URL: $url');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('   📥 Classes API Response Status: ${response.statusCode}');
-      print('   📄 Classes API Response Body: ${response.body}');
+      debugPrint('   📥 Classes API Response Status: ${response.statusCode}');
+      debugPrint('   📄 Classes API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('   🔍 Response JSON: $jsonData');
+        debugPrint('   🔍 Response JSON: $jsonData');
         
         if (jsonData['success'] == true && jsonData['data'] is List) {
           final List<dynamic> data = jsonData['data'];
-          print('   📊 Data list length: ${data.length}');
+          debugPrint('   📊 Data list length: ${data.length}');
           
           final result = data.map((c) => ClassMasterItem.fromJson(c as Map<String, dynamic>)).toList();
-          print('   ✅ Successfully parsed ${result.length} classes');
+          debugPrint('   ✅ Successfully parsed ${result.length} classes');
           
           for (int i = 0; i < result.length; i++) {
             final cls = result[i];
-            print('     📚 Class $i: ID=${cls.classMasterId}, Name="${cls.className}", Year=${cls.courseYear}');
+            debugPrint('     📚 Class $i: ID=${cls.classMasterId}, Name="${cls.className}", Year=${cls.courseYear}');
           }
           
           return result;
         } else {
-          print('   ❌ API returned success=false or data is not a list');
-          print('   🔍 Success: ${jsonData['success']}');
-          print('   🔍 Data type: ${jsonData['data']?.runtimeType}');
+          debugPrint('   ❌ API returned success=false or data is not a list');
+          debugPrint('   🔍 Success: ${jsonData['success']}');
+          debugPrint('   🔍 Data type: ${jsonData['data']?.runtimeType}');
         }
       } else {
-        print('   ❌ HTTP Error: ${response.statusCode}');
+        debugPrint('   ❌ HTTP Error: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING CLASSES ===');
-      print('   Error: $e');
-      print('   Stack trace: ${StackTrace.current}');
+      debugPrint('❌ === ERROR GETTING CLASSES ===');
+      debugPrint('   Error: $e');
+      debugPrint('   Stack trace: ${StackTrace.current}');
       return [];
     }
   }
@@ -172,29 +173,29 @@ class AdminTimetableService {
   // Get batches by class master ID
   static Future<List<BatchItem>> getBatchesByClassMaster(int classMasterId) async {
     try {
-      print('=== GETTING BATCHES BY CLASS MASTER ===');
-      print('ClassMasterId: $classMasterId');
+      debugPrint('=== GETTING BATCHES BY CLASS MASTER ===');
+      debugPrint('ClassMasterId: $classMasterId');
       
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('Uid: $uid');
+      debugPrint('Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.adminBatches}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('Batches API URL: $url');
+      debugPrint('Batches API URL: $url');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Batches API Response Status: ${response.statusCode}');
-      print('Batches API Response Body: ${response.body}');
+      debugPrint('Batches API Response Status: ${response.statusCode}');
+      debugPrint('Batches API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -204,13 +205,13 @@ class AdminTimetableService {
           
           // Filter batches by class master ID
           final filteredBatches = allBatches.where((batch) => batch.classMasterId == classMasterId).toList();
-          print('Found ${filteredBatches.length} batches for class master $classMasterId');
+          debugPrint('Found ${filteredBatches.length} batches for class master $classMasterId');
           return filteredBatches;
         }
       }
       return [];
     } catch (e) {
-      print('Error getting batches: $e');
+      debugPrint('Error getting batches: $e');
       return [];
     }
   }
@@ -218,29 +219,29 @@ class AdminTimetableService {
   // Get divisions by class ID
   static Future<List<DivisionItem>> getDivisionsByClass(int classId) async {
     try {
-      print('=== GETTING DIVISIONS BY CLASS ===');
-      print('ClassId: $classId');
+      debugPrint('=== GETTING DIVISIONS BY CLASS ===');
+      debugPrint('ClassId: $classId');
       
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('Uid: $uid');
+      debugPrint('Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.adminDivisions}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('Divisions API URL: $url');
+      debugPrint('Divisions API URL: $url');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Divisions API Response Status: ${response.statusCode}');
-      print('Divisions API Response Body: ${response.body}');
+      debugPrint('Divisions API Response Status: ${response.statusCode}');
+      debugPrint('Divisions API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -250,13 +251,13 @@ class AdminTimetableService {
           
           // Filter divisions by class ID
           final filteredDivisions = allDivisions.where((div) => div.classId == classId).toList();
-          print('Found ${filteredDivisions.length} divisions for class $classId');
+          debugPrint('Found ${filteredDivisions.length} divisions for class $classId');
           return filteredDivisions;
         }
       }
       return [];
     } catch (e) {
-      print('Error getting divisions: $e');
+      debugPrint('Error getting divisions: $e');
       return [];
     }
   }
@@ -264,40 +265,40 @@ class AdminTimetableService {
   // Get all employees
   static Future<List<EmployeeItem>> getEmployees() async {
     try {
-      print('=== GETTING EMPLOYEES ===');
+      debugPrint('=== GETTING EMPLOYEES ===');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('ERROR: Uid not found in SharedPreferences');
+        debugPrint('ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('Uid: $uid');
+      debugPrint('Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.employeesList}');
       final request = http.MultipartRequest('POST', url);
       request.fields['UId'] = uid;
 
-      print('Employees API URL: $url');
+      debugPrint('Employees API URL: $url');
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Employees API Response Status: ${response.statusCode}');
-      print('Employees API Response Body: ${response.body}');
+      debugPrint('Employees API Response Status: ${response.statusCode}');
+      debugPrint('Employees API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] is List) {
           final List<dynamic> data = jsonData['data'];
           final result = data.map((e) => EmployeeItem.fromJson(e as Map<String, dynamic>)).toList();
-          print('Successfully parsed ${result.length} employees');
+          debugPrint('Successfully parsed ${result.length} employees');
           return result;
         }
       }
       return [];
     } catch (e) {
-      print('Error getting employees: $e');
+      debugPrint('Error getting employees: $e');
       return [];
     }
   }
@@ -305,23 +306,23 @@ class AdminTimetableService {
   // Get subjects by class master ID and employee ID
   static Future<List<SubjectItem>> getSubjectsByClassMasterAndEmployee(int classMasterId, int empId) async {
     try {
-      print('🔍 === GETTING SUBJECTS BY CLASS MASTER AND EMPLOYEE ===');
-      print('   📚 ClassMasterId: $classMasterId');
-      print('    EmployeeId: $empId');
+      debugPrint('🔍 === GETTING SUBJECTS BY CLASS MASTER AND EMPLOYEE ===');
+      debugPrint('   📚 ClassMasterId: $classMasterId');
+      debugPrint('    EmployeeId: $empId');
       
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('    Uid: $uid');
+      debugPrint('    Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/SubByEmpId');
       
-      print('   🌐 Subjects API URL: $url');
-      print('   📤 Request body: Uid=$uid, classMasterId=$classMasterId, empId=$empId');
+      debugPrint('   🌐 Subjects API URL: $url');
+      debugPrint('   📤 Request body: Uid=$uid, classMasterId=$classMasterId, empId=$empId');
 
       final response = await http.post(
         url,
@@ -333,39 +334,39 @@ class AdminTimetableService {
         },
       );
 
-      print('   📥 Subjects API Response Status: ${response.statusCode}');
-      print('   📄 Subjects API Response Body: ${response.body}');
+      debugPrint('   📥 Subjects API Response Status: ${response.statusCode}');
+      debugPrint('   📄 Subjects API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('   🔍 Response JSON: $jsonData');
+        debugPrint('   🔍 Response JSON: $jsonData');
         
         if (jsonData['success'] == true && jsonData['data'] is List) {
           final List<dynamic> data = jsonData['data'];
-          print('   📊 Data list length: ${data.length}');
+          debugPrint('   📊 Data list length: ${data.length}');
           
           final result = data.map((s) => SubjectItem.fromJson(s as Map<String, dynamic>)).toList();
-          print('   ✅ Successfully parsed ${result.length} subjects');
+          debugPrint('   ✅ Successfully parsed ${result.length} subjects');
           
           for (int i = 0; i < result.length; i++) {
             final subject = result[i];
-            print('     📖 Subject $i: ID=${subject.subjectId}, Name="${subject.subjectName}"');
+            debugPrint('     📖 Subject $i: ID=${subject.subjectId}, Name="${subject.subjectName}"');
           }
           
           return result;
         } else {
-          print('   ❌ API returned success=false or data is not a list');
-          print('   🔍 Success: ${jsonData['success']}');
-          print('   🔍 Data type: ${jsonData['data']?.runtimeType}');
+          debugPrint('   ❌ API returned success=false or data is not a list');
+          debugPrint('   🔍 Success: ${jsonData['success']}');
+          debugPrint('   🔍 Data type: ${jsonData['data']?.runtimeType}');
         }
       } else {
-        print('   ❌ HTTP Error: ${response.statusCode}');
+        debugPrint('   ❌ HTTP Error: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING SUBJECTS ===');
-      print('   Error: $e');
-      print('   Stack trace: ${StackTrace.current}');
+      debugPrint('❌ === ERROR GETTING SUBJECTS ===');
+      debugPrint('   Error: $e');
+      debugPrint('   Stack trace: ${StackTrace.current}');
       return [];
     }
   }
@@ -373,22 +374,22 @@ class AdminTimetableService {
   // Get subject types by subject ID
   static Future<List<SubjectTypeItem>> getSubjectTypesBySubject(int subjectId) async {
     try {
-      print('🔍 === GETTING SUBJECT TYPES BY SUBJECT ===');
-      print('   📖 SubjectId: $subjectId');
+      debugPrint('🔍 === GETTING SUBJECT TYPES BY SUBJECT ===');
+      debugPrint('   📖 SubjectId: $subjectId');
       
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
 
-      print('    Uid: $uid');
+      debugPrint('    Uid: $uid');
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/Subject');
       
-      print('   🌐 Subject Types API URL: $url');
-      print('   📤 Request body: Uid=$uid, subjectId=$subjectId');
+      debugPrint('   🌐 Subject Types API URL: $url');
+      debugPrint('   📤 Request body: Uid=$uid, subjectId=$subjectId');
 
       final response = await http.post(
         url,
@@ -399,39 +400,39 @@ class AdminTimetableService {
         },
       );
 
-      print('   📥 Subject Types API Response Status: ${response.statusCode}');
-      print('   📄 Subject Types API Response Body: ${response.body}');
+      debugPrint('   📥 Subject Types API Response Status: ${response.statusCode}');
+      debugPrint('   📄 Subject Types API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        print('   🔍 Response JSON: $jsonData');
+        debugPrint('   🔍 Response JSON: $jsonData');
         
         if (jsonData['success'] == true && jsonData['data'] is List) {
           final List<dynamic> data = jsonData['data'];
-          print('   📊 Data list length: ${data.length}');
+          debugPrint('   📊 Data list length: ${data.length}');
           
           final result = data.map((st) => SubjectTypeItem.fromJson(st as Map<String, dynamic>)).toList();
-          print('   ✅ Successfully parsed ${result.length} subject types');
+          debugPrint('   ✅ Successfully parsed ${result.length} subject types');
           
           for (int i = 0; i < result.length; i++) {
             final subjectType = result[i];
-            print('     🏷️ Subject Type $i: ID=${subjectType.subTypeId}, Name="${subjectType.subTypeName}"');
+            debugPrint('     🏷️ Subject Type $i: ID=${subjectType.subTypeId}, Name="${subjectType.subTypeName}"');
           }
           
           return result;
         } else {
-          print('   ❌ API returned success=false or data is not a list');
-          print('   🔍 Success: ${jsonData['success']}');
-          print('   🔍 Data type: ${jsonData['data']?.runtimeType}');
+          debugPrint('   ❌ API returned success=false or data is not a list');
+          debugPrint('   🔍 Success: ${jsonData['success']}');
+          debugPrint('   🔍 Data type: ${jsonData['data']?.runtimeType}');
         }
       } else {
-        print('   ❌ HTTP Error: ${response.statusCode}');
+        debugPrint('   ❌ HTTP Error: ${response.statusCode}');
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING SUBJECT TYPES ===');
-      print('   Error: $e');
-      print('   Stack trace: ${StackTrace.current}');
+      debugPrint('❌ === ERROR GETTING SUBJECT TYPES ===');
+      debugPrint('   Error: $e');
+      debugPrint('   Stack trace: ${StackTrace.current}');
       return [];
     }
   }
@@ -439,19 +440,19 @@ class AdminTimetableService {
   // Keep the old method for backward compatibility but mark it as deprecated
   @deprecated
   static Future<List<SubjectItem>> getSubjectsByClassMaster(int classMasterId) async {
-    print('⚠️ DEPRECATED: Use getSubjectsByClassMasterAndEmployee instead');
+    debugPrint('⚠️ DEPRECATED: Use getSubjectsByClassMasterAndEmployee instead');
     return getSubjectsByClassMasterAndEmployee(classMasterId, 0);
   }
 
   // Get classes by employee ID
   static Future<List<ClassMasterItem>> getClassesByEmployee(int empId) async {
     try {
-      print('🔍 === GETTING CLASSES BY EMPLOYEE ===');
-      print('   👤 EmpId: $empId');
+      debugPrint('🔍 === GETTING CLASSES BY EMPLOYEE ===');
+      debugPrint('   👤 EmpId: $empId');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/GetClassByEmpId');
@@ -463,8 +464,8 @@ class AdminTimetableService {
           'EmpId': empId.toString(),
         },
       );
-      print('   📥 ClassesByEmp API Response Status: ${response.statusCode}');
-      print('   📄 ClassesByEmp API Response Body: ${response.body}');
+      debugPrint('   📥 ClassesByEmp API Response Status: ${response.statusCode}');
+      debugPrint('   📄 ClassesByEmp API Response Body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] is List) {
@@ -474,8 +475,8 @@ class AdminTimetableService {
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING CLASSES BY EMPLOYEE ===');
-      print('   Error: $e');
+      debugPrint('❌ === ERROR GETTING CLASSES BY EMPLOYEE ===');
+      debugPrint('   Error: $e');
       return [];
     }
   }
@@ -483,12 +484,12 @@ class AdminTimetableService {
   // Get batches by employee ID and class master ID
   static Future<List<BatchItem>> getBatchesByEmployeeAndClass(int empId, int classMasterId) async {
     try {
-      print('🔍 === GETTING BATCHES BY EMPLOYEE AND CLASS ===');
-      print('   👤 EmpId: $empId, 🏫 ClassMasterId: $classMasterId');
+      debugPrint('🔍 === GETTING BATCHES BY EMPLOYEE AND CLASS ===');
+      debugPrint('   👤 EmpId: $empId, 🏫 ClassMasterId: $classMasterId');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/BatchByEmpId');
@@ -501,8 +502,8 @@ class AdminTimetableService {
           'classmid': classMasterId.toString(),
         },
       );
-      print('   📥 BatchByEmp API Response Status: ${response.statusCode}');
-      print('   📄 BatchByEmp API Response Body: ${response.body}');
+      debugPrint('   📥 BatchByEmp API Response Status: ${response.statusCode}');
+      debugPrint('   📄 BatchByEmp API Response Body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] is List) {
@@ -512,8 +513,8 @@ class AdminTimetableService {
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING BATCHES BY EMPLOYEE AND CLASS ===');
-      print('   Error: $e');
+      debugPrint('❌ === ERROR GETTING BATCHES BY EMPLOYEE AND CLASS ===');
+      debugPrint('   Error: $e');
       return [];
     }
   }
@@ -521,12 +522,12 @@ class AdminTimetableService {
   // Get divisions by class ID
   static Future<List<DivisionItem>> getDivisionsByClassId(int classId) async {
     try {
-      print('🔍 === GETTING DIVISIONS BY CLASS ID ===');
-      print('   🏫 ClassId: $classId');
+      debugPrint('🔍 === GETTING DIVISIONS BY CLASS ID ===');
+      debugPrint('   🏫 ClassId: $classId');
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('Uid') ?? '';
       if (uid.isEmpty) {
-        print('❌ ERROR: Uid not found in SharedPreferences');
+        debugPrint('❌ ERROR: Uid not found in SharedPreferences');
         return [];
       }
       final url = Uri.parse('${ApiConstants.baseUrl}/api/User/DivByEmpId');
@@ -538,8 +539,8 @@ class AdminTimetableService {
           'classId': classId.toString(),
         },
       );
-      print('   📥 DivByEmp API Response Status: ${response.statusCode}');
-      print('   📄 DivByEmp API Response Body: ${response.body}');
+      debugPrint('   📥 DivByEmp API Response Status: ${response.statusCode}');
+      debugPrint('   📄 DivByEmp API Response Body: ${response.body}');
       final decoded = json.decode(response.body);
       if (response.statusCode == 200) {
         if (decoded is Map<String, dynamic> &&
@@ -548,20 +549,20 @@ class AdminTimetableService {
           final List<dynamic> data = decoded['data'];
           final allDivisions = data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
           // Do not filter by classId, just return all divisions
-          print('Found ${allDivisions.length} divisions');
+          debugPrint('Found ${allDivisions.length} divisions');
           return allDivisions;
         } else if (decoded is List) {
           // API returned a raw list
           final List<dynamic> data = decoded;
           final allDivisions = data.map((d) => DivisionItem.fromJson(d as Map<String, dynamic>)).toList();
-          print('Found ${allDivisions.length} divisions (raw list)');
+          debugPrint('Found ${allDivisions.length} divisions (raw list)');
           return allDivisions;
         }
       }
       return [];
     } catch (e) {
-      print('❌ === ERROR GETTING DIVISIONS BY CLASS ID ===');
-      print('   Error: $e');
+      debugPrint('❌ === ERROR GETTING DIVISIONS BY CLASS ID ===');
+      debugPrint('   Error: $e');
       return [];
     }
   }

@@ -82,7 +82,7 @@ class AppTheme {
         surface: surfaceColor,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
-        onBackground: textPrimaryColor,
+        onSurfaceVariant: textPrimaryColor,
         onSurface: textPrimaryColor,
         onError: Colors.white,
       ),
