@@ -99,9 +99,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
     try {
       debugPrint('=== LOADING STUDENT LIST ===');
-      debugPrint('[Attendance][Students] Using subjectId=0 (subject dropdown hidden)');
-      final students = await TeacherAttendanceService.getAttendanceStudentList(
-        subjectId: 0,
+      debugPrint('[Attendance][Students] Using DivisionWiseStudent endpoint');
+      final students = await TeacherAttendanceService.getDivisionWiseStudents(
         classId: _selectedBatch!.classId,
         divisionId: _selectedDivision!.divisionId,
       );
@@ -1654,6 +1653,13 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 _showSuccessSnackBar(
                     'Attendance saved successfully! Present: $presentCount, Absent: $absentCount'
                 );
+                debugPrint('[Attendance][Submit] Navigating back after success');
+                // Give the snackbar a moment to show before navigating back
+                Future.delayed(const Duration(milliseconds: 600), () {
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                });
               } else {
                 _showErrorSnackBar('Failed to save attendance. Please try again.');
               }

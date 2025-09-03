@@ -213,6 +213,123 @@ class TeacherAttendanceService {
     }
   }
 
+  // NEW: Get students division-wise (alternate endpoint)
+  static Future<List<AttendanceStudent>> getDivisionWiseStudents({
+    required int classId,
+    required int divisionId,
+  }) async {
+    try {
+      debugPrint('=== [DivisionWiseStudent] START ===');
+      debugPrint('[DivisionWiseStudent][Config] baseUrl=$baseUrl');
+      debugPrint('[DivisionWiseStudent][Params] ClassId=$classId, DivisionId=$divisionId');
+
+      // Helper to perform a POST attempt with detailed logs
+      Future<http.Response> _attemptPost(Uri uri) async {
+        debugPrint('[DivisionWiseStudent][Request] POST -> $uri');
+        final headers = {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        };
+        final body = {
+          'ClassId': classId.toString(),
+          'DivisionId': divisionId.toString(),
+        };
+        debugPrint('[DivisionWiseStudent][Request][Headers] $headers');
+        debugPrint('[DivisionWiseStudent][Request][Body] $body');
+        final sw = Stopwatch()..start();
+        final res = await http.post(uri, headers: headers, body: body);
+        sw.stop();
+        debugPrint('[DivisionWiseStudent][Response] code=${res.statusCode} (${sw.elapsedMilliseconds}ms)');
+        debugPrint('[DivisionWiseStudent][Response][Body] ${res.body}');
+        return res;
+      }
+
+      // Try canonical route first
+      final attempts = <Uri>[
+        Uri.parse('$baseUrl/api/User/DivisionWiseStudent').replace(queryParameters: {
+          'ClassId': classId.toString(),
+          'DivisionId': divisionId.toString(),
+        }),
+        // Try trailing slash
+        Uri.parse('$baseUrl/api/User/DivisionWiseStudent/').replace(queryParameters: {
+          'ClassId': classId.toString(),
+          'DivisionId': divisionId.toString(),
+        }),
+        // Try lowercase controller
+        Uri.parse('$baseUrl/api/user/DivisionWiseStudent').replace(queryParameters: {
+          'ClassId': classId.toString(),
+          'DivisionId': divisionId.toString(),
+        }),
+        // Try without /api
+        Uri.parse('$baseUrl/User/DivisionWiseStudent').replace(queryParameters: {
+          'ClassId': classId.toString(),
+          'DivisionId': divisionId.toString(),
+        }),
+      ];
+
+      http.Response? response;
+      for (final uri in attempts) {
+        response = await _attemptPost(uri);
+        // Break if we got a 200 or a body with a plausible data list
+        if (response.statusCode == 200) break;
+        final bodyText = response.body;
+        if (bodyText.contains('No HTTP resource was found') ||
+            bodyText.contains('does not support http method')) {
+          debugPrint('[DivisionWiseStudent][RouteHint] Route mismatch for $uri, trying next...');
+          continue;
+        }
+        // If other 2xx/3xx, attempt to parse anyway
+        if (response.statusCode >= 200 && response.statusCode < 400) break;
+      }
+
+      if (response != null && response.statusCode >= 200 && response.statusCode < 400) {
+        final dynamic root = json.decode(response.body);
+        // API may return { success: false, data: [...] } or just a bare list.
+        final dynamic dataNode =
+            (root is Map<String, dynamic>) ? root['data'] : root;
+        if (dataNode is List) {
+          final List<AttendanceStudent> students = dataNode.map((dynamic item) {
+            final Map<String, dynamic> m = (item as Map).cast<String, dynamic>();
+            // Map minimal fields; fill sensible defaults for missing ones
+            final int studentId = (m['StudentId'] ?? 0) as int;
+            final String name = (m['Name'] ?? '') as String;
+            final String prn = (m['CollegePRN'] ?? '')?.toString() ?? '';
+            // Try to infer roll number from name like "Foo Bar (107)"
+            int inferredRoll = 0;
+            final RegExp rollRegex = RegExp(r'\((\d+)\)');
+            final match = rollRegex.firstMatch(name);
+            if (match != null) {
+              inferredRoll = int.tryParse(match.group(1) ?? '0') ?? 0;
+            }
+            return AttendanceStudent(
+              studentId: studentId,
+              name: name,
+              classId: classId,
+              studentRollNo: inferredRoll,
+              admissionId: 0,
+              gender: '',
+              studentContactNo: '',
+              fatherContactNo: '',
+              attendanceStatus: false,
+              collegePRN: prn,
+              detailId: null,
+            );
+          }).toList();
+          debugPrint('Successfully loaded ${students.length} division-wise students');
+          debugPrint('=== [DivisionWiseStudent] END (success) ===');
+          return students;
+        }
+      }
+      debugPrint('[DivisionWiseStudent][Error] No parseable data returned');
+      debugPrint('=== [DivisionWiseStudent] END (no-data) ===');
+      return [];
+    } catch (e) {
+      debugPrint('Error getting division-wise students: $e');
+      debugPrint('=== [DivisionWiseStudent] END (exception) ===');
+      return [];
+    }
+  }
+
   // NEW: Save attendance
   static Future<bool> saveAttendance({
     required String attendanceDate,
