@@ -1008,7 +1008,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                       },
                       validator: (value) => value == null ? 'Please select a class' : null,
                     ),
-                    const SizedBox(height: 16),
+
                     // Batch selection is now automatic and hidden from UI
                     // (Auto-selected in _loadBatches and used internally.)
                     const SizedBox(height: 16),

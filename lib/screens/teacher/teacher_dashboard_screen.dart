@@ -69,18 +69,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 // Header (no animation)
                 _buildEnhancedHeader(context),
 
-                const SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Teaching Hub',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2D3748),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
+
                 // Feature Grid (no animation)
                 _buildEnhancedFeatureGrid(context),
                 const SizedBox(height: 30),
@@ -411,16 +401,20 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       ),
     ];
 
+    final Size screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double aspectRatio = screenWidth < 360 ? 0.65 : 0.75;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 0.85,
+          childAspectRatio: aspectRatio,
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
@@ -488,9 +482,95 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 ),
               ),
 
+              const SizedBox(height: 6),
+              // Subtitle
+              Text(
+                feature.subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF718096),
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              const SizedBox(height: 8),
+              // Description (adaptive lines to prevent overflow)
+              LayoutBuilder(
+                builder: (ctx, constraints) {
+                  final bool compact = constraints.maxHeight < 150;
+                  return Text(
+                    feature.description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: const Color(0xFF94A3B8),
+                    ),
+                    maxLines: compact ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  );
+                },
+              ),
+
             ],
           ),
         ),
+      ),
+    );
+  }
+
+
+
+  Widget _buildInsightCard(BuildContext context, {required String title, required String value, required Color color, required IconData icon}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha:0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        border: Border.all(color: color.withValues(alpha:0.15)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha:0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF64748B),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
