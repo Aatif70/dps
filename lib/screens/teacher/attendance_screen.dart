@@ -379,23 +379,38 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   }
 
   Future<void> _loadBatches(int classMasterId) async {
+    debugPrint('[Attendance][Batch] Loading batches for classMasterId=$classMasterId');
     setState(() => _isLoadingBatches = true);
     try {
       final batches = await TeacherAttendanceService.getBatchesByEmpId(classMasterId);
       setState(() {
         _batches = batches;
-        _selectedBatch = null;
+        // Auto-select the latest (last) batch if available
+        if (batches.isNotEmpty) {
+          _selectedBatch = batches.last;
+          debugPrint('[Attendance][Batch] Auto-selected latest batch: id=${_selectedBatch!.classId}, name=${_selectedBatch!.batch}');
+        } else {
+          _selectedBatch = null;
+          debugPrint('[Attendance][Batch] No batches returned to auto-select');
+        }
         _selectedDivision = null;
         _divisions.clear();
       });
+      // If auto-selected, load divisions for that batch
+      if (_selectedBatch != null) {
+        await _loadDivisions(_selectedBatch!.classId);
+      }
+      debugPrint('[Attendance][Batch] Loaded batches count: ${batches.length}');
     } catch (e) {
       _showErrorSnackBar('Failed to load batches');
+      debugPrint('[Attendance][Batch][Error] $e');
     } finally {
       setState(() => _isLoadingBatches = false);
     }
   }
 
   Future<void> _loadDivisions(int classId) async {
+    debugPrint('[Attendance][Division] Loading divisions for classId=$classId');
     setState(() => _isLoadingDivisions = true);
     try {
       final divisions = await TeacherAttendanceService.getDivisionsByClassId(classId);
@@ -403,8 +418,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         _divisions = divisions;
         _selectedDivision = null;
       });
+      debugPrint('[Attendance][Division] Loaded divisions count: ${divisions.length}');
     } catch (e) {
       _showErrorSnackBar('Failed to load divisions');
+      debugPrint('[Attendance][Division][Error] $e');
     } finally {
       setState(() => _isLoadingDivisions = false);
     }
@@ -1210,6 +1227,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 onChanged: _isLoadingClasses ? null : (ClassData? value) {
                   setState(() => _selectedClass = value);
                   if (value != null) {
+                    debugPrint('[Attendance][Class] Selected class: id=${value.classMasterId}, name=${value.className}');
                     _loadBatches(value.classMasterId);
                     _loadSubjects(value.classMasterId);
                   }
@@ -1217,23 +1235,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildNewParameterField<BatchData>(
-                label: 'Select Batch',
-                selectedItem: _selectedBatch,
-                hint: 'Batch',
-                items: _batches.map((e) => DropdownMenuItem(value: e, child: Text(e.batch))).toList(),
-                isLoading: _isLoadingBatches,
-                isEnabled: _selectedClass != null,
-                icon: Icons.groups_outlined,
-                onChanged: (_selectedClass == null || _isLoadingBatches) ? null : (BatchData? value) {
-                  setState(() => _selectedBatch = value);
-                  if (value != null) {
-                    _loadDivisions(value.classId);
-                  }
-                },
-              ),
-            ),
+            // Batch selection is now automatic and hidden from the UI
           ],
         ),
         const SizedBox(height: 20),
