@@ -91,6 +91,15 @@ class _LeaveScreenState extends State<LeaveScreen>
       final leaveRequests = studentLeaves.map((leave) => leave.toLegacyLeaveRequest()).toList();
       debugPrint('Leave Screen - Converted to ${leaveRequests.length} legacy leave requests');
 
+      // Sort records: latest first
+      leaveRequests.sort((a, b) {
+        final DateTime aDate = a.appliedOn ?? a.toDate ?? a.fromDate;
+        final DateTime bDate = b.appliedOn ?? b.toDate ?? b.fromDate;
+        return bDate.compareTo(aDate);
+      });
+      studentLeaves.sort((a, b) => b.toDate.compareTo(a.toDate));
+      debugPrint('Leave Screen - Sorted leave requests (latest first)');
+
       setState(() {
         _studentLeaves = studentLeaves;
         _leaveRequests = leaveRequests;

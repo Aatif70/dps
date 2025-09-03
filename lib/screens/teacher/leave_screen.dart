@@ -42,6 +42,12 @@ class _TeacherLeaveScreenState extends State<TeacherLeaveScreen> with SingleTick
         fromDate: _fromDate,
         toDate: _toDate,
       );
+      // Sort latest first using toDate, fallback to fromDate
+      leaveList.sort((a, b) {
+        final DateTime aDate = a.toDate;
+        final DateTime bDate = b.toDate;
+        return bDate.compareTo(aDate);
+      });
       setState(() {
         _leaveRequests = leaveList;
         _isLoading = false;
