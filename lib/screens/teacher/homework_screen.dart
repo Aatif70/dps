@@ -784,6 +784,7 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
   }
 
   Future<void> _loadClasses() async {
+    debugPrint('[Homework][Classes] Loading classes...');
     setState(() => _isLoading = true);
     try {
       final classes = await TeacherHomeworkService.getClasses();
@@ -791,30 +792,47 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         _classes = classes;
         _isLoading = false;
       });
+      debugPrint('[Homework][Classes] Loaded classes count: ${classes.length}');
     } catch (e) {
       setState(() => _isLoading = false);
+      debugPrint('[Homework][Classes][Error] $e');
     }
   }
 
   Future<void> _loadBatches() async {
     if (_selectedClass == null) return;
+    debugPrint('[Homework][Batch] Loading batches for classId=${_selectedClass!.classMasterId}');
     setState(() => _isLoading = true);
     try {
       final batches = await TeacherHomeworkService.getBatchList(_selectedClass!.classMasterId);
       setState(() {
         _batches = batches;
-        _selectedBatch = null;
+        // Auto-select the latest (last) batch if available
+        if (batches.isNotEmpty) {
+          _selectedBatch = batches.last;
+          debugPrint('[Homework][Batch] Auto-selected latest batch: id=${_selectedBatch!.classId}, name=${_selectedBatch!.className}');
+        } else {
+          _selectedBatch = null;
+          debugPrint('[Homework][Batch] No batches returned to auto-select');
+        }
         _divisions.clear();
         _selectedDivision = null;
         _isLoading = false;
       });
+      // If we auto-selected a batch, load its divisions automatically
+      if (_selectedBatch != null) {
+        await _loadDivisions();
+      }
+      debugPrint('[Homework][Batch] Loaded batches count: ${batches.length}');
     } catch (e) {
       setState(() => _isLoading = false);
+      debugPrint('[Homework][Batch][Error] $e');
     }
   }
 
   Future<void> _loadDivisions() async {
     if (_selectedBatch == null) return;
+    debugPrint('[Homework][Division] Loading divisions for batch.classId=${_selectedBatch!.classId}');
     setState(() => _isLoading = true);
     try {
       final divisions = await TeacherHomeworkService.getDivisions(_selectedBatch!.classId);
@@ -823,13 +841,16 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         _selectedDivision = null;
         _isLoading = false;
       });
+      debugPrint('[Homework][Division] Loaded divisions count: ${divisions.length}');
     } catch (e) {
       setState(() => _isLoading = false);
+      debugPrint('[Homework][Division][Error] $e');
     }
   }
 
   Future<void> _loadSubjects() async {
     if (_selectedClass == null) return;
+    debugPrint('[Homework][Subject] Loading subjects for classMasterId=${_selectedClass!.classMasterId}');
     setState(() => _isLoading = true);
     try {
       final subjects = await TeacherHomeworkService.getSubjects(_selectedClass!.classMasterId);
@@ -838,8 +859,10 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         _selectedSubject = null;
         _isLoading = false;
       });
+      debugPrint('[Homework][Subject] Loaded subjects count: ${subjects.length}');
     } catch (e) {
       setState(() => _isLoading = false);
+      debugPrint('[Homework][Subject][Error] $e');
     }
   }
 
@@ -853,9 +876,11 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
         setState(() {
           _selectedFile = File(result.files.single.path!);
         });
+        debugPrint('[Homework][File] Selected file: ${_selectedFile!.path}');
       }
     } catch (e) {
       CustomSnackbar.showError(context, message: 'Error picking file: $e');
+      debugPrint('[Homework][File][Error] $e');
     }
   }
 
@@ -877,10 +902,12 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedClass == null || _selectedBatch == null || _selectedDivision == null || _selectedSubject == null) {
       CustomSnackbar.showError(context, message: 'Please fill all required fields');
+      debugPrint('[Homework][Submit][Error] Missing field(s): class=${_selectedClass != null}, batch=${_selectedBatch != null}, division=${_selectedDivision != null}, subject=${_selectedSubject != null}');
       return;
     }
     setState(() => _isSubmitting = true);
     try {
+      debugPrint('[Homework][Submit] Creating homework with payload -> subjectId=${_selectedSubject!.subjectId}, date=${_selectedDate.toIso8601String()}, classId=${_selectedBatch!.classId}, divisionId=${_selectedDivision!.divisionId}, hasFile=${_selectedFile != null}');
       final success = await TeacherHomeworkService.addHomework(
         subjectId: _selectedSubject!.subjectId,
         date: _selectedDate,
@@ -892,11 +919,14 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
       if (success) {
         Navigator.pop(context);
         CustomSnackbar.showSuccess(context, message: 'Homework created successfully!');
+        debugPrint('[Homework][Submit] Success');
       } else {
         CustomSnackbar.showError(context, message: 'Failed to create homework');
+        debugPrint('[Homework][Submit][Error] API returned unsuccessful response');
       }
     } catch (e) {
       CustomSnackbar.showError(context, message: 'Error: $e');
+      debugPrint('[Homework][Submit][Error] $e');
     }
     setState(() => _isSubmitting = false);
   }
@@ -970,36 +1000,17 @@ class _CreateHomeworkFormState extends State<CreateHomeworkForm> {
                           _selectedSubject = null;
                           _subjects.clear();
                         });
+                        if (classItem != null) {
+                          debugPrint('[Homework][Class] Selected class: id=${classItem.classMasterId}, name=${classItem.className}');
+                        }
                         _loadBatches();
                         _loadSubjects();
                       },
                       validator: (value) => value == null ? 'Please select a class' : null,
                     ),
                     const SizedBox(height: 16),
-                    // Batch Dropdown
-                    DropdownButtonFormField<Batch>(
-                      decoration: const InputDecoration(
-                        labelText: 'Batch',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.layers_outlined),
-                      ),
-                      value: _selectedBatch,
-                      items: _batches.map((batch) {
-                        return DropdownMenuItem<Batch>(
-                          value: batch,
-                          child: Text(batch.className),
-                        );
-                      }).toList(),
-                      onChanged: (batch) {
-                        setState(() {
-                          _selectedBatch = batch;
-                          _selectedDivision = null;
-                          _divisions.clear();
-                        });
-                        _loadDivisions();
-                      },
-                      validator: (value) => value == null ? 'Please select a batch' : null,
-                    ),
+                    // Batch selection is now automatic and hidden from UI
+                    // (Auto-selected in _loadBatches and used internally.)
                     const SizedBox(height: 16),
                     // Division Dropdown
                     DropdownButtonFormField<Division>(
