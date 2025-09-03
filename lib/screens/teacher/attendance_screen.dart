@@ -99,8 +99,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
     try {
       debugPrint('=== LOADING STUDENT LIST ===');
+      debugPrint('[Attendance][Students] Using subjectId=0 (subject dropdown hidden)');
       final students = await TeacherAttendanceService.getAttendanceStudentList(
-        subjectId: _selectedSubject!.subjectId,
+        subjectId: 0,
         classId: _selectedBatch!.classId,
         divisionId: _selectedDivision!.divisionId,
       );
@@ -150,7 +151,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     debugPrint('=== NAVIGATING TO ATTENDANCE DETAILS ===');
     debugPrint('Attendance ID: ${record.attId}');
     debugPrint('Date: ${record.attDate}');
-    debugPrint('Subject: ${record.subjectName}');
+    // debugPrint('Subject: ${record.subjectName}'); // Subject hidden in selection context
     debugPrint('Class: ${record.className}');
 
     Navigator.of(context).push(
@@ -466,8 +467,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   bool _canShowStudentList() {
     return _selectedClass != null &&
         _selectedBatch != null &&
-        _selectedDivision != null &&
-        _selectedSubject != null;
+        _selectedDivision != null;
   }
 
   int _getCompletedSteps() {
@@ -475,7 +475,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
     if (_selectedClass != null) steps++;
     if (_selectedBatch != null) steps++;
     if (_selectedDivision != null) steps++;
-    if (_selectedSubject != null) steps++;
+    // if (_selectedSubject != null) steps++; // Subject hidden
     return steps;
   }
 
@@ -899,7 +899,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              '${_selectedClass?.className} - ${_selectedDivision?.name} | ${_selectedSubject?.subjectName}',
+              '${_selectedClass?.className} - ${_selectedDivision?.name}',
               style: const TextStyle(
                 color: Color(0xFF2C3E50),
                 fontSize: 14,
@@ -935,7 +935,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
       margin: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildNewCardHeader(),
+          // _buildNewCardHeader(),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -1028,100 +1028,100 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
   }
 
   // Keep all existing header and date selector methods...
-  Widget _buildNewCardHeader() {
-    final completedSteps = _getCompletedSteps();
-    final progress = completedSteps / 4.0;
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF4A90E2),
-            const Color(0xFF357ABD).withValues(alpha:0.9),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4A90E2).withValues(alpha:0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.tune,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Text(
-                  'Attendance Setup',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '$completedSteps/4',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Colors.white.withValues(alpha:0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-              minHeight: 6,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Complete all fields to proceed',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha:0.9),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildNewCardHeader() {
+  //   final completedSteps = _getCompletedSteps();
+  //   final progress = completedSteps / 4.0;
+  //
+  //   return Container(
+  //     padding: const EdgeInsets.all(24),
+  //     decoration: BoxDecoration(
+  //       gradient: LinearGradient(
+  //         colors: [
+  //           const Color(0xFF4A90E2),
+  //           const Color(0xFF357ABD).withValues(alpha:0.9),
+  //         ],
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //       ),
+  //       borderRadius: const BorderRadius.only(
+  //         topLeft: Radius.circular(24),
+  //         topRight: Radius.circular(24),
+  //       ),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: const Color(0xFF4A90E2).withValues(alpha:0.3),
+  //           blurRadius: 16,
+  //           offset: const Offset(0, 8),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           children: [
+  //             Container(
+  //               padding: const EdgeInsets.all(12),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withValues(alpha:0.2),
+  //                 borderRadius: BorderRadius.circular(16),
+  //               ),
+  //               child: const Icon(
+  //                 Icons.tune,
+  //                 color: Colors.white,
+  //                 size: 24,
+  //               ),
+  //             ),
+  //             const SizedBox(width: 16),
+  //             const Expanded(
+  //               child: Text(
+  //                 'Attendance Setup',
+  //                 style: TextStyle(
+  //                   color: Colors.white,
+  //                   fontSize: 22,
+  //                   fontWeight: FontWeight.bold,
+  //                   letterSpacing: 0.5,
+  //                 ),
+  //               ),
+  //             ),
+  //             Container(
+  //               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withValues(alpha:0.2),
+  //                 borderRadius: BorderRadius.circular(20),
+  //               ),
+  //               child: Text(
+  //                 '$completedSteps/4',
+  //                 style: const TextStyle(
+  //                   color: Colors.white,
+  //                   fontWeight: FontWeight.bold,
+  //                   fontSize: 14,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 20),
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(8),
+  //           child: LinearProgressIndicator(
+  //             value: progress,
+  //             backgroundColor: Colors.white.withValues(alpha:0.3),
+  //             valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+  //             minHeight: 6,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 8),
+  //         Text(
+  //           'Complete all fields to proceed',
+  //           style: TextStyle(
+  //             color: Colors.white.withValues(alpha:0.9),
+  //             fontSize: 14,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildNewDateSelector() {
     return Column(
@@ -1229,18 +1229,12 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   if (value != null) {
                     debugPrint('[Attendance][Class] Selected class: id=${value.classMasterId}, name=${value.className}');
                     _loadBatches(value.classMasterId);
-                    _loadSubjects(value.classMasterId);
+                    // _loadSubjects(value.classMasterId); // Subject dropdown hidden; fetching subjects disabled
                   }
                 },
               ),
             ),
             const SizedBox(width: 16),
-            // Batch selection is now automatic and hidden from the UI
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
             Expanded(
               child: _buildNewParameterField<DivisionData>(
                 label: 'Select Division',
@@ -1253,23 +1247,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                 onChanged: (_selectedBatch == null || _isLoadingDivisions) ? null : (DivisionData? value) {
                   setState(() {
                     _selectedDivision = value;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildNewParameterField<SubjectData>(
-                label: 'Select Subject',
-                selectedItem: _selectedSubject,
-                hint: 'Subject',
-                items: _subjects.map((e) => DropdownMenuItem(value: e, child: Text(e.subjectName))).toList(),
-                isLoading: _isLoadingSubjects,
-                isEnabled: _selectedClass != null,
-                icon: Icons.book_outlined,
-                onChanged: (_selectedClass == null || _isLoadingSubjects || _subjects.isEmpty) ? null : (SubjectData? value) {
-                  setState(() {
-                    _selectedSubject = value;
                   });
                 },
               ),
@@ -1658,9 +1635,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               // Format date for API (MM/dd/yyyy format)
               final formattedDate = DateFormat('MM/dd/yyyy').format(_selectedDate);
 
+              debugPrint('[Attendance][Submit] Using subjectId=0 (subject dropdown hidden)');
               final success = await TeacherAttendanceService.saveAttendance(
                 attendanceDate: formattedDate,
-                subjectId: _selectedSubject!.subjectId,
+                subjectId: 0,
                 classMasterId: _selectedClass!.classMasterId,
                 classId: _selectedBatch!.classId,
                 divisionId: _selectedDivision!.divisionId,
