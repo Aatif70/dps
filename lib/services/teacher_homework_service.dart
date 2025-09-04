@@ -20,8 +20,8 @@ class TeacherHomeworkService {
       final uid = prefs.getString('Uid') ?? '';
       final empId = prefs.getInt('Id') ?? 0;
 
-      final fd = DateFormat('dd-MM-yyyy').format(fromDate ?? DateTime.now().subtract(const Duration(days: 30)));
-      final td = DateFormat('dd-MM-yyyy').format(toDate ?? DateTime.now());
+      final fd = DateFormat('yyyy-MM-dd').format(fromDate ?? DateTime.now().subtract(const Duration(days: 30)));
+      final td = DateFormat('yyyy-MM-dd').format(toDate ?? DateTime.now());
 
       debugPrint('UID: $uid, EmpId: $empId, FromDate: $fd, ToDate: $td');
 
