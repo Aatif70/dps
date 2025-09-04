@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../services/teacher_study_material_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class TeacherStudyMaterialScreen extends StatefulWidget {
   const TeacherStudyMaterialScreen({super.key});

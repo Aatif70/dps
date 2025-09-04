@@ -1,4 +1,4 @@
-import 'package:dps/services/student_exam_service.dart';
+import 'package:AES/services/student_exam_service.dart';
 import 'package:flutter/material.dart';
 
 class StudentExamResultsScreen extends StatefulWidget {

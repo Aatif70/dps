@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/constants/app_strings.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

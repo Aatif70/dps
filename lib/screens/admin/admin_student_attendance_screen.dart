@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:dps/services/admin_student_attendance_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/services/admin_student_attendance_service.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class AdminStudentAttendanceScreen extends StatefulWidget {
   const AdminStudentAttendanceScreen({super.key});

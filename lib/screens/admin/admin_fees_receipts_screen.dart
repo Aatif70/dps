@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_dashboard_service.dart';
+import 'package:AES/services/admin_dashboard_service.dart';
 
 class AdminFeesReceiptsScreen extends StatefulWidget {
   const AdminFeesReceiptsScreen({super.key});

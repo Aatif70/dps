@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/services/admin_classes_service.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/services/admin_classes_service.dart';
 
 class AdminClassMastersScreen extends StatefulWidget {
   const AdminClassMastersScreen({super.key});

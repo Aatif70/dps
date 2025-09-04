@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_fees_summary_service.dart';
+import 'package:AES/services/admin_fees_summary_service.dart';
 
 class AdminFeesClassSummaryScreen extends StatefulWidget {
   const AdminFeesClassSummaryScreen({super.key});

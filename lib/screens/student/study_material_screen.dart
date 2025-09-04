@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_strings.dart';
-import 'package:dps/services/study_material_service.dart' as study_service;
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/constants/app_strings.dart';
+import 'package:AES/services/study_material_service.dart' as study_service;
+import 'package:AES/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';

@@ -1,7 +1,7 @@
-import 'package:dps/services/admin_admissions_service.dart';
-import 'package:dps/services/admin_classes_service.dart';
+import 'package:AES/services/admin_admissions_service.dart';
+import 'package:AES/services/admin_classes_service.dart';
 import 'package:flutter/material.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class AdminAdmissionAllotmentScreen extends StatefulWidget {
   const AdminAdmissionAllotmentScreen({super.key});

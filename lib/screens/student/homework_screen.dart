@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_strings.dart';
-import 'package:dps/services/homework_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/constants/app_strings.dart';
+import 'package:AES/services/homework_service.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dps/constants/api_constants.dart';
+import 'package:AES/constants/api_constants.dart';
 import 'package:photo_view/photo_view.dart';
 
 

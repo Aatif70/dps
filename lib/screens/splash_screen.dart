@@ -397,7 +397,7 @@ class _SplashScreenState extends State<SplashScreen>
         ],
       ).createShader(bounds),
       child: const Text(
-        'DPS',
+        'AES',
         style: TextStyle(
           fontSize: 36,
           fontWeight: FontWeight.w800,

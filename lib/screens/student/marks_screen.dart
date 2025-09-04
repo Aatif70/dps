@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/services/student_marks_service.dart';
+import 'package:AES/services/student_marks_service.dart';
 
 class MarksScreen extends StatefulWidget {
   const MarksScreen({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:dps/services/calendar_service.dart';
-import 'package:dps/services/admin_timetable_service.dart';
+import 'package:AES/services/calendar_service.dart';
+import 'package:AES/services/admin_timetable_service.dart';
 
 class AdminCalendarWidget extends StatefulWidget {
   const AdminCalendarWidget({super.key});

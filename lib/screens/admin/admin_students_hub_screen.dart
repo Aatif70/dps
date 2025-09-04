@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/services/admin_student_metrics_service.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/services/admin_student_metrics_service.dart';
 
 class AdminStudentsHubScreen extends StatefulWidget {
   const AdminStudentsHubScreen({super.key});

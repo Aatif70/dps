@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_classes_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/services/admin_classes_service.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class AdminClassEditScreen extends StatefulWidget {
   final int classMasterId;

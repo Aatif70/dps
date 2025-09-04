@@ -7,7 +7,7 @@ import 'package:video_player/video_player.dart';
 import '../services/gallery_service.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({Key? key}) : super(key: key);

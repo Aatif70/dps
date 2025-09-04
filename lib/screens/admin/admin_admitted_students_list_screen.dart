@@ -1,5 +1,5 @@
-import 'package:dps/services/admin_admitted_students_service.dart';
-import 'package:dps/services/admin_classes_service.dart';
+import 'package:AES/services/admin_admitted_students_service.dart';
+import 'package:AES/services/admin_classes_service.dart';
 import 'package:flutter/material.dart';
 
 class AdminAdmittedStudentsListScreen extends StatefulWidget {

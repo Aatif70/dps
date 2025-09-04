@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:dps/constants/api_constants.dart';
-import 'package:dps/models/employee_attendance_models.dart';
+import 'package:AES/constants/api_constants.dart';
+import 'package:AES/models/employee_attendance_models.dart';
 
 class EmployeeAttendanceService {
   // Get employee attendance for date range

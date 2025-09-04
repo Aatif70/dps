@@ -1,5 +1,5 @@
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/services/student_exam_service.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/services/student_exam_service.dart';
 import 'package:flutter/material.dart';
 
 class StudentResultsHubScreen extends StatefulWidget {

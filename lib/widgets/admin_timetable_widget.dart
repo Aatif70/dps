@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:dps/services/admin_timetable_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/services/admin_timetable_service.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class AdminTimetableWidget extends StatefulWidget {
   const AdminTimetableWidget({super.key});

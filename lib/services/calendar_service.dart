@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dps/constants/api_constants.dart';
+import 'package:AES/constants/api_constants.dart';
 
 class CalendarService {
   static Future<List<EventData>> getEvents() async {

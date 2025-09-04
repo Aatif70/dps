@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_student_service.dart';
-import 'package:dps/constants/api_constants.dart';
+import 'package:AES/services/admin_student_service.dart';
+import 'package:AES/constants/api_constants.dart';
 
 class AdminStudentDocumentsScreen extends StatefulWidget {
   const AdminStudentDocumentsScreen({super.key});

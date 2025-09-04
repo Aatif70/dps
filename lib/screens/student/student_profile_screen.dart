@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/services/student_profile_service.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/services/student_profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({Key? key}) : super(key: key);

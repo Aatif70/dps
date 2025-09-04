@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_employee_details_service.dart';
+import 'package:AES/services/admin_employee_details_service.dart';
 
 class AdminEmployeeDetailsScreen extends StatefulWidget {
   const AdminEmployeeDetailsScreen({super.key});

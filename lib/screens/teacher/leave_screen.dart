@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dps/constants/app_strings.dart';
+import 'package:AES/constants/app_strings.dart';
 import 'package:intl/intl.dart';
 import '../../services/teacher_leave_service.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class TeacherLeaveScreen extends StatefulWidget {
   const TeacherLeaveScreen({super.key});

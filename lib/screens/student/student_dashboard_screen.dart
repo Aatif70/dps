@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:dps/constants/app_routes.dart';
-import 'package:dps/constants/app_strings.dart';
+import 'package:AES/constants/app_routes.dart';
+import 'package:AES/constants/app_strings.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dps/widgets/event_calendar_widget.dart';
-import 'package:dps/widgets/gallery_preview_widget.dart';
-import 'package:dps/services/student_profile_service.dart';
+import 'package:AES/widgets/event_calendar_widget.dart';
+import 'package:AES/widgets/gallery_preview_widget.dart';
+import 'package:AES/services/student_profile_service.dart';
 
 
 class StudentDashboardScreen extends StatefulWidget {

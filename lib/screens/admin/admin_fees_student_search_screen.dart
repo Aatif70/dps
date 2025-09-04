@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_student_service.dart';
-import 'package:dps/constants/app_routes.dart';
+import 'package:AES/services/admin_student_service.dart';
+import 'package:AES/constants/app_routes.dart';
 
 class AdminFeesStudentSearchScreen extends StatefulWidget {
   const AdminFeesStudentSearchScreen({super.key});

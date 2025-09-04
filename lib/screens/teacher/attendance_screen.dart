@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:dps/constants/app_strings.dart';
-import 'package:dps/services/teacher_attendance_service.dart';
+import 'package:AES/constants/app_strings.dart';
+import 'package:AES/services/teacher_attendance_service.dart';
 import 'package:intl/intl.dart';
-import 'package:dps/widgets/custom_snackbar.dart';
+import 'package:AES/widgets/custom_snackbar.dart';
 
 class TeacherAttendanceScreen extends StatefulWidget {
   const TeacherAttendanceScreen({super.key});

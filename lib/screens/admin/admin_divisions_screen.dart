@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dps/services/admin_classes_service.dart';
+import 'package:AES/services/admin_classes_service.dart';
 
 class AdminDivisionsScreen extends StatefulWidget {
   const AdminDivisionsScreen({super.key});
